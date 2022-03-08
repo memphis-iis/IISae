@@ -1,4 +1,4 @@
-# Oji
+# ISSAE
 
 ## Use the vagrant script to install for headless development
 ```vagrant up```

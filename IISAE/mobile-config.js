@@ -1,8 +1,8 @@
 // This section sets up some basic app metadata, the entire section is optional.
 App.info({
-    id: 'com.uofmiis.ojicordova',
-    name: 'Oji',
-    description: 'Mental Health Assessment App',
+    id: 'com.uofmiis.issae',
+    name: 'ISSAE',
+    description: 'IIS Assessment Engine',
     author: 'UofM Institute for Intelligent Systems'
   });
   
@@ -17,7 +17,5 @@ App.info({
   })
   
   App.appendToConfig(`
-  <platform name="android">
-      <resource-file target="google-services.json" src="./resources/android/google-services.json"/>
-  </platform>
+
   `)

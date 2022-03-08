@@ -1,23 +1,17 @@
 
 /* Main Elements */
 body{
-    background-attachment: fixed;
-    background-image: url("/main-background.jpg");
-    color:white;
+    color:black;
 }
 #container-yield{
-    background-color:  rgba(0, 0, 0, 0.5);
-    margin:10px;
-    border-radius: 5px;
     margin-top:50px;
 }
 .navbar{
+    background-color: white;;
     height: 60px;
     font-size: 28px;
-    background-image: url("/main-background.jpg");
-}
-a {
-    color:white;
+    line-height: 28px;
+    border-bottom: 1px black !important;
 }
 .alert{
     margin-bottom: 50px;
@@ -26,64 +20,43 @@ a {
     margin-top:10px;
 }
 .nav-link span{
-    font-size:30px;
-    width:30px;
+    font-size:22px;;
+    width:22px;
     text-align: center;
-    color:white;
-    line-height: 40px;
+    
     text-align: center;
 }
 .nav-link .orgLogo{
-    background-color:#22847f;
+    background-color: lightblue;
     font-size:20px;
     padding: 8px;
-    border-radius: 100px;
+    border-radius: 10px;
     text-align: center;
-    line-height: 20px;
-    color:white;
     height:30px;
 }
 .btn{
     margin-bottom:20px;
     white-space: normal;
 }
-.btn-caution{
-    background-color: #e26b4d;
-}
-.btn-primary{
-    background-color: #22847f;
-}
-.btn-secondary{
-    background-color: #22847f;
-
-}
-.btn-info{
-    border-color: #e26b4d;
-    border-width: 5px;
-}
 .calendar-today {
-    background-color: #22847f;
+    background-color: #74c3f0;
 }
 .nav-calendar{
     padding-left:revert;
 }
 input, option, textarea {
-    color:white;
-    background-color: black;
     border: none;
+    background-color: rgba(0, 0, 0, 0.2);
 }
 .tab{
     background-color: rgba(0, 0, 0, 0.5);
 }
 .login input, .code input{
     background-color: rgba(0, 0, 0, 0.5);
-    border-color: #e26b4d;
     border-radius: 50px;
     margin-top: 0px;
-    color: #e26b4d;
 }
 #footer{
-    background-color: rgba(0, 0, 0, 0.5);
     margin: 10px;
     border-radius: 10px;
 }
@@ -97,11 +70,9 @@ input, option, textarea {
 /* Branding */
 img #logo-color{
     height:40px;
-    background-image: url('/logo.png');
 }
 #large-logo-color{
     margin:20px 00px 20px 20px;
-    background-image: url('/logo.png');
     max-width:100px;
     border-radius: 20px;
 }

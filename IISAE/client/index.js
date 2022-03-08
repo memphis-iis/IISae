@@ -12,7 +12,7 @@ Meteor.startup(() => {
     // Check cordova-push-plugin for all options supported.
     // The configuration object is used to initialize Cordova Push on the device.
     CordovaPush.Configure({
-      appName: 'Oji',
+      appName: 'ISSAE',
       debug: true, // Turns on various console messages in the Cordova console.
       android: {
         alert: true,
@@ -34,7 +34,7 @@ Meteor.startup(() => {
     })
   } else {
     WebPush.Configure({
-      appName: 'Oji', // required
+      appName: 'ISSAE', // required
       debug: true, 
       firebase: {
         apiKey: '________',
@@ -50,7 +50,7 @@ Meteor.startup(() => {
 Template.DefaultLayout.helpers({
   'footer': function(){
       footer.copyright = "Copyright 2022";
-      footer.message = "Oji is a collaboration between the University of Memphis, The Institute for Intelligent Systems, and the University of Southern Mississippi."
+      footer.message = "ISSAE is developed by The Institute for Intelligent Systems at The University of Memphis."
       return footer;
   }
 })

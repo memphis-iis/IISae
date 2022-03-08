@@ -1,8 +1,7 @@
 <template name="profile">
     <div class="px-4 py-5 my-5 text-center container">
        {{#if assignment}}
-       <h1>Let's start here today.</h1>
-       <h3>To continue, please complete the following.</h3>
+       <h1>What's Next?.</h1>
         <div class="assessment" style="margin-top:5px;">
             <hr>
             <h3>{{assignment.title}}</h3>
@@ -15,19 +14,18 @@
             {{/if}}
         </div>
        {{else}}
-       <h1>Hello there, {{currentUser.firstname}}.</h1>
-       <h3>What would you like to do?</h3>
+       <h1>Hello {{currentUser.firstname}}.</h1>
        {{#if isInRole 'user'}}
-            <h3>Next Modules</h3>
-            <p>The modules present exercises to improve your mental health.</p>
+            <h3>Next Module</h3>
+            <p>The modules present exercises to improve your understanding.</p>
             <button id="moduleCenter" class="btn btn-primary">Module Center</button>
             <br><br>
             <h3>Retake Assessments</h3>
-            <p>The assessments measures your current mental health.</p>
+            <p>The assessments measure your current progress.</p>
             <button id="assessmentCenter" class="btn btn-primary">Assessment Center</button>
         {{else}}
         <h3>Control Panel</h3>
-            <p>Access tools and settings for your organization and users.</p>
+            <p>Access tools and settings for your organization and students.</p>
             <button id="controlPanel" class="btn btn-primary">Control Panel</button>
         {{/if}}
        {{/if}}

@@ -1,0 +1,13 @@
+{
+    "modules": [{
+        "module":{
+            "title": "Default",
+            "description": "",
+            "display": false,
+            "identifier": "ISSAE1",
+            "order": 0,
+            "pages": []
+        }
+      }
+    ]
+  }

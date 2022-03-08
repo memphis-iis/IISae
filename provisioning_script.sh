@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Make a symbolic link to the sync'ed directory for more "natural" work
-ln -s /vagrant "$HOME/oji"
+ln -s /vagrant "$HOME/issae"
 
 # We will need to be able to compile some binary packages for Meteor
 sudo apt-get update

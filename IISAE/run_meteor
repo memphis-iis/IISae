@@ -15,7 +15,7 @@ sudo mount --bind "$HOME/.meteor/packages" packages
 
 meteor npm install --no-bin-links
 
-export MONGO_URL=mongodb://localhost:27017/oji
+export MONGO_URL=mongodb://localhost:27017/issae
 echo "MONGO_URL=$MONGO_URL"
 
 # Figure command line
