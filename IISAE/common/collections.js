@@ -2,12 +2,12 @@ import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor'
 
 //Define Collections
-Orgs = new Mongo.Collection('organizations');
-Assessments  = new Mongo.Collection('assessments');
-Trials = new Mongo.Collection('trials');
-Modules = new Mongo.Collection('modules');
-ModuleResults = new Mongo.Collection('modresults');
-Events = new Mongo.Collection('events');
+Orgs = new Meteor.Collection('organizations');
+Assessments  = new Meteor.Collection('assessments');
+Trials = new Meteor.Collection('trials');
+Modules = new Meteor.Collection('modules');
+ModuleResults = new Meteor.Collection('modresults');
+Events = new Meteor.Collection('events');
 
 //Init DynamicAssets Collection
 Images = new FilesCollection({
