@@ -6,7 +6,7 @@ Template.module.helpers({
         return Modules.findOne().pages.length;
     },
     'completed' : function(){
-        if(Meteor.user().curModule.pageId == "completed"){
+        if(this.pageId == "completed"){
             return true;
         } else {
             return false;
@@ -70,17 +70,14 @@ Template.module.helpers({
         }
         return question;
     },
-    'percentDone': function(){
-        length = Modules.findOne().pages.length;
-        percent = parseInt(this.pageId) / length * 100;
-        return percent.toFixed(0);
-    },
 });
 
 Template.module.events({
-    'click .continue': function(event) {
-        event.preventDefault();
+    'click .continue': async function(event) {
+        $(':button').prop('disabled', true); 
         const t = Template.instance();
+        event.preventDefault();
+        curModule = Modules.findOne()
         let target = "";
         let moduleId = Meteor.user().curModule.moduleId;
         let moduleData = ModuleResults.findOne({_id: moduleId});
@@ -112,6 +109,7 @@ Template.module.events({
                 }
             }
             data = {
+                questionType: t.questionType.get(),
                 pageId: thisPage,
                 questionId: thisQuestion,
                 response: response,
@@ -131,8 +129,30 @@ Template.module.events({
                     }
                  }
             }
-            Meteor.call("saveModuleData", moduleData);
-            
+            Meteor.call("saveModuleData", moduleData, moduleId, thisPage, thisQuestion, response, function(err, res){
+                feedback = t.feedback.get();
+                type = "danger"
+                message = question.incorrectFeedback || "Incorrect."
+                if(res != "disabled"){
+                    if(res == true){ 
+                        type = "success";
+                        message = "Correct!";
+                    } 
+                    addedClass = 'alert-' + type;
+                    $('#refutation').addClass(addedClass);
+                    console.log(addedClass);
+                    $('#refutation').text(message);
+                    $('#refutation').show();
+                }
+            });
+            timeOut = curModule.feedbackTimeout * 1000 || 5000;
+            await sleep(timeOut);
+            $('#refutation').removeClass('alert-success');
+            $('#refutation').removeClass('alert-danger');
+            $('#refutation').text("");
+            $('#refutation').hide();
+            $(':button').prop('disabled', false); 
+            $(':button').removeClass('btn-info');
         } else {
             moduleData.nextPage = parseInt(thisPage) + 1;
             moduleData.nextQuestion = 0;
@@ -147,12 +167,13 @@ Template.module.events({
         if(moduleData.nextPage >= Modules.findOne().pages.length){
             moduleData.nextPage = "completed";
             moduleData.nextQuestion = "completed";
+            user = Meteor.user();
             index = user.assigned.findIndex(x => x.assignmentId === moduleId);
             if(index != -1){
                 user.assigned.splice(index, 1);
             }
             user.assigned.splice(index, 1);
-            Meteor.call('changeAssignmentOneUser', [userId, user.assigned]);
+            Meteor.call('changeAssignmentOneUser', [Meteor.userId(), user.assigned]);
             Meteor.call("saveModuleData", moduleData);
             target = "/module/" + Modules.findOne()._id + "/completed";
         } 
@@ -194,4 +215,8 @@ Template.module.onCreated(function(){
     this.questionType = new ReactiveVar("");
     this.pageType = new ReactiveVar("");
     this.pageId = new ReactiveVar("");
+    this.feedback = new ReactiveVar(false);
 })
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
