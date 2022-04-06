@@ -64,7 +64,11 @@ const SEED_USER2 = {
     nextModule: 0
 };
 const SEED_USERS = [SEED_ADMIN, SEED_SUPERVISOR, SEED_USER, SEED_USER2];
-const SEED_ROLES = ['user', 'supervisor', 'admin']
+const SEED_ROLES = ['user', 'supervisor', 'admin'];
+
+//Set Statistical Defaults;
+
+
 
 //Configure Push Notifications
 serviceAccountData = null;
@@ -376,7 +380,10 @@ Meteor.methods({
             display: false,
             description: "Description",
             pages: [],
-            owner: orgId
+            owner: orgId,
+            pageFlowVars: {
+                score: 0
+            }
         }
         Modules.insert(newModule);
     },
@@ -468,13 +475,13 @@ Meteor.methods({
             if(addedField == 'nextFlow'){
                 data =  
                     {
-                        type: "Minimum Score",
+                        condition: "",
+                        operand: "=",
                         threshold: 1,
                         route: 0
                     };
                 text = "curModule." + field + "=[]; curModule." + field + ".push(data)";
-                console.log(text);
-                eval(text);
+               eval(text);
             }
             if(addedField == 'autoTutorCharacter'){
                 data = 
@@ -483,7 +490,7 @@ Meteor.methods({
                         name: "Phil",
                         template: "default",
                     };
-                text = "curModule." + field + "=[da]";
+                text = "curModule." + field + "=[data]";
                 eval(text);
             }
             if(addedField == "pages" || addedField == "fields"){
@@ -491,6 +498,9 @@ Meteor.methods({
                     type :"New",
                     text: "New",
                     nextFlow: [],
+                    pageFlowVars: {
+                        score: 0
+                    }
                 }
                 text = "curModule." + field + "=[data]";
                 console.log(text);
@@ -516,26 +526,47 @@ Meteor.methods({
                     moduleId: results,
                     pageId: 0,
                     questionId: 0,
+                    score: 0
                  }
                 }
             });
         return results;
     },
-    saveModuleData: function (moduleData, moduleId, pageId, questionId){
+    saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
         response = moduleData.responses[moduleData.responses.length - 1].response;
         questionType = moduleData.questionType;
-        feedback = answerAssess(moduleData.moduleId, pageId, questionId, questionType, response);
-        ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-        Meteor.users.upsert(Meteor.userId(), {
-            $set: {
-            curModule: {
-                moduleId: Meteor.user().curModule.moduleId,
-                pageId: moduleData.nextPage,
-                questionId: moduleData.nextQuestion,
-            },
-        }
-    })
-    return feedback;
+        curModule = Modules.findOne({_id: moduleId});
+        if(curModule){
+            correctAnswer = curModule.pages[pageId].questions[0].correctAnswer
+            enableFeedback = curModule.enableFeedback
+            enableWeightedQuestions = curModule.enableWeightedQuestions;
+            questionWeight = 1;
+            if(enableWeightedQuestions){
+                questionWeight = curModule.pages[pageId].questions[0].weight
+            }
+            feedback = "disabled";
+            if(enableFeedback){
+                feedback = answerAssess(correctAnswer, response);
+            }
+            if(feedback == true){
+                moduleData.score += parseInt(answerValue) * parseFloat(questionWeight) || parseFloat(answerValue);
+            } else; {
+                moduleData.score = moduleData.score || 0;
+            }
+            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            Meteor.users.upsert(Meteor.userId(), {
+                $set: {
+                curModule: {
+                    moduleId: Meteor.user().curModule.moduleId,
+                    pageId: moduleData.nextPage,
+                    questionId: moduleData.nextQuestion,
+                },
+            }
+        })
+        return feedback;
+    } else {
+        return false;
+    }
 },
     getPrivateImage: function(fileName){
         result =  Assets.absoluteFilePath(fileName);
@@ -631,19 +662,12 @@ function getInviteInfo(inviteCode) {
     console.log(targetOrgId,targetOrgName,targetSupervisorId,targetSupervisorName);
     return {targetOrgId, targetOrgName, targetSupervisorId, targetSupervisorName};
 }
-function answerAssess(moduleId, pageId, questionId, questionType, response){
-    curModule = Modules.findOne({_id: moduleId});
-    correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer
-    enableFeedback = curModule.enableFeedback
-    console.log('feedback', enableFeedback);
-    feedback = "disabled";
-    if(enableFeedback){
-        if(response == correctAnswer){
-            feedback = true;
-        } else {
-            feedback = false;
-        }
-    }   
+function answerAssess(correctAnswer, response){
+    if(response.toLowerCase() == correctAnswer.toLowerCase()){
+        feedback = true;
+    } else {
+        feedback = false;
+    }
     console.log(response, correctAnswer, feedback);
     return feedback;
 }

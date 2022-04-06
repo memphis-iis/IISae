@@ -3,6 +3,7 @@ Template.moduleEditor.helpers({
         moduleId = this.moduleId; 
         curModule = Modules.findOne({_id: moduleId});
         pages = curModule.pages;
+        curModule.pageFlowVarNames = Object.keys(curModule.pageFlowVars);
         for(i = 0; i < pages.length; i++){
             pages[i].isActivity = false;
             if(pages[i].type == "activity"){
@@ -10,6 +11,9 @@ Template.moduleEditor.helpers({
                 nextFlowParms = pages[i].nextFlow;
                 for(j=0;j < nextFlowParms.length; j++){
                     pages[i].nextFlow[j].parent=i;
+                    pages[i].nextFlow[j].pageFlowVars = Object.keys(curModule.pageFlowVars);
+                    pages[i].nextFlow[j].pageList = pages;
+                    
                 }
                 if(typeof pages[i].questions !== "undefined"){
                     questions = pages[i].questions;

@@ -73,7 +73,17 @@ Template.module.helpers({
 });
 
 Template.module.events({
-    'click .continue': async function(event) {
+    'keypress #response' : function(event){
+        event.preventDefault();
+        if (event.keyCode === 13) {
+            $(".continue").click();
+        } else {
+            value = $('#response').val();
+            value += String.fromCharCode(event.keyCode);
+            value = $('#response').val(value);
+        }
+    },
+    'click .continue, response': async function(event) {
         $(':button').prop('disabled', true); 
         const t = Template.instance();
         event.preventDefault();
@@ -89,9 +99,11 @@ Template.module.events({
             questionData.questionType = t.questionType.get();
             if(questionData.questionType == "blank"){
                 response = $('.textInput').val();
+                answerValue = $('.textInput').getAttribute('data-value');
             }
             if(questionData.questionType == "multiChoice"){
                 response = $(event.target).html();
+                answerValue = $(event.target).val();
             }
             if(questionData.questionType == "longText"){
                 response = $('.textareaInput').val();
@@ -118,18 +130,7 @@ Template.module.events({
             moduleData.responses.push(data);
             moduleData.nextPage = thisPage;
             moduleData.nextQuestion = parseInt(thisQuestion) + 1;
-            if(typeof Modules.findOne().pages[moduleData.nextPage] !== "undefined"){
-                if(typeof Modules.findOne().pages[moduleData.nextPage].questions !== "undefined"){
-                    if(moduleData.nextQuestion >= Modules.findOne().pages[moduleData.nextPage].questions.length){
-                        moduleData.nextPage = thisPage + 1;
-                        moduleData.nextQuestion = 0;
-                        target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
-                    } else  {
-                        target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage + "/" + moduleData.nextQuestion;
-                    }
-                 }
-            }
-            Meteor.call("saveModuleData", moduleData, moduleId, thisPage, thisQuestion, response, function(err, res){
+            Meteor.call("saveModuleData", moduleData, curModule._id , thisPage, thisQuestion, response, answerValue, function(err, res){
                 feedback = t.feedback.get();
                 type = "danger"
                 message = question.incorrectFeedback || "Incorrect."
@@ -153,6 +154,33 @@ Template.module.events({
             $('#refutation').hide();
             $(':button').prop('disabled', false); 
             $(':button').removeClass('btn-info');
+            moduleData = ModuleResults.findOne({_id: moduleId});
+            if(typeof Modules.findOne().pages[moduleData.nextPage] !== "undefined"){
+              if(typeof Modules.findOne().pages[moduleData.nextPage].questions !== "undefined"){
+                  if(moduleData.nextQuestion >= Modules.findOne().pages[moduleData.nextPage].questions.length){
+                      if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow > 0){
+                          moduleData.nextPage = thisPage + 1;
+                          moduleData.nextQuestion = 0;
+                          target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
+                      } else {
+                          conditions = Modules.findOne().pages[thisPage].nextFlow;
+                          conditionMet = false;
+                          for(i = 0; i < conditions.length; i++){
+                              curCondition = conditions[i];
+                              text = "moduleData." + curCondition.condition + curCondition.operand + curCondition.threshold;
+                              isConditionTrue = eval(text);
+                              console.log('Condition:', isConditionTrue, text, eval("moduleData." + curCondition.condition))
+                              if(isConditionTrue && !conditionMet){
+                                  target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
+                                  conditionMet = true;
+                              }
+                          }
+                      }
+                  } else  {
+                      target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage + "/" + moduleData.nextQuestion;
+                  }
+               }
+          }
         } else {
             moduleData.nextPage = parseInt(thisPage) + 1;
             moduleData.nextQuestion = 0;
@@ -177,7 +205,7 @@ Template.module.events({
             Meteor.call("saveModuleData", moduleData);
             target = "/module/" + Modules.findOne()._id + "/completed";
         } 
-
+        console.log("ROUTE:", target);
         Router.go(target);
     },
     'click #startActivity': function(event){
@@ -216,7 +244,9 @@ Template.module.onCreated(function(){
     this.pageType = new ReactiveVar("");
     this.pageId = new ReactiveVar("");
     this.feedback = new ReactiveVar(false);
+    this.statsData = new ReactiveVar({});
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+

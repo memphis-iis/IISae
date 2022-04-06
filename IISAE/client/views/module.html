@@ -32,7 +32,7 @@
             {{#if question.typeBlank}}
                 <h3>{{{question.prompt}}}</h3><br>
                 <form>
-                    <input type="text" class="textInput">
+                    <input type="text" class="textInput" data-value="{{this.value}}" style="font-size:x-large; width:100%" id="response">
                 </form>
                 <br>
                 <button id="contine" class="btn btn-primary continue">Save and Continue</button>

@@ -29,6 +29,14 @@
             {{/if}}        
           </div>
           <div class="form-check">
+            Enable Weighted Questions:
+            {{#if module.enableWeightedQuestions}}
+            <input class="markCorrect"  data-field="enableWeightedQuestions" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="enableWeightedQuestions" data-value="true" type="checkbox" >
+            {{/if}}        
+          </div>
+          <div class="form-check">
             Enable Adaptive Page Flow:
             {{#if module.enableAdaptivePages}}
             <input class="markCorrect"  data-field="enableAdaptivePages" data-value="false" type="checkbox"  checked>
@@ -67,8 +75,24 @@
         Feedback Timeout: {{module.feedbackTimeout}}<a id="open-editor" data-value={{module.feedbackTimeout}} data-field="feedbackTimeout"> Edit</a><br>
         {{/if}}
         {{#if module.enableAdaptivePages}}
-        <h3>Adaptive Page Flow Chart</h3>
-        <p>Adaptive Page Flow allows for pages to be branched based off of scoring mechanisms.</p>
+        <h3>Adaptive Page Flow Options</h3>
+        <p>Adaptive Page Flow allows for pages to be branched based off of data collected.</p>
+        <div class="form-check">
+            Override With Javascript Snippet
+            {{#if module.adaptivePageFlowOverride}}
+            <input class="markCorrect"  data-field="adaptivePageFlowOverride" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="adaptivePageFlowOverride" data-value="true" type="checkbox" >
+            {{/if}}        
+          </div>
+          {{#if module.adaptivePageFlowOverride}}
+            Available Variables: 
+            {{#each module.pageFlowVarNames}}
+            moduleData.{{this}}
+            {{/each}}<br>
+            <h4>Javascript Snippet:</h4>
+            {{module.adaptivePageFlowOverrideScript}}<a id="open-editor" data-field="adaptivePageFlowOverrideScript"  data-value="{{this.adaptivePageFlowOverrideScript}}"> Edit</a><br>
+          {{/if}}
         {{/if}}
         {{#if module.enableAutoTutor}}
         <h3>AutoTutor Options</h3>
@@ -129,7 +153,7 @@
 
 
         <a data-bs-toggle="collapse" href="#collapse-page-{{@index}}" role="button" aria-expanded="false" aria-controls="collapseExample">
-            <h3><u>Page {{@index}}</u></h3>
+            <h3><u>Page {{@index}}: {{this.header}}: {{this.subheader}}</u></h3>
           </a>
         <div class="collapse" id="collapse-page-{{@index}}">
         <table class="table" id="pageList-{{@index}}">
@@ -243,7 +267,6 @@
                     <td>
                         {{#if this.showTextOptions}}
                         <b>Correct Answer:</b>{{this.correctAnswer}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].correctAnswer" data-value="{{this.correctAnswer}}"> Edit</a><br>
-                        <b>Refutational Feedback:</b>{{this.incorrectFeedback}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].incorrectFeedback" data-value="{{this.incorrectFeedback}}"> Edit</a><br>
                         {{/if}}
                         {{#if this.isMultiChoice}}
                         <b>Correct Answer:</b>
@@ -254,14 +277,13 @@
                             {{/each}}
                         </select><br>
                         {{/if}}
+                        <b>Refutational Feedback:</b>{{this.incorrectFeedback}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].incorrectFeedback" data-value="{{this.incorrectFeedback}}"> Edit</a><br>
                         <b>Question Weight:</b>{{this.weight}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].weight" data-value="{{this.weight}}"> Edit</a><br>
                         <b>Image Attached:</b>{{this.image}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].image" data-value="{{this.image}}"> Edit</a><br>
                     </td>
                     <td>
                         <a id="delete-item" data-field="pages[{{this.parent}}].questions[{{@index}}]">Delete</a><br>
-                        {{#if this.showTextOptions}}
-                        <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].autoTutorScript">Add AutoTutor</a><br>
-                        {{/if}}
+                        <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].autoTutorScript">Add AutoTutor</a>
                         {{#if this.isCombo}}
                         <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].fields">Add Combo Question</a>
                         {{/if}}
@@ -337,7 +359,7 @@
                                 <td>
                                     <b>Image Attached:</b><img src="{{this.image}}" style="max-width:40px;"><a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].image" data-value="{{this.image}}"> Edit</a><br>
                                     <b>Refultational Feedback: </b><img src="{{this.incorrectFeedback}}" style="max-width:40px;"><a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].incorrectFeedback" data-value="{{this.incorrectFeedback}}"> Edit</a><br>
-                                    <b>Value: </b><img src="{{this.value}}" style="max-width:40px;"><a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
+                                    <b>Value: </b>{{this.value}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
                                     <div class="form-check">
                                         <b>Correct Answer: </b>
                                         {{#if this.isCorrect}}
@@ -366,7 +388,7 @@
                         </td>
                         <td>
                             <b>Image Attached:</b><img src="{{this.image}}" style="max-width:40px;"><a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].image" data-value="{{this.image}}"> Edit</a><br>
-                            <b>Value: </b><a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
+                            <b>Value:</b>{{this.value}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
                         </td>
                         <td>
                             <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}]">Delete</a>
@@ -380,10 +402,10 @@
         {{/each}}
         <a id="add-item" data-field="pages[{{@index}}].questions">Add Question</a><br>
         {{#if this.nextFlow}}
-        <h4><u>Simple Adaptive Flow Conditions</u></h4>
+        <h4><u>Simple Adaptive Page Flow Conditions</u></h4>
         <table class="table" id="flowList">
             <thead>
-                <th scope="col" width="40%">Type</th>
+                <th scope="col" width="40%">Variable</th>
                 <th scope="col" width="20%">Threshold</th>
                 <th scope="col" width="30%">Page to Route To</th>
                 <th scope="col" width="20%">Actions</th>
@@ -392,23 +414,30 @@
             {{#each this.nextFlow}}
                 <tr>
                     <td>
-                        <select id="type" class="combo-save" data-field="pages[{{this.parent}}].nextFlow[{{@index}}]].type">
-                            <option >{{this.type}}</option>
-                            <option>Minimum Sum of Scores</option>
-                            <option>Maximum Sum of Scores</option>
-                            <option>Minimum Average of Scores</option>
-                            <option>Maximum Average of Scores</option>
-                            <option>Lowest Score Less Than</option>
-                            <option>Highest Score Less Than</option>
-                            <option>Lowest Score Greater Than</option>
-                            <option>Highest Score Greater Than</option>
+                        <select id="type" class="combo-save" data-field="pages[{{this.parent}}].nextFlow[{{@index}}].condition">
+                            <option >{{this.condition}}</option>
+                            {{#each this.pageFlowVars}}
+                            <option >{{this}}</option>
+                            {{/each}}
+                        </select>
+                        <select id="type" class="combo-save" data-field="pages[{{this.parent}}].nextFlow[{{@index}}].operand">
+                            <option >{{this.operand}}</option>
+                            <option>&lt;</option>
+                            <option>&gt;</option>
+                            <option>&equals;&equals;</option>
                         </select>
                     </td>
                     <td>
-                        {{this.threshold}}<a id="open-editor" data-field="pages[{{this.parent}}].nextFlow[{{@index}}]].threshold" data-value="{{this.threshold}}"> Edit</a><br>
+                        {{this.threshold}}<a id="open-editor" data-field="pages[{{this.parent}}].nextFlow[{{@index}}].threshold" data-value="{{this.threshold}}"> Edit</a><br>
                     </td>
                     <td>
-                        {{this.route}}<a id="open-editor" data-field="pages[{{this.parent}}].nextFlow[{{@index}}]].route" data-value="{{this.route}}"> Edit</a><br>
+                        <select id="type" class="combo-save" data-field="pages[{{this.parent}}].nextFlow[{{@index}}].route">
+                        <option value="{{@index}}">{{this.route}}</option>
+                        {{#each this.pageList}}
+                        <option value="{{@index}}">Page {{@index}} : {{this.header}} : {{this.subheader}}</option>
+                        {{/each}}
+                        <option value="completed">End</option>
+                        </select>
                     </td>
                     <td>
                         <a id="delete-item" data-field="pages[{{this.parent}}].nextFlow[{{@index}}]">Delete</a>
