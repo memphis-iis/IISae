@@ -34,17 +34,10 @@
         <li>
           <a class="nav-link active" aria-current="page" href="/control-panel"><span class="glyphicon glyphicon-cog"></span></a>
         </li>
-        {{else}}
-        {{#if currentUser.assigned}}
+        {{/if}}
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/calendar"><span class="glyphicon glyphicon-calendar"></span></a>
         </li>
-        {{else}}
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/userAssessmentReport"><span class="glyphicon glyphicon-dashboard"></span></a>
-        </li>
-        {{/if}}
-        {{/if}}
         <li class="nav-item">
           <a class="nav-link active" id="logoutButton" href="/logout" aria-current="page"><span class=" glyphicon glyphicon-log-out"></span></a>
         </li>
