@@ -6,6 +6,7 @@ Orgs = new Mongo.Collection('organizations');
 Modules = new Mongo.Collection('modules');
 ModuleResults = new Mongo.Collection('modresults');
 Events = new Mongo.Collection('events');
+AutoTutorCharacters = new Mongo.Collection('autoTutorCharacters');
 
 //Init DynamicAssets Collection
 Images = new FilesCollection({

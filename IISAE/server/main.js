@@ -381,6 +381,7 @@ Meteor.methods({
         Modules.insert(newModule);
     },
     changeModule(input){
+        console.log(input);
         moduleId = input.moduleId;
         field = input.field;
         result = input.result
@@ -447,17 +448,49 @@ Meteor.methods({
             console.log('undefined: ' + addedField);          
             if(addedField == "questions"){
                 data = {
-                    type :"New",
+                    type :"multiChoice",
                     prompt: "New"
                 }
                 text = "curModule." + field + "=[data]";
                 console.log(text);
                 eval(text);
             }
+            if(addedField == 'autoTutorScript'){
+                data = 
+                    {
+                        role: "teacher",
+                        character: "default",
+                        script: "text script",
+                    };
+                text = "curModule." + field + "=[data]";
+                eval(text);
+            }
+            if(addedField == 'nextFlow'){
+                data =  
+                    {
+                        type: "Minimum Score",
+                        threshold: 1,
+                        route: 0
+                    };
+                text = "curModule." + field + "=[]; curModule." + field + ".push(data)";
+                console.log(text);
+                eval(text);
+            }
+            if(addedField == 'autoTutorCharacter'){
+                data = 
+                    {
+                        role: "teacher",
+                        name: "Phil",
+                        template: "default",
+                    };
+                text = "curModule." + field + "=[da]";
+                eval(text);
+            }
             if(addedField == "pages" || addedField == "fields"){
                 data = {
                     type :"New",
-                    text: "New"
+                    text: "New",
+                    nextFlow: [],
                 }
                 text = "curModule." + field + "=[data]";
                 console.log(text);
@@ -488,13 +521,11 @@ Meteor.methods({
             });
         return results;
     },
-    saveModuleData: function (moduleData){
+    saveModuleData: function (moduleData, moduleId, pageId, questionId){
+        response = moduleData.responses[moduleData.responses.length - 1].response;
+        questionType = moduleData.questionType;
+        feedback = answerAssess(moduleData.moduleId, pageId, questionId, questionType, response);
         ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-        nextModule = Meteor.users.findOne({_id: Meteor.userId()}).nextModule;
-        console.log("nextModule", nextModule, typeof nextModule);
-        if(moduleData.nextPage == 'completed'){
-            nextModule++;
-        }
         Meteor.users.upsert(Meteor.userId(), {
             $set: {
             curModule: {
@@ -502,9 +533,9 @@ Meteor.methods({
                 pageId: moduleData.nextPage,
                 questionId: moduleData.nextQuestion,
             },
-            nextModule: nextModule
         }
     })
+    return feedback;
 },
     getPrivateImage: function(fileName){
         result =  Assets.absoluteFilePath(fileName);
@@ -567,7 +598,7 @@ Meteor.methods({
         index = orgFiles.findIndex(x => x.name === fileName);
         orgFiles.splice(index, 1);
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
-    }
+    },
 });
 
 //Server Methods
@@ -599,6 +630,22 @@ function getInviteInfo(inviteCode) {
     targetOrgName = organization.orgName;
     console.log(targetOrgId,targetOrgName,targetSupervisorId,targetSupervisorName);
     return {targetOrgId, targetOrgName, targetSupervisorId, targetSupervisorName};
+}
+function answerAssess(moduleId, pageId, questionId, questionType, response){
+    curModule = Modules.findOne({_id: moduleId});
+    correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer
+    enableFeedback = curModule.enableFeedback
+    console.log('feedback', enableFeedback);
+    feedback = "disabled";
+    if(enableFeedback){
+        if(response == correctAnswer){
+            feedback = true;
+        } else {
+            feedback = false;
+        }
+    }   
+    console.log(response, correctAnswer, feedback);
+    return feedback;
 }
 
 //Publications and Mongo Access Control

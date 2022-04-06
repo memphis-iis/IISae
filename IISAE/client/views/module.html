@@ -6,7 +6,7 @@
             <p>You have completed this module!</p>
             <button class="btn btn-primary" id="goBack">Return to My Profile</button>    
         {{else}}
-        <h4>Page {{pageid}} of {{totalpages}} ({{percentDone}}%)</h4>
+        <h4>Page {{pageid}} of {{totalpages}}</h4>
         <hr>
         {{#if page.typeText}}
         <h3><b>{{page.header}}</b></h3>
@@ -36,6 +36,9 @@
                 </form>
                 <br>
                 <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+                <div class="alert" id="refutation" role="alert" hidden>
+                    Message: {{feedback.message}}
+                  </div>
             {{/if}}
             {{#if question.typeLongText}}
                 <h3>{{question.prompt}}</h3><br>
@@ -58,6 +61,9 @@
                      {{/if}}
                 {{/each}}
             </form>
+            <div class="alert" id="refutation" role="alert" hidden>
+                Message: {{feedback.message}}
+              </div>
             <br>
             {{/if}}
             {{#if question.typeCombo}}
