@@ -104,7 +104,7 @@ Template.module.events({
             questionData.questionType = t.questionType.get();
             if(questionData.questionType == "blank"){
                 response = $('.textInput').val();
-                answerValue = $('.textInput').getAttribute('data-value');
+                answerValue = $('.textInput').attr('data-value');
             }
             if(questionData.questionType == "multiChoice"){
                 response = $(event.target).html();
@@ -180,6 +180,10 @@ Template.module.events({
                                   moduleData.nextQuestion=0;
                                   target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
                                   conditionMet = true;
+                                  if(curCondition.clearScoring){
+                                      console.log('clear score');
+                                      moduleData.score = 0;
+                                  }
                               }
                           }
                           if(!conditionMet){

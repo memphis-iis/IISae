@@ -544,6 +544,9 @@ Meteor.methods({
             enableFeedback = curModule.enableFeedback
             enableWeightedQuestions = curModule.enableWeightedQuestions;
             questionWeight = 1;
+            if(!moduleData.score){
+                moduleData.score = 0;
+            }
             if(enableWeightedQuestions){
                 questionWeight = curModule.pages[pageId].questions[0].weight
             }
@@ -553,7 +556,7 @@ Meteor.methods({
             if(feedback == true){
                 moduleData.score += parseInt(answerValue) * parseFloat(questionWeight) || parseFloat(answerValue);
             } else; {
-                moduleData.score = moduleData.score || 0;
+                moduleData.score = moduleData.score;
             }
             console.log(moduleData.nextPage, moduleData.nextQuestion);
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
@@ -572,6 +575,7 @@ Meteor.methods({
     }
 },
 overrideUserDataRoutes: function (moduleData){
+           ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
            Meteor.users.upsert(Meteor.userId(), {
             $set: {
             curModule: {

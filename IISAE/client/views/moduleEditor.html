@@ -409,13 +409,15 @@
         </div>
         {{/each}}
         <a id="add-item" data-field="pages[{{@index}}].questions">Add Question</a><br>
+        {{/if}}
         {{#if this.nextFlow}}
         <h4><u>Simple Adaptive Page Flow Conditions</u></h4>
         <table class="table" id="flowList">
             <thead>
-                <th scope="col" width="40%">Variable</th>
-                <th scope="col" width="20%">Threshold</th>
+                <th scope="col" width="30%">Variable</th>
+                <th scope="col" width="10%">Threshold</th>
                 <th scope="col" width="30%">Page to Route To</th>
+                <th scope="col" width="20%">Options</th>
                 <th scope="col" width="20%">Actions</th>
             </thead>
             <tbody>
@@ -450,13 +452,22 @@
                         </select>
                     </td>
                     <td>
+                        <div class="form-check">
+                            Clear Score:
+                            {{#if this.clearScoring}}
+                            <input class="markCorrect"  data-field="pages[{{this.parent}}].nextFlow[{{@index}}].clearScoring" data-value="false" type="checkbox"  checked>
+                            {{else}}
+                            <input class="markCorrect"  data-field="pages[{{this.parent}}].nextFlow[{{@index}}].clearScoring" data-value="true" type="checkbox" >
+                            {{/if}}        
+                          </div>
+                    </td>
+                    <td>
                         <a id="delete-item" data-field="pages[{{this.parent}}].nextFlow[{{@index}}]">Delete</a>
                     </td>
                 </tr>
             {{/each}}
             </tbody>
             </table>
-        {{/if}}
         {{/if}}
         <br>
         <br>

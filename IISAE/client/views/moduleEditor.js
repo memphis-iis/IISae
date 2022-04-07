@@ -6,15 +6,15 @@ Template.moduleEditor.helpers({
         curModule.pageFlowVarNames = Object.keys(curModule.pageFlowVars);
         for(i = 0; i < pages.length; i++){
             pages[i].isActivity = false;
+            nextFlowParms = pages[i].nextFlow;
+            for(j=0;j < nextFlowParms.length; j++){
+                pages[i].nextFlow[j].parent=i;
+                pages[i].nextFlow[j].pageFlowVars = Object.keys(curModule.pageFlowVars);
+                pages[i].nextFlow[j].pageList = pages;
+                
+            }
             if(pages[i].type == "activity"){
                 pages[i].isActivity = true;
-                nextFlowParms = pages[i].nextFlow;
-                for(j=0;j < nextFlowParms.length; j++){
-                    pages[i].nextFlow[j].parent=i;
-                    pages[i].nextFlow[j].pageFlowVars = Object.keys(curModule.pageFlowVars);
-                    pages[i].nextFlow[j].pageList = pages;
-                    
-                }
                 if(typeof pages[i].questions !== "undefined"){
                     questions = pages[i].questions;
                     for(j=0;j < questions.length; j++){
