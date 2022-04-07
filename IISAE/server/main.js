@@ -381,6 +381,7 @@ Meteor.methods({
             description: "Description",
             pages: [],
             owner: orgId,
+            fallbackRoute: "nextPage",
             pageFlowVars: {
                 score: 0
             }
@@ -533,18 +534,19 @@ Meteor.methods({
         return results;
     },
     saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
+        console.log(moduleData, moduleId, pageId, questionId, response, answerValue);
         response = moduleData.responses[moduleData.responses.length - 1].response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
+        feedback = "disabled";
         if(curModule){
-            correctAnswer = curModule.pages[pageId].questions[0].correctAnswer
+            correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer
             enableFeedback = curModule.enableFeedback
             enableWeightedQuestions = curModule.enableWeightedQuestions;
             questionWeight = 1;
             if(enableWeightedQuestions){
                 questionWeight = curModule.pages[pageId].questions[0].weight
             }
-            feedback = "disabled";
             if(enableFeedback){
                 feedback = answerAssess(correctAnswer, response);
             }
@@ -553,6 +555,7 @@ Meteor.methods({
             } else; {
                 moduleData.score = moduleData.score || 0;
             }
+            console.log(moduleData.nextPage, moduleData.nextQuestion);
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
             Meteor.users.upsert(Meteor.userId(), {
                 $set: {
@@ -567,6 +570,17 @@ Meteor.methods({
     } else {
         return false;
     }
+},
+overrideUserDataRoutes: function (moduleData){
+           Meteor.users.upsert(Meteor.userId(), {
+            $set: {
+            curModule: {
+                moduleId: Meteor.user().curModule.moduleId,
+                pageId: moduleData.nextPage,
+                questionId: moduleData.nextQuestion,
+            }
+        }
+    });
 },
     getPrivateImage: function(fileName){
         result =  Assets.absoluteFilePath(fileName);

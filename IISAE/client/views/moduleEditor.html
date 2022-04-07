@@ -76,7 +76,15 @@
         {{/if}}
         {{#if module.enableAdaptivePages}}
         <h3>Adaptive Page Flow Options</h3>
-        <p>Adaptive Page Flow allows for pages to be branched based off of data collected.</p>
+        <p>Adaptive Page Flow allows for pages to be branched based off conditions.</p>
+        Fallback routing:
+        <select id="type" class="combo-save" data-field="fallbackRoute">
+          <option >{{module.fallbackRoute}}</option>
+          <option value="currentPage">Retry Current Page</option>
+          <option value="nextPage">Next Numerical Page</option>
+          <option value="completed">Completed</option>
+          <option value="error">Throw Error</option>
+      </select>
         <div class="form-check">
             Override With Javascript Snippet
             {{#if module.adaptivePageFlowOverride}}
@@ -424,6 +432,8 @@
                             <option >{{this.operand}}</option>
                             <option>&lt;</option>
                             <option>&gt;</option>
+                            <option>&lt;&equals;</option>
+                            <option>&gt;&equals;</option>
                             <option>&equals;&equals;</option>
                         </select>
                     </td>

@@ -1,6 +1,11 @@
 Template.module.helpers({
     'module': () => Modules.findOne(),
-    'pageid': function() {return parseInt(Meteor.user().curModule.pageId);},
+    'trialData': function(){
+        let moduleId = Meteor.user().curModule.moduleId;
+        let moduleData = ModuleResults.findOne({_id: moduleId});
+        return moduleData;
+    },
+    'pageid': function() {return parseInt(this.pageId);},
     'questionid': function() {return parseInt(this.questionId) + 1;},
     'totalpages': function(){
         return Modules.findOne().pages.length;
@@ -171,13 +176,46 @@ Template.module.events({
                               isConditionTrue = eval(text);
                               console.log('Condition:', isConditionTrue, text, eval("moduleData." + curCondition.condition))
                               if(isConditionTrue && !conditionMet){
+                                  moduleData.nextPage=curCondition.route;
+                                  moduleData.nextQuestion=0;
                                   target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
                                   conditionMet = true;
                               }
                           }
+                          if(!conditionMet){
+                            console.log('No conditions met.')
+                            routing = curModule.fallbackRoute
+                            if(routing == 'nextPage'){
+                                moduleData.nextPage = thisPage + 1;
+                                moduleData.nextQuestion = 0;
+                                target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage + "/" + moduleData.nextQuestion;
+                            } 
+                            if(routing == 'currentPage'){
+                                moduleData.nextPage = thisPage;
+                                moduleData.nextQuestion = 0;
+                                target = "/module/" + Modules.findOne()._id + "/" + thisPage;
+                            }
+
+                            if(routing == 'completed'){
+                                moduleData.nextPage = "completed";
+                                moduleData.nextQuestion =  "completed";
+                                target = "/module/" + Modules.findOne()._id + "/completed";
+                            }
+                            if(routing == 'error'){
+                                alert("Something went wrong. No routing found.");
+                                moduleData.nextPage = "error";
+                                moduleData.nextQuestion =  "error";
+                                target = "/moduleCenter";
+                            }
+                          }
+                        console.log('routing', moduleData.nextPage, moduleData.nextQuestion);
+                        Meteor.call("overrideUserDataRoutes", moduleData);
                       }
                   } else  {
+                      moduleData.nextQuestion = thisQuestion + 1;
                       target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage + "/" + moduleData.nextQuestion;
+                      
+                      
                   }
                }
           }
@@ -189,7 +227,7 @@ Template.module.events({
                 response: "read",
                 responseTimeStamp: Date.now().toString()
             }
-            Meteor.call("saveModuleData", moduleData);
+            Meteor.call("overrideUserDataRoutes", moduleData);
             target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
         }
         if(moduleData.nextPage >= Modules.findOne().pages.length){
