@@ -139,7 +139,6 @@
                     <td>
                         <select id="type" class="combo-save" data-field="autoTutorCharacter[{{@index}}].role">
                             <option >{{this.template}}</option>
-                            <option>blank</option>
                             {{#each AutoTutorCharacters}}
                                <option>{{this.name}}</option>
                             {{/each}}
@@ -275,6 +274,7 @@
                     <td>
                         {{#if this.showTextOptions}}
                         <b>Correct Answer:</b>{{this.correctAnswer}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].correctAnswer" data-value="{{this.correctAnswer}}"> Edit</a><br>
+                        <b>Value: </b>{{this.value}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
                         {{/if}}
                         {{#if this.isMultiChoice}}
                         <b>Correct Answer:</b>
