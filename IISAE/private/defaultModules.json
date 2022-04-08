@@ -1,82 +1,114 @@
 {
     "modules": [{
         "module":{
-            "title": "Default",
-            "description": "",
-            "display": false,
-            "identifier": "ISSAE1",
-            "order": 0,
-            "pages": [
-              {
-                  "type": "text",
-                  "header": "If I were a rich man... ladasdadad",
-                  "text": "This is a test module",
-                  "image": "imageTest.jpg"
-              },
-              {
-                  "type": "activity",
-                  "header": "Awesome Quiz",
-                  "instructions": "This is a sample quiz!",
-                  "questions": [
-                      {
-                          "type": "blank",
-                          "prompt": "This _______ is empty. Fill it in!"
-                      },
-                      {
-                          "type": "multiChoice",
-                          "prompt": "This is a multiple choice question!",
-                          "promptImg": "imageTest.jpg",
-                          "answers": [
-                              {
-                                  "answer": "Yes",
-                                  "value": 1
-                              },
-                              {
-                                  "answer": "No",
-                                  "value" : 2
-                              }
-                          ]
-                      },
-                      {
-                          "type":"longText",
-                          "prompt": "Tell us about yourself",
-                          "promtImg":"imgTest.jpg"
-                      },
-                      {
-                          "type": "combo",
-                          "prompt": "This is a combo question!",
-                          "promptImg": "imageTest.jpg",
-                          "fields":[
-                              {
-                                  "type": "blank",
-                                  "text": "this is a ______."
-                              },
-                              {
-                                  "type":"longtext",
-                                  "text":"tell us about yourself."
-                              },
-                              {
-                                  "type": "dropdown",
-                                  "text": "color",
-                                  "answers": [
-                                      {
-                                          "answer": "Yes",
-                                          "value": 1
-                                      },
-                                      {
-                                          "answer": "No",
-                                          "value" : 2
-                                      }
-                                  ]
-                              }
-                          ]
-
-                      }
-
-                  ]
-
-              }
-          ]
+            "title" : "Britishisms",
+            "identifier" : "New",
+            "display" : false,
+            "description" : "Description",
+            "pageFlowVars" : {
+                "score" : 0
+            },
+            "pages" : [
+                {
+                    "type" : "activity",
+                    "text" : "This is a test of britishness.",
+                    "nextFlow" : [
+                        {
+                            "condition" : "score",
+                            "operand" : "==",
+                            "threshold" : "3",
+                            "route" : "completed",
+                            "clearScoring" : false
+                        },
+                        {
+                            "condition" : "score",
+                            "operand" : "<",
+                            "threshold" : "3",
+                            "route" : "0"
+                        }
+                    ],
+                    "questions" : [
+                        {
+                            "type" : "multiChoice",
+                            "prompt" : "A sweet dough-based dessert.",
+                            "answers" : [
+                                {
+                                    "answer" : "Biscuits",
+                                    "value" : "1"
+                                },
+                                {
+                                    "answer" : "Cookie",
+                                    "value" : "New"
+                                }
+                            ],
+                            "correctAnswer" : "Biscuits",
+                            "incorrectFeedback" : "you are not british enough, mate.",
+                            "autoTutorScript" : []
+                        },
+                        {
+                            "type" : "multiChoice",
+                            "prompt" : "An acceptable goodbye",
+                            "answers" : [
+                                {
+                                    "answer" : "Cheerio",
+                                    "value" : "1"
+                                },
+                                {
+                                    "answer" : "Later dude",
+                                    "value" : "0"
+                                }
+                            ],
+                            "correctAnswer" : "Cheerio",
+                            "incorrectFeedback" : "It's a telly!",
+                            "weight" : ""
+                        },
+                        {
+                            "type" : "blank",
+                            "prompt" : "Best country?",
+                            "answers" : [],
+                            "correctAnswer" : "England",
+                            "incorrectFeedback" : "New",
+                            "autoTutorScript" : [],
+                            "value" : "1"
+                        }
+                    ],
+                    "header" : "Chicken and Biscuits",
+                    "subheader" : "How British Are You?"
+                }
+            ],
+            "owner" : "mxBCa8cQKwrC69kSH",
+            "enableFeedback" : true,
+            "autoTutorScript" : [],
+            "feedbackTimeout" : "1",
+            "enableScoring" : true,
+            "enableAdaptivePages" : true,
+            "enableAdaptiveQuestions" : false,
+            "googleAPIKey" : "a",
+            "enableAutoTutor" : true,
+            "autoTutorReadsRefutation" : false,
+            "autoTutorCharacter" : [
+                {
+                    "role" : "teacher",
+                    "name" : "Phil",
+                    "template" : "default"
+                },
+                {
+                    "role" : "student",
+                    "name" : "New",
+                    "template" : "New"
+                },
+                {
+                    "role" : "student",
+                    "name" : "New",
+                    "template" : "New"
+                }
+            ],
+            "nextFlow" : [],
+            "adaptivePageFlowOverride" : false,
+            "adaptivePageFlowOverrideScript" : "",
+            "showScoring" : true,
+            "enableWeightedQuestions" : true,
+            "fallbackRoute" : "nextPage"
         }
       }
     ]

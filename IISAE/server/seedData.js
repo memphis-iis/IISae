@@ -64,8 +64,7 @@ const SEED_USERS = [SEED_ADMIN, SEED_SUPERVISOR, SEED_USER, SEED_USER2];
 const SEED_ROLES = ['user', 'supervisor', 'admin']
 
 export function insertSeedData(){
-    const assignments = Assessments.find({}).fetch().map(x => { return { assignment: x["_id"], type: "assessment" } });
-    assignments.concat(Modules.find({}).fetch().map(x => { return { assignment: x["_id"], type: "module" } }));
+    const assignments = Modules.find({}).fetch().map(x => { return { assignment: x["_id"], type: "module" } });
     console.log(assignments);
     //create seed roles
     for(let role of SEED_ROLES){
