@@ -5,6 +5,8 @@ import { calculateScores } from './subscaleCalculations.js';
 import { Push } from 'meteor/activitree:push';
 import { FilesCollection } from 'meteor/ostrio:files';
 
+const https = require('https');
+
 const SEED_ADMIN = {
     username: 'testAdmin',
     password: 'password',
@@ -66,8 +68,8 @@ const SEED_USER2 = {
 const SEED_USERS = [SEED_ADMIN, SEED_SUPERVISOR, SEED_USER, SEED_USER2];
 const SEED_ROLES = ['user', 'supervisor', 'admin'];
 
-//Set Statistical Defaults;
-
+//Server-side constants
+const ttsAPIKey = '';
 
 
 //Configure Push Notifications
@@ -563,6 +565,22 @@ Meteor.methods({
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
             Meteor.users.upsert(Meteor.userId(), {
                 $set: {
+                    curModule: {
+                        moduleId: Meteor.user().curModule.moduleId,
+                        pageId: moduleData.nextPage,
+                        questionId: moduleData.nextQuestion,
+                    },
+                }
+            });
+            return feedback;
+        } else {
+            return false;
+        }
+    },
+    overrideUserDataRoutes: function (moduleData){
+            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            Meteor.users.upsert(Meteor.userId(), {
+                $set: {
                 curModule: {
                     moduleId: Meteor.user().curModule.moduleId,
                     pageId: moduleData.nextPage,
@@ -594,9 +612,8 @@ overrideUserDataRoutes: function (moduleData){
                 pageId: moduleData.nextPage,
                 questionId: moduleData.nextQuestion,
             }
-        }
-    });
-},
+        });
+    },
     getPrivateImage: function(fileName){
         result =  Assets.absoluteFilePath(fileName);
         return result;
@@ -658,6 +675,26 @@ overrideUserDataRoutes: function (moduleData){
         orgFiles.splice(index, 1);
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
     },
+    makeGoogleTTSApiCall: async function(message, audioPromptSpeakingRate, audioVolume) {
+        const request = JSON.stringify({
+            input: {text: message},
+            voice: {languageCode: 'en-US', ssmlGender: 'FEMALE'},
+            audioConfig: {audioEncoding: 'MP3', speakingRate: audioPromptSpeakingRate, volumeGainDb: audioVolume},
+        });
+        const options = {
+            hostname: 'texttospeech.googleapis.com',
+            path: '/v1/text:synthesize?key=' + ttsAPIKey,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+        }
+        return await makeHTTPSrequest(options, request).then(data => {
+            response = JSON.parse(data.toString('utf-8'))
+            const audioDataEncoded = response.audioContent;
+            return audioDataEncoded;
+        });
+    }
 });
 
 //Server Methods
@@ -696,6 +733,27 @@ function answerAssess(correctAnswer, response){
         feedback = false;
     }
     return feedback;
+}
+
+async function makeHTTPSrequest(options, request){
+    return new Promise((resolve, reject) => {
+        let chunks = []
+        const req = https.request(options, res => {        
+            res.on('data', d => {
+                chunks.push(d);
+            })
+            res.on('end', function() {
+                resolve(Buffer.concat(chunks));
+            })
+        })
+        
+        req.on('error', (e) => {
+            reject(e.message);
+        });
+    
+        req.write(request)
+        req.end()
+    });
 }
 
 //Publications and Mongo Access Control
