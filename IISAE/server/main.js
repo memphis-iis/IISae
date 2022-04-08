@@ -536,7 +536,7 @@ Meteor.methods({
         return results;
     },
     saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
-        console.log(moduleData, moduleId, pageId, questionId, response, answerValue);
+        console.log( moduleId, pageId, questionId, response, answerValue);
         response = moduleData.responses[moduleData.responses.length - 1].response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
@@ -556,9 +556,10 @@ Meteor.methods({
                 feedback = answerAssess(correctAnswer, response);
             }
             if(feedback == true){
-                moduleData.score += parseInt(answerValue) * parseFloat(questionWeight) || parseFloat(answerValue);
+                moduleData.score += parseInt(answerValue) * parseFloat(questionWeight);
+                console.log("Score:", moduleData.score, "Added:", answerValue);
             } else; {
-                moduleData.score = moduleData.score;
+                moduleData.score = parseInt(moduleData.score);
             }
             console.log(moduleData.nextPage, moduleData.nextQuestion);
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
@@ -584,7 +585,32 @@ Meteor.methods({
                     moduleId: Meteor.user().curModule.moduleId,
                     pageId: moduleData.nextPage,
                     questionId: moduleData.nextQuestion,
-                }
+                },
+            }
+        })
+        return feedback;
+    } else {
+            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            Meteor.users.upsert(Meteor.userId(), {
+                $set: {
+                curModule: {
+                    moduleId: Meteor.user().curModule.moduleId,
+                    pageId: moduleData.nextPage,
+                    questionId: moduleData.nextQuestion,
+                },
+            }
+        })
+        return false;
+    }
+},
+overrideUserDataRoutes: function (moduleData){
+           ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+           Meteor.users.upsert(Meteor.userId(), {
+            $set: {
+            curModule: {
+                moduleId: Meteor.user().curModule.moduleId,
+                pageId: moduleData.nextPage,
+                questionId: moduleData.nextQuestion,
             }
         });
     },
@@ -628,7 +654,6 @@ Meteor.methods({
     },
     addFileToOrg: function(filePath, fileName,type){
         org = Orgs.findOne({_id: Meteor.user().organization});
-        console.log(org);
         if(typeof org.files === "undefined"){
             org.files = [];
         }
@@ -699,7 +724,6 @@ function getInviteInfo(inviteCode) {
     targetSupervisorName = supervisor.firstname + " " + supervisor.lastname;
     targetOrgId = supervisor.organization;
     targetOrgName = organization.orgName;
-    console.log(targetOrgId,targetOrgName,targetSupervisorId,targetSupervisorName);
     return {targetOrgId, targetOrgName, targetSupervisorId, targetSupervisorName};
 }
 function answerAssess(correctAnswer, response){
@@ -708,7 +732,6 @@ function answerAssess(correctAnswer, response){
     } else {
         feedback = false;
     }
-    console.log(response, correctAnswer, feedback);
     return feedback;
 }
 
