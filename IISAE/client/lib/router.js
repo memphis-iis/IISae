@@ -163,16 +163,6 @@ Router.route('/assessment/:_id/:_questionid', {
     });
   }
 });
-// editing assessments
-Router.route('/assessmentEditor/:_assessmentid', {
-  action: function(){
-    this.render('assessmentEditor', {
-      data:{
-        assessmentid: this.params._assessmentid,
-      }
-    });
-  }
-});
 // editing modules
 Router.route('/moduleEditor/:_moduleId', {
   action: function(){
@@ -262,23 +252,6 @@ Router.route('/moduleReport/:_id', {
     if(Meteor.user()){
       if (Roles.userIsInRole(Meteor.user(), 'admin') || Roles.userIsInRole(Meteor.user(), 'supervisor')  ) {
         this.render('moduleReport');
-      }
-    } else {
-      this.render('/');
-    }
-  }
-});
-// route assessments results report
-Router.route('/assessmentReport/:_id', {
-  subscriptions: function(){
-    subs = [];
-    subs.push(Meteor.subscribe('getAssessmentsResultsByTrialId', this.params._id));
-    return subs;
-  },
-  action: function(){
-    if(Meteor.user()){
-      if (Roles.userIsInRole(Meteor.user(), 'admin') || Roles.userIsInRole(Meteor.user(), 'supervisor')  ) {
-        this.render('assessmentReport');
       }
     } else {
       this.render('/');

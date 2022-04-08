@@ -13,28 +13,6 @@ Template.adminControlPanel.helpers({
     currentUpload() {
         return Template.instance().currentUpload.get();
     },
-    'assignments': function(){
-        data =  Orgs.findOne({_id: Meteor.user().organization}).newUserAssignments;
-        console.log(data);
-        for(i = 0; i < data.length; i++){
-            data.first = false;
-            data.last =  false;
-            if(data[i].type == "assessment"){
-                data[i] = Assessments.findOne({_id: data[i].assignment});
-            }
-            if(data[i].type == "module"){
-                data[i] = Modules.findOne({_id: data[i].assignment});
-            }
-            if(i == 0){
-                data[i].first = true;
-            }
-            if(i == data.length - 1){
-                data[i].last = true;
-            }
-        }
-        return data;
-    },
-  
     'files':  function(){
         files = Orgs.findOne({_id: Meteor.user().organization}).files;
         if(files){
@@ -47,46 +25,6 @@ Template.adminControlPanel.helpers({
             return files;
         }
         return false;
-    },
-    'assessments': function (){
-      const t = Template.instance();
-      userId = t.selectedUser.get();
-      data = Assessments.find().fetch();
-      org = Orgs.findOne({_id: Meteor.user().organization});
-      if(userId == "org"){
-        for(i = 0; i < data.length; i++){
-            data[i].status = "";
-            data[i].orgView = true;
-            if(org.newUserAssignments && org.newUserAssignments.findIndex(x => x.assignment === data[i]._id) > -1){
-                data[i].status += "Assigned to new users. ";
-                data[i].newUserRequired = true;
-            } 
-            if(data[i].owner == org._id){
-                data[i].status += "Created by your organization."
-                data[i].owned = true;
-            }
-            if(data[i].owner == false){
-                data[i].status += "Uploaded by App Administrator."
-            }
-            if(Meteor.user().author){
-                data[i].owned = true;
-            }
-        }
-      } else {
-        user = Meteor.users.findOne({_id: userId});
-        for(i = 0; i < data.length; i++){
-            data[i].orgView = false;
-            if(user.assigned.includes(data[i]._id)){
-                data[i].assigned = true;
-                data[i].status = "Assigned and not completed.";
-            } else {
-             
-                data[i].status = "Not assigned.";
-                data[i].assigned = false;
-            }
-        }
-        } 
-        return data;
     },
     'module': function(){
         data = Modules.find().fetch();
@@ -202,17 +140,6 @@ Template.adminControlPanel.events({
         org.newUserAssignments.splice(index, 1);
         Meteor.call('changeAssignmentToNewUsers', org.newUserAssignments);
     },
-    'click #assign-all': function(event){
-        event.preventDefault();
-        newAssignment = $(event.target).data("assessment-id");
-        Meteor.call('assignToAllUsers', newAssignment);
-        assignment = Assessments.findOne({_id: newAssignment});
-        $('#alert').show();
-        $('#alert').removeClass();
-        $('#alert').addClass("alert alert-success");
-        $('#alert-p').html("Successfully assigned " + assignment.title + " to all users.");
-
-    },
     'click #close-alert': function(event){
         $('#alert').hide();
 
@@ -224,29 +151,6 @@ Template.adminControlPanel.events({
     'click #close-mods-alert': function(event){
         $('#alert-mods').hide();
 
-    },
-    'click #copy-assessment': function (event){
-        assessment = $(event.target).data("assessment-id");
-        newOwner = Meteor.user().organization;
-        Meteor.call('copyAssessment', {
-            newOwner: newOwner,
-            assessment: assessment
-        });
-    },
-    'click #edit-assessment': function (event){
-        assessment = $(event.target).data("assessment-id");
-        Router.go('/assessmentEditor/' + assessment);
-    },
-    'click #delete-assessment': function (event){
-        event.preventDefault();
-        deletedAssessment = $(event.target).data("assessment-id");
-        assessment = Assessments.findOne({_id: deletedAssessment});
-        $('#alert').show();
-        $('#alert').removeClass();
-        $('#alert').addClass("alert alert-danger");
-        $('#alert-p').html("This cannot be undone." + assessment.title + " will be permanently deleted. Did you make a backup?");
-        $('#alert-confirm').attr('data-assessment-id', deletedAssessment);
-        $('#alert-confirm').addClass("confirm-delete-assessment");
     },
     'click #copy-module': function (event){
         newModule = $(event.target).data("module-id");
@@ -362,7 +266,6 @@ Template.adminControlPanel.events({
 Template.adminControlPanel.onCreated(function() {
     Meteor.subscribe('getUsersInOrg');
     Meteor.subscribe('getSupervisorsInOrg');
-    Meteor.subscribe('assessments');
     Meteor.subscribe('getUserModuleResults');
     Meteor.subscribe('modules');
     this.selectedUser = new ReactiveVar("org");

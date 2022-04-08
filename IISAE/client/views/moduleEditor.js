@@ -3,26 +3,46 @@ Template.moduleEditor.helpers({
         moduleId = this.moduleId; 
         curModule = Modules.findOne({_id: moduleId});
         pages = curModule.pages;
+        curModule.pageFlowVarNames = Object.keys(curModule.pageFlowVars);
         for(i = 0; i < pages.length; i++){
             pages[i].isActivity = false;
+            nextFlowParms = pages[i].nextFlow;
+            for(j=0;j < nextFlowParms.length; j++){
+                pages[i].nextFlow[j].parent=i;
+                pages[i].nextFlow[j].pageFlowVars = Object.keys(curModule.pageFlowVars);
+                pages[i].nextFlow[j].pageList = pages;
+                
+            }
             if(pages[i].type == "activity"){
                 pages[i].isActivity = true;
                 if(typeof pages[i].questions !== "undefined"){
                     questions = pages[i].questions;
                     for(j=0;j < questions.length; j++){
                         questions[j].parent = i;
+                        questions[j].showTextOptions = true;
                         questions[j].isCombo = false;
                         questions[j].isMultiChoice = false;
+                        if(questions[j].autoTutorScript){
+                            autoTutorScripts = pages[i].questions[j].autoTutorScript;
+                            for(k=0;k < autoTutorScripts.length; k++){
+                                pages[i].questions[j].autoTutorScript[k].page = i;
+                                pages[i].questions[j].autoTutorScript[k].parent= j;
+                                pages[i].questions[j].autoTutorScript[k].characterChoices = curModule.autoTutorCharacter;
+                            }
+                        }
                         if(questions[j].type == "combo"){ 
                             questions[j].isCombo = true;
+                            questions[j].showTextOptions = false;
                             if(typeof questions[j].fields !== "undefined"){
                                 fields = questions[j].fields;
                                 for(k=0;k < fields.length;k++){
+                                    fields[k].showTextOptions = true;
                                     fields[k].page = i;
                                     fields[k].parent = j;
                                     fields[k].isMultiChoice = false;
                                     if(fields[k].type == "multiChoice"){
                                         fields[k].isMultiChoice = true;
+                                        fields[k].showTextOptions = false;
                                         if(typeof fields[k].answers !== "undefined"){
                                             answers = fields[k].answers;
                                             for(l=0;l < answers.length; l++){
@@ -38,6 +58,7 @@ Template.moduleEditor.helpers({
                         if(questions[j].type == "multiChoice"){
                             answers = questions[j].answers;
                             questions[j].isMultiChoice = true;
+                            questions[j].showTextOptions = false;
                             if(typeof answers !== "undefined"){
                                 for(k = 0; k < answers.length; k++){
                                     answers[k].parent = j;
@@ -48,13 +69,25 @@ Template.moduleEditor.helpers({
                     }
                 }
             }
+            if(pages[i].autoTutorScript){
+                autoTutorScripts = pages[i].autoTutorScript;
+                for(j=0;j < autoTutorScripts.length; j++){
+                    pages[i].autoTutorScript[j].parent = i;
+                    pages[i].autoTutorScript[j].characterChoices = curModule.autoTutorCharacter;
+                }
+            }
         }
+        console.log(curModule);
         return curModule;
     },
     'json': function(){
         moduleId = this.moduleId; 
         curModule = Modules.findOne({_id: moduleId});
         return JSON.stringify(curModule, null, 2);
+    },
+    'AutoTutorCharacters': function(){
+                
+        return AutoTutorCharacters.find({}).fetch();
     },
 });
 
@@ -123,7 +156,13 @@ Template.moduleEditor.events({
         moduleId = $('#moduleId').val();
         addModuleItem(moduleId, field);
     },
-    
+    'change .markCorrect': function(event){
+        event.preventDefault();
+        moduleId = $('#moduleId').val();
+        field = event.target.getAttribute('data-field');
+        result = event.target.getAttribute('data-value');
+        changeModule(moduleId, field, result);
+    }
 })
 
 Template.moduleEditor.onCreated(function() {

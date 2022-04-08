@@ -57,10 +57,8 @@ Meteor.startup(async function() {
             }).fetch();
             userListResponse = []
             for(i = 0; i < userlist.length; i++){
-                userTrials = Trials.find({userId: userlist[i]._id}).fetch();
                 userModules = Modules.find({userId: userlist[i]._id}).fetch();
                 curUser = userlist[i];
-                curUser.trials = JSON.parse(JSON.stringify(userTrials));
                 curUser.modules = JSON.parse(JSON.stringify(userModules));
                 userListResponse.push(curUser);
             }
@@ -132,18 +130,9 @@ Meteor.methods({
         }
     },
     createOrganization: function(newOrgName, newOrgOwner, newOrgDesc, useDefaultFlow){
-        allAssessments = Assessments.find().fetch();
         allModules = Modules.find().fetch();
         newUserAssignments = [];
         if(useDefaultFlow){
-            for(i=0; i<allAssessments.length; i++){
-                assessment = allAssessments[i]._id;
-                data = {
-                    assignment: assessment,
-                    type: "assessment"
-                }
-                newUserAssignments.push(data);
-            }
             for(i=0; i<allModules.length; i++){
                 modules = allModules[i]._id;
                 data = {
@@ -236,34 +225,6 @@ Meteor.methods({
         assignment = input[1];
         Meteor.users.upsert({_id: userId},{$set: {assigned: assignment}});
     },
-    deleteAssessment: function(assessment){
-        Assessments.remove({_id: assessment});
-    },
-    copyAssessment: function(input){
-        orgId = input.newOwner;
-        assessment = input.assessment;
-        copiedAssessment = Assessments.findOne({_id: assessment});
-        delete copiedAssessment._id;
-        copiedAssessment.owner = orgId;
-        copiedAssessment.title = copiedAssessment.title + " copy";
-        Assessments.insert(copiedAssessment);
-    },
-    createAssessment: function(){
-        orgId = Meteor.user().organization,
-        newAssessment = {
-            title: "New Assessment",
-            identifier: "New",
-            display: false,
-            description: "Description",
-            questions: [],
-            answers: [],
-            answerValues: [],
-            reversedValues: [],
-            reversedQuestions: [],
-            owner: orgId
-        }
-        Assessments.insert(newAssessment);
-    },
     deleteModule: function(module){
         Modules.remove({_id: module});
     },
@@ -284,34 +245,16 @@ Meteor.methods({
             display: false,
             description: "Description",
             pages: [],
-            owner: orgId
+            owner: orgId,
+            fallbackRoute: "nextPage",
+            pageFlowVars: {
+                score: 0
+            }
         }
         Modules.insert(newModule);
     },
-
-
-    changeAssessment(input){
-        assessmentId = input.assessmentId;
-        field = input.field;
-        result = input.result
-        assessment = Assessments.findOne({_id: assessmentId});
-        if(field == "reversedQuestions"){
-            result = parseInt(result);
-            index = assessment.reversedQuestions.indexOf(result);
-            if(index > -1){
-                assessment.reversedQuestions.splice(index,1);
-            } else {
-                assessment.reversedQuestions.push(result);
-            }
-            assessment.reversedQuestions.sort(function(a,b){return a - b});
-        } else {
-            text = "assessment." + field + "=" + result;
-            eval(text);
-        }
-        Assessments.update(assessmentId, {$set: assessment});
-
-    },
     changeModule(input){
+        console.log(input);
         moduleId = input.moduleId;
         field = input.field;
         result = input.result
@@ -319,57 +262,6 @@ Meteor.methods({
         text = "curModule." + field + "=" + result;
         eval(text);
         Modules.update(moduleId, {$set: curModule});
-    },
-    deleteAssessmentItem(input){
-        assessmentId = input.assessmentId;
-        field = input.field;
-        assessment = Assessments.findOne({_id: assessmentId})
-        fieldParsed = field.split(".")
-        item = fieldParsed[fieldParsed.length - 1].split("[");
-        index = item[1].substring(0, item[1].length - 1);
-        index = parseInt(index);
-        if(fieldParsed.length == 1){
-            items = eval("assessment." + item[0])
-        } else {
-            prefix = "";
-            for(i = 0; i < fieldParsed.length - 1; i++){
-                prefix+=fieldParsed[i] + ".";
-            }
-            items = eval("assessment." + prefix + item[0])
-        }
-        items.splice(index, 1);
-        text = "assessment." + item[0] + "=items";
-        eval(text);
-        Assessments.update(assessmentId, {$set: assessment});
-    },
-    addAssessmentItem(input){
-        assessmentId = input.assessmentId;
-        field = input.field;
-        assessment = Assessments.findOne({_id: assessmentId});
-        text = "assessment." + field;
-        newField = eval(text);
-        if(typeof newField[0] === "object"){
-            keys = Object.keys(newField[0]);
-            newItem = {};
-            for(i = 0; i < keys.length; i++){
-                text = "newField[i]." + keys[i];
-                key = eval(text);
-                subField = eval('newField[i].' + keys[i] );
-                if(typeof subField == 'string'){
-                    text = 'newItem.' + keys[i] + '= \"New\"';
-                    eval(text);
-                }
-                if(typeof subField == "object"){
-                    text = 'newItem.' + keys[i] + '= []';
-                    eval(text);
-                }
-            }
-            newField.push(newItem)
-        
-        } else {
-            newField.push('New');
-        }
-        Assessments.upsert(assessmentId, {$set: assessment});
     },
     deleteModuleItem(input){
         moduleId = input.moduleId;
@@ -429,17 +321,52 @@ Meteor.methods({
             console.log('undefined: ' + addedField);          
             if(addedField == "questions"){
                 data = {
-                    type :"New",
+                    type :"multiChoice",
                     prompt: "New"
                 }
                 text = "curModule." + field + "=[data]";
                 console.log(text);
                 eval(text);
             }
+            if(addedField == 'autoTutorScript'){
+                data = 
+                    {
+                        role: "teacher",
+                        character: "default",
+                        script: "text script",
+                    };
+                text = "curModule." + field + "=[data]";
+                eval(text);
+            }
+            if(addedField == 'nextFlow'){
+                data =  
+                    {
+                        condition: "",
+                        operand: "=",
+                        threshold: 1,
+                        route: 0
+                    };
+                text = "curModule." + field + "=[]; curModule." + field + ".push(data)";
+               eval(text);
+            }
+            if(addedField == 'autoTutorCharacter'){
+                data = 
+                    {
+                        role: "teacher",
+                        name: "Phil",
+                        template: "default",
+                    };
+                text = "curModule." + field + "=[data]";
+                eval(text);
+            }
             if(addedField == "pages" || addedField == "fields"){
                 data = {
                     type :"New",
-                    text: "New"
+                    text: "New",
+                    nextFlow: [],
+                    pageFlowVars: {
+                        score: 0
+                    }
                 }
                 text = "curModule." + field + "=[data]";
                 console.log(text);
@@ -457,89 +384,6 @@ Meteor.methods({
         Modules.upsert(moduleId, {$set: curModule});
     },
     //assessment data collection
-    saveAssessmentData: function(newData){
-        trialId = newData.trialId;
-        assessmentId = newData.assessmentId
-        assessmentName = newData.assessmentName
-        userId = Meteor.userId();
-        questionId = newData.questionId;
-        oldResults = Trials.findOne({_id: trialId});
-        let identifier;
-        
-        if(typeof oldResults === "undefined"){
-            data = [];
-            subscaleTotals = {};
-            identifier = newData.identifier;
-        } else {
-            data = oldResults.data;
-            subscaleTotals = oldResults.subscaleTotals;
-            identifier = oldResults.identifier;
-        }
-        data[newData.questionId] = {
-            response: newData.response,
-            responseValue: newData.responseValue,
-            subscales: newData.subscales
-        }
-        //sum the response values by subscale for data reporting
-        if(!newData.subscales){
-            //current assessment doesnt use subscales, just tally the totalls
-            if(subscaleTotals['default']){
-                subscaleTotals['default'] += newData.responseValue;
-            }
-            else{
-                subscaleTotals['default'] = newData.responseValue;
-            }
-        }
-        for(let subscale of newData.subscales){
-            if(subscaleTotals[subscale]){
-                subscaleTotals[subscale] += newData.responseValue;
-            }
-            else{
-                subscaleTotals[subscale] = newData.responseValue;
-            }
-        }
-        var output = Trials.upsert({_id: trialId}, {$set: {userId: userId, assessmentId: assessmentId, assessmentName: assessmentName, lastAccessed: new Date(), identifier: identifier, data: data, subscaleTotals: subscaleTotals, curQuestion: newData.questionId}});
-
-        if(typeof output.insertedId === "undefined"){
-            Meteor.users.update(userId, {
-                $set: {
-                  curTrial: {
-                      trialId: trialId,
-                      questionId: questionId + 1
-                  }
-                }
-              });
-            return trialId;
-        } else {
-            Meteor.users.update(userId, {
-                $set: {
-                    curTrial: {
-                        trialId: output.insertedId,
-                        questionId: 1
-                    }
-                }
-              });
-            return output.insertedId;
-        }
-    },
-    endAssessment: function(trialId) {
-        let trial = Trials.findOne({'_id': trialId});
-        const adjustedScores = calculateScores(trial.identifier, trial.subscaleTotals, Meteor.user().sex)
-        if(adjustedScores)
-            Trials.upsert({_id: trialId}, {$set: {subscaleTotals: adjustedScores, completed: "true"}});
-    },
-    clearAssessmentProgress: function (){
-        userId = Meteor.userId();
-
-        Meteor.users.update(userId, {
-            $set: {
-              curTrial: {
-                  trialId: 0,
-                  questionId: 0
-              }
-            }
-          });
-    },
     createNewModuleTrial: function(data){
         const results = ModuleResults.insert(data);
             Meteor.users.update(Meteor.userId(), {
@@ -548,28 +392,64 @@ Meteor.methods({
                     moduleId: results,
                     pageId: 0,
                     questionId: 0,
+                    score: 0
                  }
                 }
             });
         return results;
     },
-    saveModuleData: function (moduleData){
-        ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-        nextModule = Meteor.users.findOne({_id: Meteor.userId()}).nextModule;
-        console.log("nextModule", nextModule, typeof nextModule);
-        if(moduleData.nextPage == 'completed'){
-            nextModule++;
-        }
-        Meteor.users.upsert(Meteor.userId(), {
+    saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
+        console.log(moduleData, moduleId, pageId, questionId, response, answerValue);
+        response = moduleData.responses[moduleData.responses.length - 1].response;
+        questionType = moduleData.questionType;
+        curModule = Modules.findOne({_id: moduleId});
+        feedback = "disabled";
+        if(curModule){
+            correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer
+            enableFeedback = curModule.enableFeedback
+            enableWeightedQuestions = curModule.enableWeightedQuestions;
+            questionWeight = 1;
+            if(!moduleData.score){
+                moduleData.score = 0;
+            }
+            if(enableWeightedQuestions){
+                questionWeight = curModule.pages[pageId].questions[0].weight
+            }
+            if(enableFeedback){
+                feedback = answerAssess(correctAnswer, response);
+            }
+            if(feedback == true){
+                moduleData.score += parseInt(answerValue) * parseFloat(questionWeight) || parseFloat(answerValue);
+            } else; {
+                moduleData.score = moduleData.score;
+            }
+            console.log(moduleData.nextPage, moduleData.nextQuestion);
+            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            Meteor.users.upsert(Meteor.userId(), {
+                $set: {
+                curModule: {
+                    moduleId: Meteor.user().curModule.moduleId,
+                    pageId: moduleData.nextPage,
+                    questionId: moduleData.nextQuestion,
+                },
+            }
+        })
+        return feedback;
+    } else {
+        return false;
+    }
+},
+overrideUserDataRoutes: function (moduleData){
+           ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+           Meteor.users.upsert(Meteor.userId(), {
             $set: {
             curModule: {
                 moduleId: Meteor.user().curModule.moduleId,
                 pageId: moduleData.nextPage,
                 questionId: moduleData.nextQuestion,
-            },
-            nextModule: nextModule
+            }
         }
-    })
+    });
 },
     getPrivateImage: function(fileName){
         result =  Assets.absoluteFilePath(fileName);
@@ -592,58 +472,6 @@ Meteor.methods({
               }
             }
         });
-    },
-    calcOrgStats: function(){
-        users = Meteor.users.find({organization: Meteor.user().organization}).fetch();
-        subscales = [];
-        subscaleList = [];
-        data = {};
-        data.userCount = users.length;
-        data.assessmentCount = 0;
-        data.moduleCount = 0;
-        subscaleData = [];
-        for(i = 0; i < users.length; i++){
-            trials = Trials.find({"userId": users[i]._id}).fetch();
-            for(j = 0; j < trials.length; j++){
-                data.assessmentCount++;
-                for(k = 0; k < Object.getOwnPropertyNames(trials[j].subscaleTotals).length; k++){
-                    subscale = Object.getOwnPropertyNames(trials[j].subscaleTotals)[k];
-                    subscaleIndex = subscaleList.indexOf(subscale);
-                    if(subscaleIndex === -1){
-                        subscaleList.push(subscale);
-                        subscaleIndex = subscaleList.indexOf(subscale);
-                        subscaleData[subscaleIndex] = {
-                            name: subscale,
-                            all: [trials[j].subscaleTotals[subscale]],
-                            count: 1,
-                            sum: trials[j].subscaleTotals[subscale],
-                            avg:  trials[j].subscaleTotals[subscale],
-                            median: trials[j].subscaleTotals[subscale],
-                        };
-                    } else {
-                        subscaleData[subscaleIndex].all.push(trials[j].subscaleTotals[subscale]);
-                        subscaleData[subscaleIndex].count++;
-                        subscaleData[subscaleIndex].sum+= trials[j].subscaleTotals[subscale];
-                        subscaleData[subscaleIndex].avg = subscaleData[subscaleIndex].sum / subscaleData[subscaleIndex].count;
-                        const sorted = subscaleData[subscaleIndex].all.slice().sort((a, b) => a - b);
-                        const middle = Math.floor(sorted.length / 2);
-                        if (sorted.length % 2 === 0) {
-                            median = (sorted[middle - 1] + sorted[middle]) / 2;
-                        } else {
-                            median = sorted[middle];
-                        }
-                        subscaleData[subscaleIndex].median = median;
-                    }
-           
-                }
-            }
-        }
-        data.subscaleData = subscaleData;
-        Orgs.upsert({_id: Meteor.user().organization},{
-            $set: {
-                orgStats: data
-            }
-        })
     },
     createEvent: function(type, month, day, year, time, title, importance){
         Events.insert({
@@ -684,7 +512,7 @@ Meteor.methods({
         index = orgFiles.findIndex(x => x.name === fileName);
         orgFiles.splice(index, 1);
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
-    }
+    },
 });
 
 //Server Methods
@@ -717,17 +545,17 @@ function getInviteInfo(inviteCode) {
     console.log(targetOrgId,targetOrgName,targetSupervisorId,targetSupervisorName);
     return {targetOrgId, targetOrgName, targetSupervisorId, targetSupervisorName};
 }
+function answerAssess(correctAnswer, response){
+    if(response.toLowerCase() == correctAnswer.toLowerCase()){
+        feedback = true;
+    } else {
+        feedback = false;
+    }
+    console.log(response, correctAnswer, feedback);
+    return feedback;
+}
 
 async function insertDefaultAssignments(){
-    if(Assessments.find().count() === 0){
-        console.log('Importing Default Assessments into Mongo.')
-        var data = JSON.parse(Assets.getText('defaultAssessments.json'));
-        for(let assessment of data['assessments']){
-            console.log(assessment['assessment'])
-            assessment['assessment'].owner = false;
-            await Assessments.insert(assessment['assessment']);
-        }
-    }
     if(Modules.find().count() === 0){
         console.log('Importing Default Modules into Mongo.')
         var data = JSON.parse(Assets.getText('defaultModules.json'));
@@ -753,10 +581,6 @@ Meteor.publish(null, function() {
     return Meteor.users.find({_id: this.userId});
 });
 
-//Publish current assessment information
-Meteor.publish('curAssessment', function(id) {
-    return Assessments.find({_id: id});
-});
 
 //allow admins to see all users of org, Can only see emails of users. Can See full data of supervisors
 Meteor.publish('getUsersInOrg', function() {
@@ -790,19 +614,6 @@ Meteor.publish(null, function () {
         this.ready()
     }
 });
-//allow assessments to be published
-Meteor.publish('assessments', function () {
-    return Assessments.find({});
-});
-
-//allow current users trial data to be published
-Meteor.publish('usertrials', function () {
-    if(Roles.userIsInRole(this.userId, ['admin', 'supervisor']))
-        return Trials.find();
-    return Trials.find({'userId': this.userId});
-});
-
-//allow cur
 //allow current module pages to be published
 Meteor.publish('curModule', function (id) {
     return Modules.find({_id: id});
@@ -819,10 +630,6 @@ Meteor.publish('getUserModuleResults', function (id) {
 Meteor.publish('getModuleResultsByTrialId', function (id) {
     return ModuleResults.find({_id: id});
 });
-Meteor.publish('getAssessmentsResultsByTrialId', function (id) {
-    return Trials.find({_id: id});
-});
-
 //get my events
 Meteor.publish(null, function() {
     return Events.find({createdBy: this.userId});

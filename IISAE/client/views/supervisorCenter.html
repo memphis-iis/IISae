@@ -1,19 +1,5 @@
 <template name="supervisorCenter">
     <div class="px-4 py-5 my-5 text-center">
        <h1>Supervisor Center</h1>
-       <p class="lead mb-4">Below are a list of available assessments to help you evaluate your mental health.</p>
-       <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-            {{#each assessment}}
-                {{#if this.display}} 
-                    <div class="assessment" style="margin-top:5px;">
-                        <hr>
-                        <h3>{{this.title}}</h3>
-                        <p>{{this.description}}</p>
-                        <p><i>Last Assessed:</i>{{this.lastAssessed}}</p>
-                        <button id="startAssessment" class="startAssessment btn btn-primary {{this.identifier}}">Begin {{this.title}}</button>
-                    </div>
-                {{/if}}
-            {{/each}}
-        </div>
     </div>
 </template>

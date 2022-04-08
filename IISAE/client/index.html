@@ -1,6 +1,6 @@
 <head>
   <meta charset="utf-8">
-  <title>ISSAE</title>
+  <title>IIS Assessment Engine</title>
   <style>
     body {
         /* Handle fixed navbars at bottom of page */
@@ -21,29 +21,19 @@
     <div class="container">
       <ul class="nav nav-pills nav-fill justify-content-right">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/profile">ISS<i>ae</i>{{#if organization}} | <span class="orgLogo">{{organization.orgNameTruncated}}</span> {{/if}}</a>
+          <a class="nav-link active" aria-current="page" href="/profile">IIS<i>ae</i>{{#if organization}} | <span class="orgLogo">{{organization.orgNameTruncated}}</span> {{/if}}</a>
         </li>
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/profile"><span class="glyphicon glyphicon-home"></span></a>
         </li>
         {{#if isInRole 'supervisor,admin'}}
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/calendar"><span class="glyphicon glyphicon-calendar"></span></a>
-        </li>
         <li>
           <a class="nav-link active" aria-current="page" href="/control-panel"><span class="glyphicon glyphicon-cog"></span></a>
         </li>
-        {{else}}
-        {{#if currentUser.assigned}}
+        {{/if}}
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/calendar"><span class="glyphicon glyphicon-calendar"></span></a>
         </li>
-        {{else}}
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/userAssessmentReport"><span class="glyphicon glyphicon-dashboard"></span></a>
-        </li>
-        {{/if}}
-        {{/if}}
         <li class="nav-item">
           <a class="nav-link active" id="logoutButton" href="/logout" aria-current="page"><span class=" glyphicon glyphicon-log-out"></span></a>
         </li>
