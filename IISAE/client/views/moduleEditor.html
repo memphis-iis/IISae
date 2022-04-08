@@ -411,10 +411,10 @@
         <a id="add-item" data-field="pages[{{@index}}].questions">Add Question</a><br>
         {{/if}}
         {{#if this.nextFlow}}
-        <h4><u>Simple Adaptive Page Flow Conditions</u></h4>
+        <h4><u>Page Routes</u></h4>
         <table class="table" id="flowList">
             <thead>
-                <th scope="col" width="30%">Variable</th>
+                <th scope="col" width="30%">Type</th>
                 <th scope="col" width="10%">Threshold</th>
                 <th scope="col" width="30%">Page to Route To</th>
                 <th scope="col" width="20%">Options</th>
@@ -426,8 +426,9 @@
                     <td>
                         <select id="type" class="combo-save" data-field="pages[{{this.parent}}].nextFlow[{{@index}}].condition">
                             <option >{{this.condition}}</option>
+                            <option value="static">Static</option>
                             {{#each this.pageFlowVars}}
-                            <option >{{this}}</option>
+                            <option val="{{this}}">{{this}}</option>
                             {{/each}}
                         </select>
                         <select id="type" class="combo-save" data-field="pages[{{this.parent}}].nextFlow[{{@index}}].operand">
@@ -471,7 +472,7 @@
         {{/if}}
         <br>
         <br>
-        <a id="add-item" data-field="pages[{{@index}}].nextFlow">Add Simple Adaptive Page Flow Condition</a>
+        <a id="add-item" data-field="pages[{{@index}}].nextFlow">Add Page Route</a>
         </div>
     {{/each}}
     <a id="add-item" data-field="pages">Add Page</a>

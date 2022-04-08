@@ -7,6 +7,7 @@ import { FilesCollection } from 'meteor/ostrio:files';
 import { insertSeedData } from './seedData'
 
 export { addUserToRoles }
+
 //Configure Push Notifications
 serviceAccountData = null;
 //Public Dynamic Assets
@@ -399,7 +400,7 @@ Meteor.methods({
         return results;
     },
     saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
-        console.log(moduleData, moduleId, pageId, questionId, response, answerValue);
+        console.log( moduleId, pageId, questionId, response, answerValue);
         response = moduleData.responses[moduleData.responses.length - 1].response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
@@ -419,11 +420,28 @@ Meteor.methods({
                 feedback = answerAssess(correctAnswer, response);
             }
             if(feedback == true){
-                moduleData.score += parseInt(answerValue) * parseFloat(questionWeight) || parseFloat(answerValue);
+                moduleData.score += parseInt(answerValue) * parseFloat(questionWeight);
+                console.log("Score:", moduleData.score, "Added:", answerValue);
             } else; {
-                moduleData.score = moduleData.score;
+                moduleData.score = parseInt(moduleData.score);
             }
             console.log(moduleData.nextPage, moduleData.nextQuestion);
+            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            Meteor.users.upsert(Meteor.userId(), {
+                $set: {
+                    curModule: {
+                        moduleId: Meteor.user().curModule.moduleId,
+                        pageId: moduleData.nextPage,
+                        questionId: moduleData.nextQuestion,
+                    },
+                }
+            });
+            return feedback;
+        } else {
+            return false;
+        }
+    },
+    overrideUserDataRoutes: function (moduleData){
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
             Meteor.users.upsert(Meteor.userId(), {
                 $set: {
@@ -436,6 +454,16 @@ Meteor.methods({
         })
         return feedback;
     } else {
+            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            Meteor.users.upsert(Meteor.userId(), {
+                $set: {
+                curModule: {
+                    moduleId: Meteor.user().curModule.moduleId,
+                    pageId: moduleData.nextPage,
+                    questionId: moduleData.nextQuestion,
+                },
+            }
+        })
         return false;
     }
 },
@@ -448,9 +476,8 @@ overrideUserDataRoutes: function (moduleData){
                 pageId: moduleData.nextPage,
                 questionId: moduleData.nextQuestion,
             }
-        }
-    });
-},
+        });
+    },
     getPrivateImage: function(fileName){
         result =  Assets.absoluteFilePath(fileName);
         return result;
@@ -491,7 +518,6 @@ overrideUserDataRoutes: function (moduleData){
     },
     addFileToOrg: function(filePath, fileName,type){
         org = Orgs.findOne({_id: Meteor.user().organization});
-        console.log(org);
         if(typeof org.files === "undefined"){
             org.files = [];
         }
@@ -513,6 +539,26 @@ overrideUserDataRoutes: function (moduleData){
         orgFiles.splice(index, 1);
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
     },
+    makeGoogleTTSApiCall: async function(message, audioPromptSpeakingRate, audioVolume) {
+        const request = JSON.stringify({
+            input: {text: message},
+            voice: {languageCode: 'en-US', ssmlGender: 'FEMALE'},
+            audioConfig: {audioEncoding: 'MP3', speakingRate: audioPromptSpeakingRate, volumeGainDb: audioVolume},
+        });
+        const options = {
+            hostname: 'texttospeech.googleapis.com',
+            path: '/v1/text:synthesize?key=' + ttsAPIKey,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+        }
+        return await makeHTTPSrequest(options, request).then(data => {
+            response = JSON.parse(data.toString('utf-8'))
+            const audioDataEncoded = response.audioContent;
+            return audioDataEncoded;
+        });
+    }
 });
 
 //Server Methods
@@ -542,7 +588,6 @@ function getInviteInfo(inviteCode) {
     targetSupervisorName = supervisor.firstname + " " + supervisor.lastname;
     targetOrgId = supervisor.organization;
     targetOrgName = organization.orgName;
-    console.log(targetOrgId,targetOrgName,targetSupervisorId,targetSupervisorName);
     return {targetOrgId, targetOrgName, targetSupervisorId, targetSupervisorName};
 }
 function answerAssess(correctAnswer, response){
@@ -551,7 +596,6 @@ function answerAssess(correctAnswer, response){
     } else {
         feedback = false;
     }
-    console.log(response, correctAnswer, feedback);
     return feedback;
 }
 
@@ -565,6 +609,25 @@ async function insertDefaultAssignments(){
             await Modules.insert(newModule);
         };
     }
+async function makeHTTPSrequest(options, request){
+    return new Promise((resolve, reject) => {
+        let chunks = []
+        const req = https.request(options, res => {        
+            res.on('data', d => {
+                chunks.push(d);
+            })
+            res.on('end', function() {
+                resolve(Buffer.concat(chunks));
+            })
+        })
+        
+        req.on('error', (e) => {
+            reject(e.message);
+        });
+    
+        req.write(request)
+        req.end()
+    });
 }
 
 //Publications and Mongo Access Control
@@ -593,7 +656,7 @@ Meteor.publish('getUsersInOrg', function() {
 });
 
 Meteor.publish('getSupervisorsInOrg', function() {
-    if(Roles.userIsInRole(this.userId, 'admin')){
+https://github.com/memphis-iis/IISae/pull/13/conflict?name=IISAE%252Fserver%252Fmain.js&ancestor_oid=3547d8f237c5001014a2929db0f8db7358eee88f&base_oid=3b066d3c3029925e90c740d5439ba302aab7c0c1&head_oid=b3453d9e59e7d5941cc22fe8e6856576afbc5539    if(Roles.userIsInRole(this.userId, 'admin')){
         return Meteor.users.find({ organization: Meteor.user().organization, role: 'supervisor' });
     }
 });
