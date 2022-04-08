@@ -169,7 +169,7 @@ Template.module.events({
             if(typeof Modules.findOne().pages[moduleData.nextPage] !== "undefined"){
               if(typeof Modules.findOne().pages[moduleData.nextPage].questions !== "undefined"){
                   if(moduleData.nextQuestion >= Modules.findOne().pages[moduleData.nextPage].questions.length){
-                      if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow > 0){
+                      if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow.length > 0){
                           moduleData.nextPage = thisPage + 1;
                           moduleData.nextQuestion = 0;
                           target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
@@ -234,7 +234,7 @@ Template.module.events({
                }
           }
         } else {
-            if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow > 0){
+            if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow.length > 0){
                 moduleData.nextPage = parseInt(thisPage) + 1;
                 moduleData.nextQuestion = 0;
                 data = {
