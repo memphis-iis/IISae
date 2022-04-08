@@ -57,6 +57,18 @@ Template.profile.events({
 })
 
 
-Template.profile.onCreated(function() {
+Template.profile.onCreated(function() {let text = data.text
+    let audioPromptSpeakingRate = 1
+    let audioVolume = .5
+    Meteor.call('makeGoogleTTSApiCall', text, audioPromptSpeakingRate, audioVolume, function(err, res) {
+        if(err){
+            console.log("Something went wrong with TTS, ", err)
+        }
+        if(res != undefined){
+            const audioObj = new Audio('data:audio/ogg;base64,' + res)
+            window.currentAudioObj = audioObj;
+            audioObj.play();
+        }
+    });
     Meteor.subscribe('assessments');
 })
