@@ -110,6 +110,5 @@
             "enableWeightedQuestions" : true,
             "fallbackRoute" : "nextPage"
         }
-      }
-    ]
+    }]
   }

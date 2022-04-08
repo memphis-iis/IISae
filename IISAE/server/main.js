@@ -20,55 +20,6 @@ Meteor.startup(async function() {
         });
     }
 
-    //Iron Router Api
-    Router.route('/api',{
-    where: "server",
-    action: function (){
-        this.response.writeHead(200, {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        });
-        username = this.request.headers['x-user-id'];
-        loginToken = this.request.headers['x-auth-token'];
-        user = Meteor.users.findOne({username: username});
-        isTokenExpired = true;
-        keys = user.api;
-        now = new Date();
-        expDate = keys.expires;
-        expDate.setDate(expDate.getDate())
-        if(now < expDate){
-            isTokenExpired = false;
-        }
-        if(!user || user.api.token != loginToken || isTokenExpired == true){
-            this.response.end("{sucess: false, message: 'incorrect username or expired token'}");
-        } else {
-            organization = Orgs.findOne({orgOwnerId: user._id});
-            userlist = Meteor.users.find({organization: organization._id}, {
-                fields: {
-                    firstname: 0,
-                    lastname: 0,
-                    emails: 0,
-                    username: 0,
-                    role: 0,
-                    supervisorInviteCode: 0,
-                    services: 0,
-                    organization: 0,
-                    api: 0
-                },
-            }).fetch();
-            userListResponse = []
-            for(i = 0; i < userlist.length; i++){
-                userModules = Modules.find({userId: userlist[i]._id}).fetch();
-                curUser = userlist[i];
-                curUser.modules = JSON.parse(JSON.stringify(userModules));
-                userListResponse.push(curUser);
-            }
-            organization.users = userListResponse;
-            this.response.end(JSON.stringify(organization));
-            }
-        }
-  });
-
     //load default JSON assessment/modules into mongo collection
     insertDefaultAssignments().then(function(){
         if(Meteor.isDevelopment) insertSeedData();
@@ -442,39 +393,14 @@ Meteor.methods({
         }
     },
     overrideUserDataRoutes: function (moduleData){
-            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-            Meteor.users.upsert(Meteor.userId(), {
-                $set: {
-                curModule: {
-                    moduleId: Meteor.user().curModule.moduleId,
-                    pageId: moduleData.nextPage,
-                    questionId: moduleData.nextQuestion,
-                },
-            }
-        })
-        return feedback;
-    } else {
-            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-            Meteor.users.upsert(Meteor.userId(), {
-                $set: {
-                curModule: {
-                    moduleId: Meteor.user().curModule.moduleId,
-                    pageId: moduleData.nextPage,
-                    questionId: moduleData.nextQuestion,
-                },
-            }
-        })
-        return false;
-    }
-},
-overrideUserDataRoutes: function (moduleData){
-           ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-           Meteor.users.upsert(Meteor.userId(), {
+        ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+        Meteor.users.upsert(Meteor.userId(), {
             $set: {
-            curModule: {
-                moduleId: Meteor.user().curModule.moduleId,
-                pageId: moduleData.nextPage,
-                questionId: moduleData.nextQuestion,
+                curModule: {
+                    moduleId: Meteor.user().curModule.moduleId,
+                    pageId: moduleData.nextPage,
+                    questionId: moduleData.nextQuestion,
+                }
             }
         });
     },
@@ -609,6 +535,8 @@ async function insertDefaultAssignments(){
             await Modules.insert(newModule);
         };
     }
+}
+
 async function makeHTTPSrequest(options, request){
     return new Promise((resolve, reject) => {
         let chunks = []
@@ -629,79 +557,3 @@ async function makeHTTPSrequest(options, request){
         req.end()
     });
 }
-
-//Publications and Mongo Access Control
-Meteor.users.deny({
-    update() { return true; }
-});
-
-Meteor.users.allow({
-
-});
-
-//Show current user data for current user
-Meteor.publish(null, function() {
-    return Meteor.users.find({_id: this.userId});
-});
-
-
-//allow admins to see all users of org, Can only see emails of users. Can See full data of supervisors
-Meteor.publish('getUsersInOrg', function() {
-    if(Roles.userIsInRole(this.userId, 'admin' )){ 
-        return Meteor.users.find({ organization: Meteor.user().organization, role: 'user' });
-    }
-    else if(Roles.userIsInRole(this.userId, 'supervisor')){
-        return Meteor.users.find({ organization: Meteor.user().organization, role: 'user', supervisor: this.userId})
-    }
-});
-
-Meteor.publish('getSupervisorsInOrg', function() {
-https://github.com/memphis-iis/IISae/pull/13/conflict?name=IISAE%252Fserver%252Fmain.js&ancestor_oid=3547d8f237c5001014a2929db0f8db7358eee88f&base_oid=3b066d3c3029925e90c740d5439ba302aab7c0c1&head_oid=b3453d9e59e7d5941cc22fe8e6856576afbc5539    if(Roles.userIsInRole(this.userId, 'admin')){
-        return Meteor.users.find({ organization: Meteor.user().organization, role: 'supervisor' });
-    }
-});
-
-//Allow users access to Org information
-Meteor.publish(null, function() {
-    if(Meteor.user()){
-        return Orgs.find({_id: Meteor.user().organization});
-    }
-});
-
-//allow the use of Roles.userIsInRole() accorss client
-Meteor.publish(null, function () {
-    if (this.userId) {
-        return Meteor.roleAssignment.find({ 'user._id': this.userId });
-    } 
-    else {
-        this.ready()
-    }
-});
-//allow current module pages to be published
-Meteor.publish('curModule', function (id) {
-    return Modules.find({_id: id});
-});
-//allow all modules to be seen
-Meteor.publish('modules', function () {
-    return Modules.find({});
-});
-//get module results
-Meteor.publish('getUserModuleResults', function (id) {
-    return ModuleResults.find({});
-});
-
-Meteor.publish('getModuleResultsByTrialId', function (id) {
-    return ModuleResults.find({_id: id});
-});
-//get my events
-Meteor.publish(null, function() {
-    return Events.find({createdBy: this.userId});
-});
-
-//get all organization events
-Meteor.publish('events', function() {
-    console.log(Meteor.user().organization, this.userId)
-    if(Meteor.user()){
-        return Events.find({$or: [{ $and: [{org: Meteor.user().organization},{createdBy: this.userId}]},{$and:[{createdBy: Meteor.user().supervisor},{type:"Supervisor Group"}]},{$and: [{org: Meteor.user().organization},{type: "All Organization"}]},{type:this.userId}]}, {sort: {year:1 , month:1, day:1, time:1}})
-    }
-});
