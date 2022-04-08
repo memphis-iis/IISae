@@ -18,6 +18,12 @@ Template.module.helpers({
         }
     },
     'page': function(){
+        $('#refutation').removeClass('alert-success');
+        $('#refutation').removeClass('alert-danger');
+        $('#refutation').text("");
+        $('#refutation').hide();
+        $(':button').prop('disabled', false); 
+        $(':button').removeClass('btn-info');
         page = Modules.findOne().pages[parseInt(this.pageId)];
         const t = Template.instance();
         if(page.type == "text"){
@@ -104,7 +110,7 @@ Template.module.events({
             questionData.questionType = t.questionType.get();
             if(questionData.questionType == "blank"){
                 response = $('.textInput').val();
-                answerValue = $('.textInput').attr('data-value');
+                answerValue = $(event.target).val();
             }
             if(questionData.questionType == "multiChoice"){
                 response = $(event.target).html();
@@ -146,7 +152,6 @@ Template.module.events({
                     } 
                     addedClass = 'alert-' + type;
                     $('#refutation').addClass(addedClass);
-                    console.log(addedClass);
                     $('#refutation').text(message);
                     $('#refutation').show();
                 }
@@ -170,29 +175,34 @@ Template.module.events({
                       } else {
                           conditions = Modules.findOne().pages[thisPage].nextFlow;
                           conditionMet = false;
-                          for(i = 0; i < conditions.length; i++){
+                          for(i = 0; i < conditions.length && !conditionMet ; i++){
                               curCondition = conditions[i];
-                              text = "moduleData." + curCondition.condition + curCondition.operand + curCondition.threshold;
-                              isConditionTrue = eval(text);
-                              console.log('Condition:', isConditionTrue, text, eval("moduleData." + curCondition.condition))
-                              if(isConditionTrue && !conditionMet){
-                                  moduleData.nextPage=curCondition.route;
-                                  moduleData.nextQuestion=0;
-                                  target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
-                                  conditionMet = true;
-                                  if(curCondition.clearScoring){
-                                      console.log('clear score');
-                                      moduleData.score = 0;
-                                  }
-                              }
+                              if(curCondition.condition !== "static"){
+                                text = "moduleData." + curCondition.condition + curCondition.operand + curCondition.threshold;
+                                isConditionTrue = eval(text);
+                                variableStatus = eval("moduleData." + curCondition.condition);
+                                if(isConditionTrue && !conditionMet){
+                                    moduleData.nextPage=curCondition.route;
+                                    moduleData.nextQuestion=0;
+                                    target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
+                                    conditionMet = true;
+                                        console.log('clear score');
+                                        moduleData.score = 0;
+                                    }
+                                } else {
+                                target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
+                                if(curCondition.clearScoring){
+                                    console.log('clear score');
+                                    moduleData.score = 0;
+                                }
+                            }
                           }
                           if(!conditionMet){
-                            console.log('No conditions met.')
                             routing = curModule.fallbackRoute
                             if(routing == 'nextPage'){
                                 moduleData.nextPage = thisPage + 1;
                                 moduleData.nextQuestion = 0;
-                                target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage + "/" + moduleData.nextQuestion;
+                                target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
                             } 
                             if(routing == 'currentPage'){
                                 moduleData.nextPage = thisPage;
@@ -212,7 +222,6 @@ Template.module.events({
                                 target = "/moduleCenter";
                             }
                           }
-                        console.log('routing', moduleData.nextPage, moduleData.nextQuestion);
                         Meteor.call("overrideUserDataRoutes", moduleData);
                       }
                   } else  {
@@ -224,15 +233,67 @@ Template.module.events({
                }
           }
         } else {
-            moduleData.nextPage = parseInt(thisPage) + 1;
-            moduleData.nextQuestion = 0;
-            data = {
-                pageId: thisPage,
-                response: "read",
-                responseTimeStamp: Date.now().toString()
+            if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow > 0){
+                moduleData.nextPage = parseInt(thisPage) + 1;
+                moduleData.nextQuestion = 0;
+                data = {
+                    pageId: thisPage,
+                    response: "read",
+                    responseTimeStamp: Date.now().toString()
+                }
+                Meteor.call("overrideUserDataRoutes", moduleData);
+                target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
+            } else {
+                conditions = Modules.findOne().pages[thisPage].nextFlow;
+                conditionMet = false;
+                for(i = 0; i < conditions.length && !conditionMet ; i++){
+                    curCondition = conditions[i];
+                    if(curCondition.condition !== "static"){
+                      text = "moduleData." + curCondition.condition + curCondition.operand + curCondition.threshold;
+                      isConditionTrue = eval(text);
+                      variableStatus = eval("moduleData." + curCondition.condition);
+                      if(isConditionTrue && !conditionMet){
+                          moduleData.nextPage=curCondition.route;
+                          moduleData.nextQuestion=0;
+                          target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
+                          conditionMet = true;
+                              moduleData.score = 0;
+                          }
+                      } else {
+                      target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
+                      if(curCondition.clearScoring){
+                          moduleData.score = 0;
+                      }
+                  }
+                }
+                if(!conditionMet){
+                  routing = curModule.fallbackRoute
+                  if(routing == 'nextPage'){
+                      moduleData.nextPage = thisPage + 1;
+                      moduleData.nextQuestion = 0;
+                      target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
+                  } 
+                  if(routing == 'currentPage'){
+                      moduleData.nextPage = thisPage;
+                      moduleData.nextQuestion = 0;
+                      target = "/module/" + Modules.findOne()._id + "/" + thisPage;
+                  }
+
+                  if(routing == 'completed'){
+                      moduleData.nextPage = "completed";
+                      moduleData.nextQuestion =  "completed";
+                      target = "/module/" + Modules.findOne()._id + "/completed";
+                  }
+                  if(routing == 'error'){
+                      alert("Something went wrong. No routing found.");
+                      moduleData.nextPage = "error";
+                      moduleData.nextQuestion =  "error";
+                      target = "/moduleCenter";
+                  }
+                }
+              Meteor.call("overrideUserDataRoutes", moduleData);
             }
-            Meteor.call("overrideUserDataRoutes", moduleData);
-            target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
+            
         }
         if(moduleData.nextPage >= Modules.findOne().pages.length){
             moduleData.nextPage = "completed";
