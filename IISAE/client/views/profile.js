@@ -58,7 +58,7 @@ Template.profile.events({
 
 
 Template.profile.onCreated(function() {
-    let text = data.text
+    let text = ''
     let audioPromptSpeakingRate = 1
     let audioVolume = .5
     Meteor.call('makeGoogleTTSApiCall', text, audioPromptSpeakingRate, audioVolume, function(err, res) {
