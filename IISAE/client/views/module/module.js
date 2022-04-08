@@ -26,16 +26,19 @@ Template.module.helpers({
         $(':button').removeClass('btn-info');
         page = Modules.findOne().pages[parseInt(this.pageId)];
         const t = Template.instance();
-        if(page.type == "text"){
-            page.typeText = true;
-            t.pageType.set("text");
-        };
-        if(page.type == "activity"){
-            page.typeActivity = true;
-            t.pageType.set("activity");
-        };
-        if(!page.imgStyle){
-            page.imgStyle = "max-width:50%; height:auto; margin:10px;"
+            if(page){
+            if(page.type == "text"){
+                page.typeText = true;
+                t.pageType.set("text");
+            };
+            if(page.type == "activity"){
+                page.typeActivity = true;
+                t.pageType.set("activity");
+            };
+            if(!page.imgStyle){
+                page.imgStyle = "max-width:50%; height:auto; margin:10px;"
+            }
+            return page;
         }
     },
     'question': function(){
