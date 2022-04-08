@@ -5,6 +5,8 @@ import { calculateScores } from './subscaleCalculations.js';
 import { Push } from 'meteor/activitree:push';
 import { FilesCollection } from 'meteor/ostrio:files';
 
+const https = require('https');
+
 const SEED_ADMIN = {
     username: 'testAdmin',
     password: 'password',
