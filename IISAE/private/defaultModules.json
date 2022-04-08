@@ -6,7 +6,77 @@
             "display": false,
             "identifier": "ISSAE1",
             "order": 0,
-            "pages": []
+            "pages": [
+              {
+                  "type": "text",
+                  "header": "If I were a rich man... ladasdadad",
+                  "text": "This is a test module",
+                  "image": "imageTest.jpg"
+              },
+              {
+                  "type": "activity",
+                  "header": "Awesome Quiz",
+                  "instructions": "This is a sample quiz!",
+                  "questions": [
+                      {
+                          "type": "blank",
+                          "prompt": "This _______ is empty. Fill it in!"
+                      },
+                      {
+                          "type": "multiChoice",
+                          "prompt": "This is a multiple choice question!",
+                          "promptImg": "imageTest.jpg",
+                          "answers": [
+                              {
+                                  "answer": "Yes",
+                                  "value": 1
+                              },
+                              {
+                                  "answer": "No",
+                                  "value" : 2
+                              }
+                          ]
+                      },
+                      {
+                          "type":"longText",
+                          "prompt": "Tell us about yourself",
+                          "promtImg":"imgTest.jpg"
+                      },
+                      {
+                          "type": "combo",
+                          "prompt": "This is a combo question!",
+                          "promptImg": "imageTest.jpg",
+                          "fields":[
+                              {
+                                  "type": "blank",
+                                  "text": "this is a ______."
+                              },
+                              {
+                                  "type":"longtext",
+                                  "text":"tell us about yourself."
+                              },
+                              {
+                                  "type": "dropdown",
+                                  "text": "color",
+                                  "answers": [
+                                      {
+                                          "answer": "Yes",
+                                          "value": 1
+                                      },
+                                      {
+                                          "answer": "No",
+                                          "value" : 2
+                                      }
+                                  ]
+                              }
+                          ]
+
+                      }
+
+                  ]
+
+              }
+          ]
         }
       }
     ]

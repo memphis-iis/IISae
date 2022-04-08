@@ -723,8 +723,9 @@ async function insertDefaultAssignments(){
         console.log('Importing Default Assessments into Mongo.')
         var data = JSON.parse(Assets.getText('defaultAssessments.json'));
         for(let assessment of data['assessments']){
-            assessment.owner = false;
-            await Assessments.insert(assessment);
+            console.log(assessment['assessment'])
+            assessment['assessment'].owner = false;
+            await Assessments.insert(assessment['assessment']);
         }
     }
     if(Modules.find().count() === 0){

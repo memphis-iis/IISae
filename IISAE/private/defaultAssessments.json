@@ -6,10 +6,16 @@
             "owner": false,
             "identifier": "Default",
             "description": "This is the example assessment.",
-            "questions": [{
+            "questions": [
+                {
                 "text": "Test Question 1",
                 "subscales": ["TEST"]
-            }],
+                },
+                {
+                "text": "Test Question 2",
+                "subscales": ["TEST"]
+                }
+            ],
             "answers": ["A", "B", "C", "D"],
             "answerValues": [1, 2, 3, 4],
             "reversedValues": [4, 3, 2, 1],
