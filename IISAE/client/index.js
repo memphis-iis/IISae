@@ -49,9 +49,7 @@ Meteor.startup(() => {
 })
 Template.DefaultLayout.helpers({
   'footer': function(){
-      footer.copyright = "Copyright 2022";
-      footer.message = "ISSAE is developed by The Institute for Intelligent Systems at The University of Memphis."
-      return footer;
+    return {copyright: "Copyright 2022", message: "IISAE is developed by The Institute for Intelligent Systems at The University of Memphis." };
   }
 })
 Template.DefaultLayout.events({

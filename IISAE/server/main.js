@@ -4,159 +4,26 @@ import { Roles } from 'meteor/alanning:roles'; // https://github.com/Meteor-Comm
 import { calculateScores } from './subscaleCalculations.js';
 import { Push } from 'meteor/activitree:push';
 import { FilesCollection } from 'meteor/ostrio:files';
+import { insertSeedData } from './seedData'
 
-const SEED_ADMIN = {
-    username: 'testAdmin',
-    password: 'password',
-    email: 'testAdmin@memphis.edu',
-    firstName: 'Johnny',
-    lastName: 'Test',
-    org : "",
-    supervisorID: "0",
-    role: 'admin',
-    supervisorInviteCode: "12345",
-    sex: 'female',
-    assigned: [],
-    nextModule: -1
-};
-const SEED_SUPERVISOR = {
-    username: 'testSupervisor',
-    password: 'password',
-    email: 'testSupervisor@memphis.edu',
-    firstName: 'Supervisor',
-    lastName: 'Test',
-    org : "",
-    supervisorID: "0",
-    role: 'supervisor',
-    supervisorInviteCode: "12345",
-    sex: 'male',
-    assigned: [],
-    nextModule: -1
-};
-const SEED_USER = {
-    username: 'testUser',
-    password: 'password',
-    email: 'testUser@memphis.edu',
-    firstName: 'User',
-    lastName: 'Test',
-    org : "",
-    supervisorID: "0",
-    role: 'user',
-    supervisorInviteCode: null,
-    sex: 'female',
-    assigned: [],
-    hasCompletedFirstAssessment: false,
-    nextModule: 0
-};
-const SEED_USER2 = {
-    username: 'testUserNotInIIS',
-    password: 'password',
-    email: 'testUserNotInIIS@memphis.edu',
-    firstName: 'User',
-    lastName: 'Test',
-    org : "alksdjhfaslkd",
-    supervisorID: "0",
-    role: 'user',
-    supervisorInviteCode: null,
-    sex: 'male',
-    assigned: [],
-    hasCompletedFirstAssessment: false,
-    nextModule: 0
-};
-const SEED_USERS = [SEED_ADMIN, SEED_SUPERVISOR, SEED_USER, SEED_USER2];
-const SEED_ROLES = ['user', 'supervisor', 'admin'];
-
-//Set Statistical Defaults;
-
-
+export { addUserToRoles }
 
 //Configure Push Notifications
 serviceAccountData = null;
 //Public Dynamic Assets
 
 
-Meteor.startup(() => {
+Meteor.startup(async function() {
     if (Meteor.isServer) {
         Meteor.publish('files.images.all', function () {
           return Images.find().cursor;
         });
     }
 
-    //load default JSON modules into mongo collection
-    if(Modules.find().count() === 0){
-        console.log('Importing Default Modules into Mongo.')
-        var data = JSON.parse(Assets.getText('defaultModules.json'));
-        for (var i =0; i < data['modules'].length; i++){
-            newModule = data['modules'][i]['module'];
-            newModule.owner = false;
-            Modules.insert(newModule);
-        };
-    }
-
-    //create seed roles
-    for(let role of SEED_ROLES){
-        if(!Meteor.roles.findOne({ '_id' : role })){
-            Roles.createRole(role);
-        }
-    }
-    let newOrgId;
-    //create seed user
-    for(let user of SEED_USERS){
-        if (!Accounts.findUserByUsername(user.username)) {
-            const uid = Accounts.createUser({
-                username: user.username,
-                password: user.password,
-                email: user.email,
-            });
-            
-            addUserToRoles(uid, user.role);
-            if(user.role == "admin"){
-                Orgs.insert({
-                    orgName: "IIS",
-                    orgOwnerId: uid,
-                    orgDesc: "Testing",
-                    newUserAssignments: []
-                });
-                newOrgId = Orgs.findOne({orgOwnerId: uid})._id;
-                const d = new Date();
-                let month = d.getMonth(); 
-                let day = d.getDate();
-                let year = d.getFullYear();
-                let title = "test event";
-                Events.insert({
-                    type: "org",
-                    org: newOrgId,
-                    month: month,
-                    day: day,
-                    year: year,
-                    title: title,
-                    createdBy: uid
-                });
-                Meteor.call('generateInvite',uid);
-            }
-
-            let supervisorID = '';
-            if(user.username == 'testUser'){
-                supervisorID =  Accounts.findUserByUsername(SEED_SUPERVISOR.username)._id;
-            }
-            Meteor.users.update({ _id: uid }, 
-                {   $set:
-                    {
-                        sex: user.sex,
-                        firstname: user.firstName,
-                        lastname: user.lastName,
-                        supervisor: supervisorID,
-                        organization: user.org ? user.org: newOrgId,
-                        sex: user.sex,
-                        assigned: user.assigned,
-                        hasCompletedFirstAssessment: user.hasCompletedFirstAssessment,
-                        nextModule: 0,
-                        author: true
-                    }
-                }
-            );
-        }
-    }
+    //load default JSON assessment/modules into mongo collection
+    insertDefaultAssignments().then(function(){
+        if(Meteor.isDevelopment) insertSeedData();
+    });  
 });
 
 //Global Methods
@@ -513,40 +380,30 @@ Meteor.methods({
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
             Meteor.users.upsert(Meteor.userId(), {
                 $set: {
-                curModule: {
-                    moduleId: Meteor.user().curModule.moduleId,
-                    pageId: moduleData.nextPage,
-                    questionId: moduleData.nextQuestion,
-                },
-            }
-        })
-        return feedback;
-    } else {
-            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-            Meteor.users.upsert(Meteor.userId(), {
-                $set: {
-                curModule: {
-                    moduleId: Meteor.user().curModule.moduleId,
-                    pageId: moduleData.nextPage,
-                    questionId: moduleData.nextQuestion,
-                },
-            }
-        })
-        return false;
-    }
-},
-overrideUserDataRoutes: function (moduleData){
-           ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-           Meteor.users.upsert(Meteor.userId(), {
-            $set: {
-            curModule: {
-                moduleId: Meteor.user().curModule.moduleId,
-                pageId: moduleData.nextPage,
-                questionId: moduleData.nextQuestion,
-            }
+                    curModule: {
+                        moduleId: Meteor.user().curModule.moduleId,
+                        pageId: moduleData.nextPage,
+                        questionId: moduleData.nextQuestion,
+                    },
+                }
+            });
+            return feedback;
+        } else {
+            return false;
         }
-    });
-},
+    },
+    overrideUserDataRoutes: function (moduleData){
+        ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+        Meteor.users.upsert(Meteor.userId(), {
+            $set: {
+                curModule: {
+                    moduleId: Meteor.user().curModule.moduleId,
+                    pageId: moduleData.nextPage,
+                    questionId: moduleData.nextQuestion,
+                }
+            }
+        });
+    },
     getPrivateImage: function(fileName){
         result =  Assets.absoluteFilePath(fileName);
         return result;
@@ -608,6 +465,26 @@ overrideUserDataRoutes: function (moduleData){
         orgFiles.splice(index, 1);
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
     },
+    makeGoogleTTSApiCall: async function(message, audioPromptSpeakingRate, audioVolume) {
+        const request = JSON.stringify({
+            input: {text: message},
+            voice: {languageCode: 'en-US', ssmlGender: 'FEMALE'},
+            audioConfig: {audioEncoding: 'MP3', speakingRate: audioPromptSpeakingRate, volumeGainDb: audioVolume},
+        });
+        const options = {
+            hostname: 'texttospeech.googleapis.com',
+            path: '/v1/text:synthesize?key=' + ttsAPIKey,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8'
+            }
+        }
+        return await makeHTTPSrequest(options, request).then(data => {
+            response = JSON.parse(data.toString('utf-8'))
+            const audioDataEncoded = response.audioContent;
+            return audioDataEncoded;
+        });
+    }
 });
 
 //Server Methods
@@ -646,4 +523,37 @@ function answerAssess(correctAnswer, response){
         feedback = false;
     }
     return feedback;
+}
+
+async function insertDefaultAssignments(){
+    if(Modules.find().count() === 0){
+        console.log('Importing Default Modules into Mongo.')
+        var data = JSON.parse(Assets.getText('defaultModules.json'));
+        for (var i =0; i < data['modules'].length; i++){
+            newModule = data['modules'][i]['module'];
+            newModule.owner = false;
+            await Modules.insert(newModule);
+        };
+    }
+}
+
+async function makeHTTPSrequest(options, request){
+    return new Promise((resolve, reject) => {
+        let chunks = []
+        const req = https.request(options, res => {        
+            res.on('data', d => {
+                chunks.push(d);
+            })
+            res.on('end', function() {
+                resolve(Buffer.concat(chunks));
+            })
+        })
+        
+        req.on('error', (e) => {
+            reject(e.message);
+        });
+    
+        req.write(request)
+        req.end()
+    });
 }

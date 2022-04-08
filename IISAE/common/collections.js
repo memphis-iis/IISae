@@ -2,10 +2,10 @@ import { Mongo } from 'meteor/mongo';
 import { Meteor } from 'meteor/meteor'
 
 //Define Collections
-Orgs = new Mongo.Collection('organizations');
-Modules = new Mongo.Collection('modules');
-ModuleResults = new Mongo.Collection('modresults');
-Events = new Mongo.Collection('events');
+Orgs = new Meteor.Collection('organizations');
+Modules = new Meteor.Collection('modules');
+ModuleResults = new Meteor.Collection('modresults');
+Events = new Meteor.Collection('events');
 AutoTutorCharacters = new Mongo.Collection('autoTutorCharacters');
 
 //Init DynamicAssets Collection

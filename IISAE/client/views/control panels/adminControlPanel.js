@@ -15,13 +15,16 @@ Template.adminControlPanel.helpers({
     },
     'files':  function(){
         files = Orgs.findOne({_id: Meteor.user().organization}).files;
-        for(i = 0; i < files.length; i++){
-            files[i].isImage = false;
-            if(files[i].type.includes("image")){
-                files[i].isImage = true;
+        if(files){
+            for(i = 0; i < files.length; i++){
+                files[i].isImage = false;
+                if(files[i].type.includes("image")){
+                    files[i].isImage = true;
+                }
             }
+            return files;
         }
-        return files;
+        return false;
     },
     'module': function(){
         data = Modules.find().fetch();
@@ -29,7 +32,7 @@ Template.adminControlPanel.helpers({
         for(i = 0; i < data.length; i++){
             data[i].status = "";
             data[i].orgView = true;
-            if(org.newUserAssignments.findIndex(x => x.assignment === data[i]._id) > -1){
+            if(org.newUserAssignments&& org.newUserAssignments.findIndex(x => x.assignment === data[i]._id) > -1){
                 data[i].status += "Assigned to new users. ";
                 data[i].newUserRequired = true;
             } 

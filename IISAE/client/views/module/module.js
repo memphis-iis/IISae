@@ -37,7 +37,6 @@ Template.module.helpers({
         if(!page.imgStyle){
             page.imgStyle = "max-width:50%; height:auto; margin:10px;"
         }
-        return page;
     },
     'question': function(){
         page = Modules.findOne().pages[parseInt(this.pageId)];
@@ -103,8 +102,10 @@ Template.module.events({
         let moduleId = Meteor.user().curModule.moduleId;
         let moduleData = ModuleResults.findOne({_id: moduleId});
         moduleData.lastAccessed = Date.now().toString();
-        thisPage = Meteor.user().curModule.pageId;
-        thisQuestion = parseInt(Meteor.user().curModule.questionId);
+        let thisPage = Meteor.user().curModule.pageId;
+        let userId = Meteor.userId();
+        let user = Meteor.users.findOne({_id: userId});
+        let thisQuestion = parseInt(Meteor.user().curModule.questionId);
         if(t.pageType.get() == "activity"){
             questionData = {};
             questionData.questionType = t.questionType.get();
@@ -168,7 +169,7 @@ Template.module.events({
             if(typeof Modules.findOne().pages[moduleData.nextPage] !== "undefined"){
               if(typeof Modules.findOne().pages[moduleData.nextPage].questions !== "undefined"){
                   if(moduleData.nextQuestion >= Modules.findOne().pages[moduleData.nextPage].questions.length){
-                      if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow > 0){
+                      if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow.length > 0){
                           moduleData.nextPage = thisPage + 1;
                           moduleData.nextQuestion = 0;
                           target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
@@ -233,7 +234,7 @@ Template.module.events({
                }
           }
         } else {
-            if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow > 0){
+            if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow.length > 0){
                 moduleData.nextPage = parseInt(thisPage) + 1;
                 moduleData.nextQuestion = 0;
                 data = {
