@@ -42,9 +42,18 @@ Template.module.helpers({
         }
     },
     'question': function(){
+        autoTutorReadsPrompt = Modules.findOne().autoTutorReadsPrompt;
         page = Modules.findOne().pages[parseInt(this.pageId)];
         question = page.questions[parseInt(this.questionId)];
         const t = Template.instance();
+        promptRead = t.promptRead.get();
+        if(autoTutorReadsPrompt && question.prompt && promptRead == 1){
+            readTTS(question.prompt);
+            t.promptRead.set(2);
+        } else {
+            promptRead++;
+            t.promptRead.set(promptRead);
+        }
         if(question.type == "blank"){
             question.typeBlank = true;
         };
@@ -114,11 +123,11 @@ Template.module.events({
             questionData.questionType = t.questionType.get();
             if(questionData.questionType == "blank"){
                 response = $('.textInput').val();
-                answerValue = $(event.target).val();
+                answerValue = parseInt($(event.target).val());
             }
             if(questionData.questionType == "multiChoice"){
                 response = $(event.target).html();
-                answerValue = $(event.target).val();
+                answerValue = parseInt($(event.target).val());
             }
             if(questionData.questionType == "longText"){
                 response = $('.textareaInput').val();
@@ -142,6 +151,9 @@ Template.module.events({
                 response: response,
                 responseTimeStamp: Date.now().toString()
             }
+            if(curModule.autoTutorReadsResponse && response){
+               readTTS(response);
+            }
             moduleData.responses.push(data);
             moduleData.nextPage = thisPage;
             moduleData.nextQuestion = parseInt(thisQuestion) + 1;
@@ -158,6 +170,9 @@ Template.module.events({
                     $('#refutation').addClass(addedClass);
                     $('#refutation').text(message);
                     $('#refutation').show();
+                    if(curModule.autoTutorReadsRefutation){
+                        readTTS(message);
+                    }
                 }
             });
             timeOut = curModule.feedbackTimeout * 1000 || 5000;
@@ -312,6 +327,7 @@ Template.module.events({
             Meteor.call("saveModuleData", moduleData);
             target = "/module/" + Modules.findOne()._id + "/completed";
         } 
+        t.promptRead.set(0);
         console.log("ROUTE:", target);
         Router.go(target);
     },
@@ -345,15 +361,38 @@ Template.module.events({
         Router.go(target);
     }
 })
-
 Template.module.onCreated(function(){
+    params = Router.current().params;
+    Meteor.subscribe('curModule', params.moduleId);
     this.questionType = new ReactiveVar("");
     this.pageType = new ReactiveVar("");
     this.pageId = new ReactiveVar("");
     this.feedback = new ReactiveVar(false);
     this.statsData = new ReactiveVar({});
+    this.promptRead = new ReactiveVar(0);
+    this.audioActive = new ReactiveVar(false);
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+function readTTS(message){
+    let moduleId =  Modules.findOne()._id;
+    let text = message;
+    let audioPromptSpeakingRate = 1
+    let audioVolume = .5
+    Meteor.call('makeGoogleTTSApiCall', text, audioPromptSpeakingRate, audioVolume, moduleId, function(err, res) {
+        if(err){
+            console.log("Something went wrong with TTS, ", err)
+        }
+        if(res != undefined){
+            const audioObj = new Audio('data:audio/ogg;base64,' + res)
+            window.currentAudioObj = audioObj;
+            audioObj.addEventListener('ended', function(){
+                audioActive = false;
+            })
+            audioObj.play();
+        }
+    });
+
 }
 

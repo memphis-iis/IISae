@@ -465,7 +465,16 @@ Meteor.methods({
         orgFiles.splice(index, 1);
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
     },
-    makeGoogleTTSApiCall: async function(message, audioPromptSpeakingRate, audioVolume) {
+    makeGoogleTTSApiCall: async function(message, audioPromptSpeakingRate, audioVolume, moduleId=false) {
+        console.log("Module TTS:",moduleId);
+        if(moduleId !== false){
+            curModule = Modules.findOne({_id: moduleId});
+            console.log(curModule);
+            if(curModule.googleAPIKey){
+                console.log('using module key.')
+                ttsAPIKey = curModule.googleAPIKey;
+            } 
+        }
         const request = JSON.stringify({
             input: {text: message},
             voice: {languageCode: 'en-US', ssmlGender: 'FEMALE'},
@@ -538,6 +547,7 @@ async function insertDefaultAssignments(){
 }
 
 async function makeHTTPSrequest(options, request){
+    const https = require('https');
     return new Promise((resolve, reject) => {
         let chunks = []
         const req = https.request(options, res => {        

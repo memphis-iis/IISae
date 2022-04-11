@@ -214,6 +214,7 @@ Router.route('/module/:_id/:_pageid/:_questionid', {
       data:{
         pageId: this.params._pageid,
         questionId: this.params._questionid,
+        moduleId: this.params._id,
       }
     });
   }

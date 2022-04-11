@@ -106,13 +106,38 @@
         <h3>AutoTutor Options</h3>
         <p>The AutoTutor Conversational Engine allows for a simulation of a classroom setting with a virtual instructor and multiple virtual students.</p>
         <div class="form-check">
+            <div class="form-check">
+            AutoTutor reads prompt:
+            {{#if module.autoTutorReadsPrompt}}
+            <input class="markCorrect"  data-field="autoTutorReadsPrompt" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="autoTutorReadsPrompt" data-value="true" type="checkbox" >
+            {{/if}}        
+            </div>
+            <div class="form-check">
+            AutoTutor reads script:
+            {{#if module.autoTutorReadsScript}}
+            <input class="markCorrect"  data-field="autoTutorReadsScript" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="autoTutorReadsScript" data-value="true" type="checkbox" >
+            {{/if}}        
+            </div>
+            <div class="form-check">
+            AutoTutor reads user response:
+            {{#if module.autoTutorReadsResponse}}
+            <input class="markCorrect"  data-field="autoTutorReadsResponse" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="autoTutorReadsResponse" data-value="true" type="checkbox" >
+            {{/if}}        
+            </div>
             AutoTutor reads refutation:
-            {{#if module.enableAutoTutor}}
+            {{#if module.autoTutorReadsRefutation}}
             <input class="markCorrect"  data-field="autoTutorReadsRefutation" data-value="false" type="checkbox"  checked>
             {{else}}
             <input class="markCorrect"  data-field="autoTutorReadsRefutation" data-value="true" type="checkbox" >
             {{/if}}        
           </div>
+          
           <br>
           {{#if module.autoTutorCharacter}}
           <h4>AutoTutor Characters</h4>
@@ -159,10 +184,10 @@
         {{#each module.pages}}
 
 
-        <a data-bs-toggle="collapse" href="#collapse-page-{{@index}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+        
             <h3><u>Page {{@index}}: {{this.header}}: {{this.subheader}}</u></h3>
-          </a>
-        <div class="collapse" id="collapse-page-{{@index}}">
+        
+       <div>
         <table class="table" id="pageList-{{@index}}">
             <thead>
                 <th scope="col" width="5%">Type</th>
@@ -246,8 +271,8 @@
         </table>
         {{#if this.isActivity}}
         {{#each questions}}
-        <a data-bs-toggle="collapse" href="#collapse-page-{{this.parent}}-question{{@index}}" role="button" aria-expanded="false" aria-controls="collapseExample"><h4>Question {{@index}}</h4></a>
-        <div class="collapse" id="collapse-page-{{this.parent}}-question{{@index}}">
+        Question {{@index}}
+       <div>
         <table class="table" id="questionList">
             <thead>
                 <th scope="col" width="10%">Type</th>

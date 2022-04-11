@@ -31,7 +31,7 @@
             <img src="{{question.promptImg}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
             {{/if}}
             {{#if question.typeBlank}}
-                <h3>{{{question.prompt}}}</h3><br>
+                <h3 id="prompt">{{{question.prompt}}}</h3><br>
                 <form>
                     <input type="text" class="textInput" style="font-size:x-large; width:100%" id="response">
                 </form>
@@ -42,7 +42,7 @@
                   </div>
             {{/if}}
             {{#if question.typeLongText}}
-                <h3>{{question.prompt}}</h3><br>
+            <h3 id="prompt">{{{question.prompt}}}</h3><br>
                 <form>
                     <textarea style="height:100px; width:100%;" class="textareaInput"></textarea>
                 </form>
@@ -50,7 +50,7 @@
                 <button id="contine" class="btn btn-primary continue">Save and Continue</button>
             {{/if}}
             {{#if question.typeMultiChoice}}
-            <h3>{{{question.prompt}}}</h3><br>
+            <h3 id="prompt">{{{question.prompt}}}</h3><br>
             <form>
                 {{#each question.answers}}
                     {{#if this.image}}
