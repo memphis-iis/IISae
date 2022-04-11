@@ -48,7 +48,7 @@ Template.module.helpers({
         const t = Template.instance();
         promptRead = t.promptRead.get();
         if(autoTutorReadsPrompt && question.prompt && promptRead == 1){
-            readTTS(question.prompt);
+            readTTS(t, question.prompt);
             t.promptRead.set(2);
         } else {
             promptRead++;
@@ -152,7 +152,7 @@ Template.module.events({
                 responseTimeStamp: Date.now().toString()
             }
             if(curModule.autoTutorReadsResponse && response){
-               readTTS(response);
+               readTTS(t, response);
             }
             moduleData.responses.push(data);
             moduleData.nextPage = thisPage;
@@ -171,7 +171,7 @@ Template.module.events({
                     $('#refutation').text(message);
                     $('#refutation').show();
                     if(curModule.autoTutorReadsRefutation){
-                        readTTS(message);
+                        readTTS(t, message);
                     }
                 }
             });
@@ -371,28 +371,41 @@ Template.module.onCreated(function(){
     this.statsData = new ReactiveVar({});
     this.promptRead = new ReactiveVar(0);
     this.audioActive = new ReactiveVar(false);
+    this.TTSstack = new ReactiveVar([]);
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-function readTTS(message){
+function readTTS(template, message){
+    message = "super long text that will definetly get annoying"
     let moduleId =  Modules.findOne()._id;
-    let text = message;
     let audioPromptSpeakingRate = 1
     let audioVolume = .5
-    Meteor.call('makeGoogleTTSApiCall', text, audioPromptSpeakingRate, audioVolume, moduleId, function(err, res) {
-        if(err){
-            console.log("Something went wrong with TTS, ", err)
-        }
-        if(res != undefined){
-            const audioObj = new Audio('data:audio/ogg;base64,' + res)
-            window.currentAudioObj = audioObj;
-            audioObj.addEventListener('ended', function(){
-                audioActive = false;
-            })
-            audioObj.play();
-        }
-    });
+    let audioActive = template.audioActive.get();
+    let TTSstack = template.TTSstack.get();
+    if(audioActive){
+        TTSstack.push(message);
+    }
+    else{
+        Meteor.call('makeGoogleTTSApiCall', message, audioPromptSpeakingRate, audioVolume, moduleId, function(err, res) {
+            if(err){
+                console.log("Something went wrong with TTS, ", err)
+            }
+            if(res != undefined){
+                const audioObj = new Audio('data:audio/ogg;base64,' + res)
+                //if we have an audio object playing then we'll add this sound to that event's end
+                window.currentAudioObj = audioObj;
+                audioObj.addEventListener('ended', function(){
+                    template.audioActive.set(false);
+                    if(TTSstack.length > 0){
+                        readTTS(template, TTSstack.shift());
+                    }
+                });
+                template.audioActive.set(true);
+                audioObj.play();
+            }
+        });
+    }
 
 }
 
