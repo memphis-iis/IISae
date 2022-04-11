@@ -184,15 +184,16 @@ Template.module.events({
             $(':button').prop('disabled', false); 
             $(':button').removeClass('btn-info');
             moduleData = ModuleResults.findOne({_id: moduleId});
-            if(typeof Modules.findOne().pages[moduleData.nextPage] !== "undefined"){
-              if(typeof Modules.findOne().pages[moduleData.nextPage].questions !== "undefined"){
-                  if(moduleData.nextQuestion >= Modules.findOne().pages[moduleData.nextPage].questions.length){
-                      if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow.length > 0){
+            let nextPage = curModule.pages[moduleData.nextPage]
+            if(typeof nextPage !== "undefined"){
+              if(typeof nextPage.questions !== "undefined"){
+                  if(moduleData.nextQuestion >= nextPage.questions.length){
+                      if(!curModule.enableAdaptivePages && curModule.pages[thisPage].nextFlow.length > 0){
                           moduleData.nextPage = thisPage + 1;
                           moduleData.nextQuestion = 0;
-                          target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
+                          target = "/module/" + curModule._id + "/" + moduleData.nextPage;
                       } else {
-                          conditions = Modules.findOne().pages[thisPage].nextFlow;
+                          conditions = curModule.pages[thisPage].nextFlow;
                           conditionMet = false;
                           for(i = 0; i < conditions.length && !conditionMet ; i++){
                               curCondition = conditions[i];
@@ -203,13 +204,13 @@ Template.module.events({
                                 if(isConditionTrue && !conditionMet){
                                     moduleData.nextPage=curCondition.route;
                                     moduleData.nextQuestion=0;
-                                    target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
+                                    target = "/module/" + curModule._id + "/" + curCondition.route;
                                     conditionMet = true;
                                         console.log('clear score');
                                         moduleData.score = 0;
                                     }
                                 } else {
-                                target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
+                                target = "/module/" + curModule._id + "/" + curCondition.route;
                                 if(curCondition.clearScoring){
                                     console.log('clear score');
                                     moduleData.score = 0;
@@ -221,18 +222,18 @@ Template.module.events({
                             if(routing == 'nextPage'){
                                 moduleData.nextPage = thisPage + 1;
                                 moduleData.nextQuestion = 0;
-                                target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
+                                target = "/module/" + curModule._id + "/" + moduleData.nextPage;
                             } 
                             if(routing == 'currentPage'){
                                 moduleData.nextPage = thisPage;
                                 moduleData.nextQuestion = 0;
-                                target = "/module/" + Modules.findOne()._id + "/" + thisPage;
+                                target = "/module/" + curModule._id + "/" + thisPage;
                             }
 
                             if(routing == 'completed'){
                                 moduleData.nextPage = "completed";
                                 moduleData.nextQuestion =  "completed";
-                                target = "/module/" + Modules.findOne()._id + "/completed";
+                                target = "/module/" + curModule._id + "/completed";
                             }
                             if(routing == 'error'){
                                 alert("Something went wrong. No routing found.");
@@ -245,14 +246,14 @@ Template.module.events({
                       }
                   } else  {
                       moduleData.nextQuestion = thisQuestion + 1;
-                      target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage + "/" + moduleData.nextQuestion;
+                      target = "/module/" + curModule._id + "/" + moduleData.nextPage + "/" + moduleData.nextQuestion;
                       
                       
                   }
                }
           }
         } else {
-            if(!curModule.enableAdaptivePages && Modules.findOne().pages[thisPage].nextFlow.length > 0){
+            if(!curModule.enableAdaptivePages && curModule.pages[thisPage].nextFlow.length > 0){
                 moduleData.nextPage = parseInt(thisPage) + 1;
                 moduleData.nextQuestion = 0;
                 data = {
@@ -261,9 +262,9 @@ Template.module.events({
                     responseTimeStamp: Date.now().toString()
                 }
                 Meteor.call("overrideUserDataRoutes", moduleData);
-                target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
+                target = "/module/" + curModule._id + "/" + moduleData.nextPage;
             } else {
-                conditions = Modules.findOne().pages[thisPage].nextFlow;
+                conditions = curModule.pages[thisPage].nextFlow;
                 conditionMet = false;
                 for(i = 0; i < conditions.length && !conditionMet ; i++){
                     curCondition = conditions[i];
@@ -274,12 +275,12 @@ Template.module.events({
                       if(isConditionTrue && !conditionMet){
                           moduleData.nextPage=curCondition.route;
                           moduleData.nextQuestion=0;
-                          target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
+                          target = "/module/" + curModule._id + "/" + curCondition.route;
                           conditionMet = true;
                               moduleData.score = 0;
                           }
                       } else {
-                      target = "/module/" + Modules.findOne()._id + "/" + curCondition.route;
+                      target = "/module/" + curModule._id + "/" + curCondition.route;
                       if(curCondition.clearScoring){
                           moduleData.score = 0;
                       }
@@ -290,18 +291,18 @@ Template.module.events({
                   if(routing == 'nextPage'){
                       moduleData.nextPage = thisPage + 1;
                       moduleData.nextQuestion = 0;
-                      target = "/module/" + Modules.findOne()._id + "/" + moduleData.nextPage;
+                      target = "/module/" + curModule._id + "/" + moduleData.nextPage;
                   } 
                   if(routing == 'currentPage'){
                       moduleData.nextPage = thisPage;
                       moduleData.nextQuestion = 0;
-                      target = "/module/" + Modules.findOne()._id + "/" + thisPage;
+                      target = "/module/" + curModule._id + "/" + thisPage;
                   }
 
                   if(routing == 'completed'){
                       moduleData.nextPage = "completed";
                       moduleData.nextQuestion =  "completed";
-                      target = "/module/" + Modules.findOne()._id + "/completed";
+                      target = "/module/" + curModule._id + "/completed";
                   }
                   if(routing == 'error'){
                       alert("Something went wrong. No routing found.");
@@ -314,7 +315,7 @@ Template.module.events({
             }
             
         }
-        if(moduleData.nextPage >= Modules.findOne().pages.length){
+        if(moduleData.nextPage >= curModule.pages.length){
             moduleData.nextPage = "completed";
             moduleData.nextQuestion = "completed";
             user = Meteor.user();
@@ -325,7 +326,7 @@ Template.module.events({
             user.assigned.splice(index, 1);
             Meteor.call('changeAssignmentOneUser', [Meteor.userId(), user.assigned]);
             Meteor.call("saveModuleData", moduleData);
-            target = "/module/" + Modules.findOne()._id + "/completed";
+            target = "/module/" + curModule._id + "/completed";
         } 
         t.promptRead.set(0);
         console.log("ROUTE:", target);
@@ -371,41 +372,41 @@ Template.module.onCreated(function(){
     this.statsData = new ReactiveVar({});
     this.promptRead = new ReactiveVar(0);
     this.audioActive = new ReactiveVar(false);
-    this.TTSstack = new ReactiveVar([]);
+    this.TTSQueue = new ReactiveVar([]);
 })
-function sleep(ms) {
+async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function readTTS(template, message){
-    message = "super long text that will definetly get annoying"
     let moduleId =  Modules.findOne()._id;
-    let audioPromptSpeakingRate = 1
-    let audioVolume = .5
     let audioActive = template.audioActive.get();
-    let TTSstack = template.TTSstack.get();
-    if(audioActive){
-        TTSstack.push(message);
-    }
-    else{
-        Meteor.call('makeGoogleTTSApiCall', message, audioPromptSpeakingRate, audioVolume, moduleId, function(err, res) {
-            if(err){
-                console.log("Something went wrong with TTS, ", err)
+    let TTSQueue = template.TTSQueue.get();
+    Meteor.call('makeGoogleTTSApiCall', message, moduleId, function(err, res) {
+        if(err){
+            console.log("Something went wrong with TTS, ", err)
+        }
+        if(res != undefined){
+            TTSQueue.push(res);
+            if(!audioActive){
+                playAudio(template);
             }
-            if(res != undefined){
-                const audioObj = new Audio('data:audio/ogg;base64,' + res)
-                //if we have an audio object playing then we'll add this sound to that event's end
-                window.currentAudioObj = audioObj;
-                audioObj.addEventListener('ended', function(){
-                    template.audioActive.set(false);
-                    if(TTSstack.length > 0){
-                        readTTS(template, TTSstack.shift());
-                    }
-                });
-                template.audioActive.set(true);
-                audioObj.play();
-            }
-        });
+        }
+    });
     }
 
+function playAudio(template){
+    template.audioActive.set(true);
+    let TTSQueue = template.TTSQueue.get();
+    const audioObj = new Audio('data:audio/ogg;base64,' + TTSQueue.shift());
+    window.currentAudioObj = audioObj;
+    window.currentAudioObj.addEventListener('ended', function(){
+        if(TTSQueue.length > 0){
+            playAudio(template);
+        }
+        else{
+            template.audioActive.set(false);
+        }
+    });
+    window.currentAudioObj.play();
 }
 
