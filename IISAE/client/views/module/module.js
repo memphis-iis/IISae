@@ -374,7 +374,7 @@ Template.module.onCreated(function(){
     this.audioActive = new ReactiveVar(false);
     this.TTSQueue = new ReactiveVar([]);
 })
-async function sleep(ms) {
+function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function readTTS(template, message){
