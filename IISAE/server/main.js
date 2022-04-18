@@ -465,7 +465,7 @@ Meteor.methods({
         orgFiles.splice(index, 1);
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
     },
-    makeGoogleTTSApiCall: async function(message, audioPromptSpeakingRate, audioVolume, moduleId=false) {
+    makeGoogleTTSApiCall: async function(message, moduleId=false) {
         console.log("Module TTS:",moduleId);
         if(moduleId !== false){
             curModule = Modules.findOne({_id: moduleId});
@@ -478,7 +478,7 @@ Meteor.methods({
         const request = JSON.stringify({
             input: {text: message},
             voice: {languageCode: 'en-US', ssmlGender: 'FEMALE'},
-            audioConfig: {audioEncoding: 'MP3', speakingRate: audioPromptSpeakingRate, volumeGainDb: audioVolume},
+            audioConfig: {audioEncoding: 'MP3', speakingRate: 1, volumeGainDb: .5},
         });
         const options = {
             hostname: 'texttospeech.googleapis.com',
