@@ -46,7 +46,6 @@ Meteor.methods({
                     email: emailAddr
                 });
                 const authors = Meteor.settings.public.authors;
-                console.log(authors);
                 author = false;
                 if(authors.indexOf(emailAddr) !== -1){
                     author = true;
@@ -206,7 +205,6 @@ Meteor.methods({
         Modules.insert(newModule);
     },
     changeModule(input){
-        console.log(input);
         moduleId = input.moduleId;
         field = input.field;
         result = input.result
@@ -249,19 +247,15 @@ Meteor.methods({
                 newItem = {};
                 for(i = 0; i < keys.length; i++){
                     text = "newField[0]." + keys[i];
-                    console.log(text);
                     eval(text);
-                    console.log(keys[i], typeof key);
                     subField = eval('newField[0].' + keys[i] );
                     if(typeof subField == 'string'){
                         text = 'newItem.' + keys[i] + '= \"New\"';
                         eval(text);
-                        console.log('evaltext',text)
                     }
                     if(typeof subField == "object"){
                         text = 'newItem.' + keys[i] + '= []';
                         eval(text);
-                        console.log('evaltext',text)
                     }
                 }
                 newField.push(newItem)
@@ -270,14 +264,12 @@ Meteor.methods({
         } else {
             addedField = field.split(".");
             addedField = addedField[addedField.length - 1];
-            console.log('undefined: ' + addedField);          
             if(addedField == "questions"){
                 data = {
                     type :"multiChoice",
                     prompt: "New"
                 }
                 text = "curModule." + field + "=[data]";
-                console.log(text);
                 eval(text);
             }
             if(addedField == 'autoTutorScript'){
@@ -321,7 +313,6 @@ Meteor.methods({
                     }
                 }
                 text = "curModule." + field + "=[data]";
-                console.log(text);
                 eval(text);
             }
             if(addedField == "answers"){
@@ -329,7 +320,6 @@ Meteor.methods({
                     answer:"New",
                 }
                 text = "curModule." + field + "=[data]";
-                console.log(text);
                 eval(text);
             }
         }
@@ -351,12 +341,11 @@ Meteor.methods({
         return results;
     },
     saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
-        console.log( moduleId, pageId, questionId, response, answerValue);
         response = moduleData.responses[moduleData.responses.length - 1].response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
         feedback = "disabled";
-        if(curModule){
+        if(curModule && pageId !== "completed"){
             correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer
             enableFeedback = curModule.enableFeedback
             enableWeightedQuestions = curModule.enableWeightedQuestions;
@@ -372,11 +361,9 @@ Meteor.methods({
             }
             if(feedback == true){
                 moduleData.score += parseInt(answerValue) * parseFloat(questionWeight);
-                console.log("Score:", moduleData.score, "Added:", answerValue);
             } else; {
                 moduleData.score = parseInt(moduleData.score);
             }
-            console.log(moduleData.nextPage, moduleData.nextQuestion);
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
             Meteor.users.upsert(Meteor.userId(), {
                 $set: {
@@ -389,6 +376,16 @@ Meteor.methods({
             });
             return feedback;
         } else {
+            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            Meteor.users.upsert(Meteor.userId(), {
+                $set: {
+                    curModule: {
+                        moduleId: Meteor.user().curModule.moduleId,
+                        pageId: moduleData.nextPage,
+                        questionId: moduleData.nextQuestion,
+                    },
+                }
+            });
             return false;
         }
     },
@@ -466,12 +463,9 @@ Meteor.methods({
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
     },
     makeGoogleTTSApiCall: async function(message, moduleId=false) {
-        console.log("Module TTS:",moduleId);
         if(moduleId !== false){
             curModule = Modules.findOne({_id: moduleId});
-            console.log(curModule);
             if(curModule.googleAPIKey){
-                console.log('using module key.')
                 ttsAPIKey = curModule.googleAPIKey;
             } 
         }

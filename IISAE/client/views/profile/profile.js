@@ -1,6 +1,6 @@
 Template.profile.helpers({
     'assignment': function(){
-        assigned = Meteor.user().assigned;
+        assigned = Meteor.user().assigned || []; 
         assignment = {};
         if(assigned.length === 0){
             assignment = false;
@@ -8,11 +8,6 @@ Template.profile.helpers({
             assignment.show = true;
             assignment.isAssessment = false;
             assignment.isModule = false;
-            if(assigned[0].type == "assessment"){
-                assignment = Assessments.findOne({_id: assigned[0].assignment});
-                assignment.isAssessment = true;
-            }
-
             if(assigned[0].type == "module"){
                 assignment = Modules.findOne({_id: assigned[0].assignment});
                 assignment.isModule = true;

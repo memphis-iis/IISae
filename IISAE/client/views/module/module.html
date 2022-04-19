@@ -1,118 +1,118 @@
 <template name="module">
     <div class="px-4 py-5 my-5 text-center">
-       <h3>{{module.title}}</h3>
-       {{#if this.pageId}}
-       {{#if completed}}
-            <p>You have completed this module!</p>
-            <button class="btn btn-primary" id="goBack">Return to My Profile</button>    
-        {{else}}
-        {{#if module.showScoring}}
-        Score: {{trialData.score}}
-        {{/if}}
-        {{#if page.typeText}}
-        <h3><b>{{page.header}}</b></h3>
-        <h4><b>{{page.subheader}}</b></h4>
-        {{#if page.imageAbove}}
-            <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
-            <br>
-        {{/if}}
-        <p id="pageText">{{{page.text}}}</p>
-        <br>
-        {{#if page.imageBelow}}
-            <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
-            <br>
-        {{/if}}
-        <button id="contine" class="btn btn-primary continue">Save and Continue</button>
-        {{/if}}
-        {{#if this.questionId}}
-            <h3><b>Activity: {{page.header}}</b></h3>
-            <h5>Question {{questionid}}</h5>
-            {{#if question.promptImg}}
-            <img src="{{question.promptImg}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
-            {{/if}}
-            {{#if question.typeBlank}}
-                <h3 id="prompt">{{{question.prompt}}}</h3><br>
-                <form>
-                    <input type="text" class="textInput" style="font-size:x-large; width:100%" id="response">
-                </form>
-                <br>
-                <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="{{question.value}}">Save and Continue</button>
-                <div class="alert" id="refutation" role="alert" hidden>
-                    Message: {{feedback.message}}
-                  </div>
-            {{/if}}
-            {{#if question.typeLongText}}
-            <h3 id="prompt">{{{question.prompt}}}</h3><br>
-                <form>
-                    <textarea style="height:100px; width:100%;" class="textareaInput"></textarea>
-                </form>
-                <br>
-                <button id="contine" class="btn btn-primary continue">Save and Continue</button>
-            {{/if}}
-            {{#if question.typeMultiChoice}}
-            <h3 id="prompt">{{{question.prompt}}}</h3><br>
-            <form>
-                {{#each question.answers}}
-                    {{#if this.image}}
-                    <button  class="btn btn-secondary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
-                        <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
-                    </button>
-                    {{else}}
-                     <button  class="btn btn-secondary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.answer}}</button>
-                     {{/if}}
-                {{/each}}
-            </form>
-            <div class="alert" id="refutation" role="alert" hidden>
-                Message: {{feedback.message}}
-              </div>
-            <br>
-            {{/if}}
-            {{#if question.typeCombo}}
-            <h3>{{{question.prompt}}}</h3><br>
-                <form>
-                {{#each question.fields}}
-                    {{#if this.typeBlank}}
-                        <h3>{{this.text}}</h3>
-                            <input class="combo" type="text">
+        <h3>{{module.title}}</h3>
+        {{#if this.pageId}}
+            {{#if completed}}
+                <p>You have completed this module!</p>
+                <button class="btn btn-primary" id="goBack">Return to My Profile</button>    
+            {{else}}
+                {{#if module.showScoring}}
+                    Score: {{trialData.score}}
+                {{/if}}
+                {{#if page.typeText}}
+                    <h3><b>{{page.header}}</b></h3>
+                    <h4><b>{{page.subheader}}</b></h4>
+                    {{#if page.imageAbove}}
+                        <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
+                        <br>
                     {{/if}}
-                    {{#if this.typeLongText}}
-                    <h3>{{this.text}}</h3><br>
+                    <p id="pageText">{{{page.text}}}</p>
+                    <br>
+                    {{#if page.imageBelow}}
+                        <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
+                        <br>
+                    {{/if}}
+                    <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+                {{/if}}
+                {{#if this.questionId}}
+                    <h3><b>Activity: {{page.header}}</b></h3>
+                    <h5>Question {{questionid}}</h5>
+                    {{#if question.promptImg}}
+                        <img src="{{question.promptImg}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
+                    {{/if}}
+                    {{#if question.typeBlank}}
+                        <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                        <form>
+                        <input type="text" class="textInput" style="font-size:x-large; width:100%" id="response">
+                        </form>
+                        <br>
+                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="{{question.value}}">Save and Continue</button>
+                        <div class="alert" id="refutation" role="alert" hidden>
+                            Message: {{feedback.message}}
+                        </div>
+                    {{/if}}
+                    {{#if question.typeLongText}}
+                        <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                        <form>
+                            <textarea style="height:100px; width:100%;" class="textareaInput"></textarea>
+                        </form>
+                        <br>
+                        <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+                    {{/if}}
+                    {{#if question.typeMultiChoice}}
+                    <h3 id="prompt">{{{question.prompt}}}</h3><br>
                     <form>
-                        <textarea style="height:100px; width:100%;" class="combo"></textarea>
-                    </form>
-                    <br>
-                   {{/if}}
-                    {{#if this.typeMultiChoice}}
-                    <h3>{{this.text}}</h3>
-                        {{#each this.answers}}
-                        {{#if this.image}}
-                        <button  class="btn btn-secondary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">
-                            <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
-                        </button>
-                        {{else}}
-                        <button  class="btn btn-secondary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">{{this.answer}}</button>
-                        {{/if}}
+                        {{#each question.answers}}
+                            {{#if this.image}}
+                                <button  class="btn btn-secondary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
+                                    <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
+                                </button>
+                            {{else}}
+                                <button  class="btn btn-secondary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.answer}}</button>
+                            {{/if}}
                         {{/each}}
-                    {{/if}}
+                    </form>
+                    <div class="alert" id="refutation" role="alert" hidden>
+                    Message: {{feedback.message}}
+                    </div>
                     <br>
-                {{/each}}
-                </form> 
-                <br>
-                <button  class="btn btn-primary continue" id="continue" name="">Save and Continue</button>
-            <br>
+                    {{/if}}
+                    {{#if question.typeCombo}}
+                    <h3>{{{question.prompt}}}</h3><br>
+                        <form>
+                        {{#each question.fields}}
+                            {{#if this.typeBlank}}
+                                <h3>{{this.text}}</h3>
+                                    <input class="combo" type="text">
+                            {{/if}}
+                            {{#if this.typeLongText}}
+                            <h3>{{this.text}}</h3><br>
+                            <form>
+                                <textarea style="height:100px; width:100%;" class="combo"></textarea>
+                            </form>
+                            <br>
+                          {{/if}}
+                          {{#if this.typeMultiChoice}}
+                                <h3>{{this.text}}</h3>
+                                {{#each this.answers}}
+                                    {{#if this.image}}
+                                    <button  class="btn btn-secondary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">
+                                        <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
+                                    </button>
+                                    {{else}}
+                                    <button  class="btn btn-secondary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">{{this.answer}}</button>
+                                    {{/if}}
+                                {{/each}}
+                            {{/if}}
+                            <br>
+                        {{/each}}
+                        </form> 
+                        <br>
+                        <button  class="btn btn-primary continue" id="continue" name="">Save and Continue</button>
+                        <br>
+                    {{/if}}
+                {{else}}
+                     {{#if page.typeActivity}}
+                         <h3><b>Activity: {{page.header}}</b></h3>
+                        <p>{{page.instructions}}</p>
+                         <button class="btn btn-primary" id="startActivity">Begin Activity!</button>
+                    {{/if}}
+                {{/if}}
             {{/if}}
         {{else}}
-        {{#if page.typeActivity}}
-        <h3><b>Activity: {{page.header}}</b></h3>
-        <p>{{page.instructions}}</p>
-        <button class="btn btn-primary" id="startActivity">Begin Activity!</button>
-        {{/if}}
-        {{/if}}
-        {{/if}}
-       {{else}}
-            <p>{{module.description}}</p>
-            <button class="btn btn-primary" id="startModule">Lets Begin!</button>
-            <button class="btn btn-caution" id="goBack">I'm not ready.</button>
-        {{/if}}
+                <p>{{module.description}}</p>
+                <button class="btn btn-primary" id="startModule">Lets Begin!</button>
+                <button class="btn btn-caution" id="goBack">I'm not ready.</button>
+            {{/if}}
     </div>
 </template>

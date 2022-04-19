@@ -203,20 +203,26 @@ Router.route('/module/:_id/:_pageid', {
 
 //module quiz page question id
 Router.route('/module/:_id/:_pageid/:_questionid', {
-  subscriptions: function(){
+  template: 'module',
+  waitOn: function(){
     subs = [];
     subs.push(Meteor.subscribe('curModule', this.params._id));
     subs.push(Meteor.subscribe('getUserModuleResults'));
     return subs;
   },
-  action: function(){
-    this.render('module', {
-      data:{
+  data: function(){
+    if(this.ready()){
+      questionPrompt = Modules.findOne().pages[this.params._pageid].questions[this.params._questionid].prompt;
+      data = {
         pageId: this.params._pageid,
         questionId: this.params._questionid,
         moduleId: this.params._id,
+        prompt: questionPrompt,
+        autoTutorReadsPrompt: true
       }
-    });
+      console.log("Route Data", data);
+      return data
+    }
   }
 });
 // route organizational invites

@@ -1,3 +1,14 @@
+Template.module.onRendered(function (){
+    moduleData = Modules.findOne();
+    const t = Template.instance();
+    autoTutorReadsPrompt = moduleData.autoTutorReadsPrompt;
+    promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
+    console.log(Meteor.user().curModule.questionId);
+    if(autoTutorReadsPrompt && promptToRead){
+        readTTS(t, promptToRead);
+    } 
+});
+
 Template.module.helpers({
     'module': () => Modules.findOne(),
     'trialData': function(){
@@ -26,7 +37,7 @@ Template.module.helpers({
         $(':button').removeClass('btn-info');
         page = Modules.findOne().pages[parseInt(this.pageId)];
         const t = Template.instance();
-            if(page){
+        if(page){
             if(page.type == "text"){
                 page.typeText = true;
                 t.pageType.set("text");
@@ -38,22 +49,16 @@ Template.module.helpers({
             if(!page.imgStyle){
                 page.imgStyle = "max-width:50%; height:auto; margin:10px;"
             }
-            return page;
         }
+        return page;
     },
     'question': function(){
-        autoTutorReadsPrompt = Modules.findOne().autoTutorReadsPrompt;
+        curModule = Modules.findOne();
+        autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
         page = Modules.findOne().pages[parseInt(this.pageId)];
         question = page.questions[parseInt(this.questionId)];
         const t = Template.instance();
-        promptRead = t.promptRead.get();
-        if(autoTutorReadsPrompt && question.prompt && promptRead == 1){
-            readTTS(t, question.prompt);
-            t.promptRead.set(2);
-        } else {
-            promptRead++;
-            t.promptRead.set(promptRead);
-        }
+
         if(question.type == "blank"){
             question.typeBlank = true;
         };
@@ -105,19 +110,25 @@ Template.module.events({
             value = $('#response').val(value);
         }
     },
+    'mouseover .multichoice': function(event){
+        response = $(event.target).html();
+        curModule = Modules.findOne();
+        const t = Template.instance();
+        if(curModule.autoTutorReadsResponse && response){
+            readTTS(t, response);
+         }
+    },
     'click .continue, response': async function(event) {
         $(':button').prop('disabled', true); 
         const t = Template.instance();
         event.preventDefault();
         curModule = Modules.findOne()
-        let target = "";
-        let moduleId = Meteor.user().curModule.moduleId;
-        let moduleData = ModuleResults.findOne({_id: moduleId});
+        target = "";
+        moduleId = Meteor.user().curModule.moduleId;
+        moduleData = ModuleResults.findOne({_id: moduleId});
         moduleData.lastAccessed = Date.now().toString();
-        let thisPage = Meteor.user().curModule.pageId;
-        let userId = Meteor.userId();
-        let user = Meteor.users.findOne({_id: userId});
-        let thisQuestion = parseInt(Meteor.user().curModule.questionId);
+        thisPage = Meteor.user().curModule.pageId;
+        thisQuestion = Meteor.user().curModule.questionId;
         if(t.pageType.get() == "activity"){
             questionData = {};
             questionData.questionType = t.questionType.get();
@@ -152,11 +163,11 @@ Template.module.events({
                 responseTimeStamp: Date.now().toString()
             }
             if(curModule.autoTutorReadsResponse && response){
-               readTTS(t, response);
-            }
+                readTTS(t, response);
+             }
             moduleData.responses.push(data);
             moduleData.nextPage = thisPage;
-            moduleData.nextQuestion = parseInt(thisQuestion) + 1;
+            moduleData.nextQuestion = thisQuestion + 1;
             Meteor.call("saveModuleData", moduleData, curModule._id , thisPage, thisQuestion, response, answerValue, function(err, res){
                 feedback = t.feedback.get();
                 type = "danger"
@@ -184,157 +195,74 @@ Template.module.events({
             $(':button').prop('disabled', false); 
             $(':button').removeClass('btn-info');
             moduleData = ModuleResults.findOne({_id: moduleId});
-            let nextPage = curModule.pages[moduleData.nextPage]
-            if(typeof nextPage !== "undefined"){
-              if(typeof nextPage.questions !== "undefined"){
-                  if(moduleData.nextQuestion >= nextPage.questions.length){
-                      if(!curModule.enableAdaptivePages && curModule.pages[thisPage].nextFlow.length > 0){
-                          moduleData.nextPage = thisPage + 1;
-                          moduleData.nextQuestion = 0;
-                          target = "/module/" + curModule._id + "/" + moduleData.nextPage;
-                      } else {
-                          conditions = curModule.pages[thisPage].nextFlow;
-                          conditionMet = false;
-                          for(i = 0; i < conditions.length && !conditionMet ; i++){
-                              curCondition = conditions[i];
-                              if(curCondition.condition !== "static"){
-                                text = "moduleData." + curCondition.condition + curCondition.operand + curCondition.threshold;
-                                isConditionTrue = eval(text);
-                                variableStatus = eval("moduleData." + curCondition.condition);
-                                if(isConditionTrue && !conditionMet){
-                                    moduleData.nextPage=curCondition.route;
-                                    moduleData.nextQuestion=0;
-                                    target = "/module/" + curModule._id + "/" + curCondition.route;
-                                    conditionMet = true;
-                                        console.log('clear score');
-                                        moduleData.score = 0;
-                                    }
-                                } else {
-                                target = "/module/" + curModule._id + "/" + curCondition.route;
-                                if(curCondition.clearScoring){
-                                    console.log('clear score');
-                                    moduleData.score = 0;
-                                }
-                            }
-                          }
-                          if(!conditionMet){
-                            routing = curModule.fallbackRoute
-                            if(routing == 'nextPage'){
-                                moduleData.nextPage = thisPage + 1;
-                                moduleData.nextQuestion = 0;
-                                target = "/module/" + curModule._id + "/" + moduleData.nextPage;
-                            } 
-                            if(routing == 'currentPage'){
-                                moduleData.nextPage = thisPage;
-                                moduleData.nextQuestion = 0;
-                                target = "/module/" + curModule._id + "/" + thisPage;
-                            }
-
-                            if(routing == 'completed'){
-                                moduleData.nextPage = "completed";
-                                moduleData.nextQuestion =  "completed";
-                                target = "/module/" + curModule._id + "/completed";
-                            }
-                            if(routing == 'error'){
-                                alert("Something went wrong. No routing found.");
-                                moduleData.nextPage = "error";
-                                moduleData.nextQuestion =  "error";
-                                target = "/moduleCenter";
-                            }
-                          }
-                        Meteor.call("overrideUserDataRoutes", moduleData);
-                      }
-                  } else  {
-                      moduleData.nextQuestion = thisQuestion + 1;
-                      target = "/module/" + curModule._id + "/" + moduleData.nextPage + "/" + moduleData.nextQuestion;
-                      
-                      
-                  }
-               }
-          }
-        } else {
-            if(!curModule.enableAdaptivePages && curModule.pages[thisPage].nextFlow.length > 0){
-                moduleData.nextPage = parseInt(thisPage) + 1;
-                moduleData.nextQuestion = 0;
-                data = {
-                    pageId: thisPage,
-                    response: "read",
-                    responseTimeStamp: Date.now().toString()
+            if(!curModule.enableAdaptivePages && curModule.pages[thisPage].nextFlow.length == 0){
+                nextQuestion = thisQuestion + 1;
+                nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
+                console.log(thisPage, nextQuestion, nextQuestionData);
+                if(typeof nextQuestionData !== "undefined"){
+                    target = "/module/" + curModule._id + "/" + thisPage + "/" + nextQuestion; 
+                } else {
+                    nextPage = thisPage + 1;
+                    if(typeof curModule.pages[nextPage] !== "undefined"){
+                        target = "/module/" + curModule._id + "/" + nextPage; 
+                    } else {
+                        target = "/module/" + curModule._id + "/completed"; 
+                    }
                 }
-                Meteor.call("overrideUserDataRoutes", moduleData);
-                target = "/module/" + curModule._id + "/" + moduleData.nextPage;
             } else {
                 conditions = curModule.pages[thisPage].nextFlow;
-                conditionMet = false;
-                for(i = 0; i < conditions.length && !conditionMet ; i++){
-                    curCondition = conditions[i];
-                    if(curCondition.condition !== "static"){
-                      text = "moduleData." + curCondition.condition + curCondition.operand + curCondition.threshold;
-                      isConditionTrue = eval(text);
-                      variableStatus = eval("moduleData." + curCondition.condition);
-                      if(isConditionTrue && !conditionMet){
-                          moduleData.nextPage=curCondition.route;
-                          moduleData.nextQuestion=0;
-                          target = "/module/" + curModule._id + "/" + curCondition.route;
-                          conditionMet = true;
-                              moduleData.score = 0;
-                          }
-                      } else {
-                      target = "/module/" + curModule._id + "/" + curCondition.route;
-                      if(curCondition.clearScoring){
-                          moduleData.score = 0;
-                      }
-                  }
+                routePicked = false;
+                for(i = 0; i < conditions.length; i++){
+                    if(!routePicked){
+                        conditionStatement = "moduleData." + conditions[i].condition + conditions[i].operand + conditions[i].threshold;
+                        conditionState = eval(conditionStatement);
+                        if(conditionState){
+                            target = "/module/" + curModule._id + "/" + condition.route; 
+                            routePicked = true;
+                        }
+                    }
                 }
-                if(!conditionMet){
-                  routing = curModule.fallbackRoute
-                  if(routing == 'nextPage'){
-                      moduleData.nextPage = thisPage + 1;
-                      moduleData.nextQuestion = 0;
-                      target = "/module/" + curModule._id + "/" + moduleData.nextPage;
-                  } 
-                  if(routing == 'currentPage'){
-                      moduleData.nextPage = thisPage;
-                      moduleData.nextQuestion = 0;
-                      target = "/module/" + curModule._id + "/" + thisPage;
-                  }
-
-                  if(routing == 'completed'){
-                      moduleData.nextPage = "completed";
-                      moduleData.nextQuestion =  "completed";
-                      target = "/module/" + curModule._id + "/completed";
-                  }
-                  if(routing == 'error'){
-                      alert("Something went wrong. No routing found.");
-                      moduleData.nextPage = "error";
-                      moduleData.nextQuestion =  "error";
-                      target = "/moduleCenter";
-                  }
+                if(!routePicked){
+                    routing = curModule.fallbackRoute
+                    if(routing == 'nextPage'){
+                        moduleData.nextPage = thisPage + 1;
+                        if(typeof curModule.pages[nextPage] !== "undefined"){
+                            moduleData.nextQuestion = 0;
+                            routePicked = true;
+                            target = "/module/" + curModule._id + "/" + moduleData.nextPage;
+                        } else {
+                            target = "/module/" + curModule._id + "/completed";
+                        }
+                    } 
+                    if(routing == 'currentPage'){
+                        moduleData.nextPage = thisPage;
+                        moduleData.nextQuestion = 0;
+                        routePicked = true;
+                        target = "/module/" + curModule._id + "/" + thisPage;
+                    }
+                  
+                    if(routing == 'completed'){
+                        moduleData.nextPage = "completed";
+                        moduleData.nextQuestion =  "completed";
+                        routePicked = true;
+                        target = "/module/" + curModule._id + "/completed";
+                    }
+                    if(routing == 'error'){
+                        alert("Something went wrong. No routing found.");
+                        moduleData.nextPage = "error";
+                        moduleData.nextQuestion =  "error";
+                        routePicked = true;
+                        target = "/moduleCenter";
+                    }
                 }
-              Meteor.call("overrideUserDataRoutes", moduleData);
             }
-            
         }
-        if(moduleData.nextPage >= curModule.pages.length){
-            moduleData.nextPage = "completed";
-            moduleData.nextQuestion = "completed";
-            user = Meteor.user();
-            index = user.assigned.findIndex(x => x.assignmentId === moduleId);
-            if(index != -1){
-                user.assigned.splice(index, 1);
-            }
-            user.assigned.splice(index, 1);
-            Meteor.call('changeAssignmentOneUser', [Meteor.userId(), user.assigned]);
-            Meteor.call("saveModuleData", moduleData);
-            target = "/module/" + curModule._id + "/completed";
-        } 
-        t.promptRead.set(0);
         console.log("ROUTE:", target);
-        Router.go(target);
+        window.location.href = target;
     },
     'click #startActivity': function(event){
         target =  $(location).attr('href') + "/0";
-        Router.go(target);
+        window.location.href = target;
     },
     'click .multichoice': function(event){
         event.preventDefault();
@@ -355,11 +283,11 @@ Template.module.events({
         }
         Meteor.call("createNewModuleTrial", data);
         target = "/module/" + Modules.findOne()._id + "/0";
-        Router.go(target);
+        window.location.href = target;
     },
     'click #goBack': function(event){
         target = "/profile/"
-        Router.go(target);
+        window.location.href=target;
     }
 })
 Template.module.onCreated(function(){
@@ -367,10 +295,9 @@ Template.module.onCreated(function(){
     Meteor.subscribe('curModule', params.moduleId);
     this.questionType = new ReactiveVar("");
     this.pageType = new ReactiveVar("");
-    this.pageId = new ReactiveVar("");
     this.feedback = new ReactiveVar(false);
     this.statsData = new ReactiveVar({});
-    this.promptRead = new ReactiveVar(0);
+    this.promptRead = new ReactiveVar(false);
     this.audioActive = new ReactiveVar(false);
     this.TTSQueue = new ReactiveVar([]);
 })
@@ -392,7 +319,7 @@ function readTTS(template, message){
             }
         }
     });
-    }
+}
 
 function playAudio(template){
     template.audioActive.set(true);
