@@ -406,9 +406,12 @@ function setupRecording(template){
 
 
         recorder.ondataavailable = function(event) {
-            if (event.data.size > 0) {
+            console.log(template.feedback.get());
+            if (event.data.size > 0 && template.feedback.get() == false) {
                 chunks = [event.data];
                 processAudio(chunks);
+            } else {
+                $('#audioRecordingNotice').html("I am waiting for AutoTutor to finish.");
             }
         }
 
@@ -431,6 +434,7 @@ function setupRecording(template){
                 $('#audioRecordingNotice').html("I am listening.");
                 $('#audiovis').show();
             } else {
+                recorder.stop();
                 transcript = results.responses[results.responses.length - 1].transcription[0].alternatives[0].transcript;
                 if(transcript != "" || typeof transcript !== "undefined"){
                     stream.getTracks() // get all tracks from the MediaStream
