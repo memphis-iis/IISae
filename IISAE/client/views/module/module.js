@@ -1,5 +1,19 @@
+import hark from 'hark';
+import { FilesCollection } from 'meteor/ostrio:files';
+import FileReader from 'filereader';
+
+var chunks = [];
+
 Template.module.onRendered(function (){
+    $('#visualizer').hide();
     moduleData = Modules.findOne();
+    let moduleId = Meteor.user().curModule.moduleId;
+    moduleResults = ModuleResults.findOne({_id: moduleId});
+    data = {
+        pageRendered: Date.now()
+    }
+    moduleResults.responses.push(data);
+    Meteor.call('initiateNewResponse',moduleResults);
     const t = Template.instance();
     autoTutorReadsPrompt = moduleData.autoTutorReadsPrompt;
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
@@ -7,6 +21,9 @@ Template.module.onRendered(function (){
     if(autoTutorReadsPrompt && promptToRead){
         readTTS(t, promptToRead);
     } 
+    if(moduleData.audioRecording && !moduleData.enableAutoTutor){
+        setupRecording(t);
+    }
 });
 
 Template.module.helpers({
@@ -58,14 +75,14 @@ Template.module.helpers({
         page = Modules.findOne().pages[parseInt(this.pageId)];
         question = page.questions[parseInt(this.questionId)];
         const t = Template.instance();
-
+        question.audioRecording = curModule.audioRecording;
         if(question.type == "blank"){
             question.typeBlank = true;
         };
         if(question.type == "multiChoice"){
             question.typeMultiChoice = true;
         };
-        if(question.type == "longText"){
+        if(question.type == "longtext"){
             question.typeLongText = true;
         };
         if(question.type == "dropdown"){
@@ -97,6 +114,19 @@ Template.module.helpers({
         }
         return question;
     },
+    'transcript': function(){
+        let moduleId = Meteor.user().curModule.moduleId;
+        results = ModuleResults.findOne({_id: moduleId});
+        if(results.responses[results.responses.length - 1].transcription !== false){
+            transcript = results.responses[results.responses.length - 1].transcription[0].alternatives[0].transcript;
+            if(transcript != "" || typeof transcript !== "undefined"){
+                const t = Template.instance();
+                t.transcript.set(transcript);
+                $(".continue").click();
+            }
+            return transcript;
+        }
+    }
 });
 
 Template.module.events({
@@ -118,7 +148,7 @@ Template.module.events({
             readTTS(t, response);
          }
     },
-    'click .continue, response': async function(event) {
+    'click .continue': async function(event) {
         $(':button').prop('disabled', true); 
         const t = Template.instance();
         event.preventDefault();
@@ -129,43 +159,53 @@ Template.module.events({
         moduleData.lastAccessed = Date.now().toString();
         thisPage = Meteor.user().curModule.pageId;
         thisQuestion = Meteor.user().curModule.questionId;
+        answerValue = 0;
+        transcript = t.transcript.get();
+        $('#audioRecordingNotice').html("Waiting for AutoTutor to finish.");
         if(t.pageType.get() == "activity"){
-            questionData = {};
-            questionData.questionType = t.questionType.get();
-            if(questionData.questionType == "blank"){
-                response = $('.textInput').val();
-                answerValue = parseInt($(event.target).val());
-            }
-            if(questionData.questionType == "multiChoice"){
-                response = $(event.target).html();
-                answerValue = parseInt($(event.target).val());
-            }
-            if(questionData.questionType == "longText"){
-                response = $('.textareaInput').val();
-            }
-            if(questionData.questionType == "combo"){
-                allInput = document.getElementsByClassName('combo');
-                response = [];
-                for(i = 0; i < allInput.length; i++){
-                    if ($(allInput[i]).prop('nodeName') == "INPUT" || $(allInput[i]).prop('nodeName') == "TEXTAREA"){
-                        response.push($(allInput[i]).val());
-                    }
-                    if ($(allInput[i]).hasClass('btn-info')){
-                        response.push($(allInput[i]).html());
+            if(transcript == "" || !transcript){
+                questionData = {};
+                if(curModule.audioRecording){
+                    questionData.audioRecorded = chunks;
+                    console.log('audio saved as ', chunks);
+                }
+                if(questionData.questionType == "blank"){
+                    response = $('.textInput').val();
+                    answerValue = parseInt($(event.target).getAttr('value'));
+                }
+                if(questionData.questionType == "multiChoice"){
+                    response = $(event.target).html();
+                    answerValue = parseInt($(event.target).getAttr('value'));
+                }
+                if(questionData.questionType == "longText"){
+                    response = $('.textareaInput').val();
+                }
+                if(questionData.questionType == "combo"){
+                    allInput = document.getElementsByClassName('combo');
+                    response = [];
+                    for(i = 0; i < allInput.length; i++){
+                        if ($(allInput[i]).prop('nodeName') == "INPUT" || $(allInput[i]).prop('nodeName') == "TEXTAREA"){
+                            response.push($(allInput[i]).val());
+                        }
+                        if ($(allInput[i]).hasClass('btn-info')){
+                            response.push($(allInput[i]).html());
+                        }
                     }
                 }
+            } else {
+                response = transcript;
+                answerValue = 1;
             }
-            data = {
-                questionType: t.questionType.get(),
-                pageId: thisPage,
-                questionId: thisQuestion,
-                response: response,
-                responseTimeStamp: Date.now().toString()
-            }
+            data = moduleData.responses[moduleData.responses.length - 1];
+            data.questionType = t.questionType.get();
+            data.pageId =  thisPage;
+            data.questionId = thisQuestion;
+            data.response =  response;
+            data.responseTimeStamp = Date.now().toString();
             if(curModule.autoTutorReadsResponse && response){
                 readTTS(t, response);
              }
-            moduleData.responses.push(data);
+            moduleData.responses[moduleData.responses.length - 1]=data;
             moduleData.nextPage = thisPage;
             moduleData.nextQuestion = thisQuestion + 1;
             Meteor.call("saveModuleData", moduleData, curModule._id , thisPage, thisQuestion, response, answerValue, function(err, res){
@@ -266,13 +306,17 @@ Template.module.events({
     },
     'click .multichoice': function(event){
         event.preventDefault();
-        const collection = document.getElementsByClassName("multichoice");
-        for (let i = 0; i < collection.length; i++){
-            if(collection[i].dataset.group == $(event.target).data("group")){
-                collection[i].classList.remove("btn-info");
+        const t = Template.instance();
+        transcript.transcript.get();
+        if(transcript = "" || !transcript){
+            const collection = document.getElementsByClassName("multichoice");
+            for (let i = 0; i < collection.length; i++){
+                if(collection[i].dataset.group == $(event.target).data("group")){
+                    collection[i].classList.remove("btn-info");
+                }
             }
+            event.target.classList.toggle('btn-info');
         }
-        event.target.classList.toggle('btn-info');
     },
     'click #startModule': function(event){
         event.preventDefault();
@@ -297,9 +341,10 @@ Template.module.onCreated(function(){
     this.pageType = new ReactiveVar("");
     this.feedback = new ReactiveVar(false);
     this.statsData = new ReactiveVar({});
-    this.promptRead = new ReactiveVar(false);
     this.audioActive = new ReactiveVar(false);
     this.TTSQueue = new ReactiveVar([]);
+    this.audioToSave = new ReactiveVar("");
+    this.transcript = new ReactiveVar("");
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -321,7 +366,7 @@ function readTTS(template, message){
     });
 }
 
-function playAudio(template){
+async function playAudio(template){
     template.audioActive.set(true);
     let TTSQueue = template.TTSQueue.get();
     const audioObj = new Audio('data:audio/ogg;base64,' + TTSQueue.shift());
@@ -331,9 +376,122 @@ function playAudio(template){
             playAudio(template);
         }
         else{
-            template.audioActive.set(false);
+            sleep(1000).then(function(){
+                template.audioActive.set(false);
+                $('#audioRecordingNotice').html("I am listening.");
+                $('#audiovis').show();
+                moduleData = Modules.findOne({});
+                if(moduleData.audioRecording){
+                    setupRecording(template);
+                }
+                }
+            );
         }
     });
     window.currentAudioObj.play();
+}
+function setupRecording(template){
+    /// Setup Audio Recording
+    template = template;
+    navigator.getUserMedia({ audio : true}, onMediaSuccess, function(){});
+  
+    function onMediaSuccess(stream) {
+      visualize(stream);
+      var options = {};
+      var speechEvents = hark(stream, options);
+      var recorder = new MediaRecorder(stream);
+      console.log("recording");
+      recorder.start();
+
+
+
+        recorder.ondataavailable = function(event) {
+            if (event.data.size > 0) {
+                chunks = [event.data];
+                processAudio(chunks);
+            }
+        }
+
+        async function processAudio(chunks) {
+            $('#audiovis').hide();
+            var blob = new Blob(chunks, {
+              type: "audio/webm"
+            });
+            fileName = "responseAudio_" + Meteor.userId() + "_" +  Meteor.user().curModule.moduleId + "_" + Date.now() + ".webm";
+            blob.arrayBuffer().then((arrayBuffer) => {
+                let moduleId = Meteor.user().curModule.moduleId;
+                var Buffer = require('buffer').Buffer;
+                const buffer=Buffer.from(arrayBuffer,'binary');
+                Meteor.call('processAudio',buffer,fileName, moduleId, function(err,res){
+
+          
+            });
+            results = ModuleResults.findOne({_id: moduleId});
+            if(!results.responses[results.responses.length - 1].transcription){
+                $('#audioRecordingNotice').html("I am listening.");
+                $('#audiovis').show();
+            } else {
+                transcript = results.responses[results.responses.length - 1].transcription[0].alternatives[0].transcript;
+                if(transcript != "" || typeof transcript !== "undefined"){
+                    stream.getTracks() // get all tracks from the MediaStream
+                    forEach( track => track.stop() ); // stop each of them
+                }
+            }
+        })
+    }
+
+  
+      speechEvents.on('stopped_speaking', function() {
+           console.log('stopped_speaking');
+           if(recorder.state == "recording"){
+            recorder.stop();
+            $('#audioRecordingNotice').html("I am thinking.");
+           }
+      });
+    };
+}
+function visualize(stream){
+    const visualizer = document.getElementById("audiovis");
+    visualizer.height = 25;
+    visualizer.width = 200;
+    const canvasCtx = visualizer.getContext("2d");
+    const audioCtx = new AudioContext();
+    const source = audioCtx.createMediaStreamSource(stream);
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    source.connect(analyser);
+    drawVis();
+    function drawVis(){
+        WIDTH = visualizer.width;
+        HEIGHT = visualizer.height;
+        requestAnimationFrame(drawVis);
+        analyser.getByteTimeDomainData(dataArray);
+        canvasCtx.fillStyle = "#ffffff";
+        canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+        canvasCtx.lineWidth = 1;
+        canvasCtx.strokeStyle = "#4287f5";
+        canvasCtx.beginPath();
+        let sliceWidth = (WIDTH * 1.0) / bufferLength;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            let v = dataArray[i] / 128.0;
+            let y = (v * HEIGHT) / 2;
+
+            if (i === 0) {
+                canvasCtx.moveTo(x, y);
+            } else {
+                canvasCtx.lineTo(x, y);
+            }
+
+            x += sliceWidth;
+        }
+        canvasCtx.lineTo(visualizer.width, visualizer.height / 2);
+        canvasCtx.stroke();
+
+    }
 }
 

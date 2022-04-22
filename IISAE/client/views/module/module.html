@@ -32,9 +32,18 @@
                     {{/if}}
                     {{#if question.typeBlank}}
                         <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                        {{#if question.audioRecording}}
+                        <p id="audioRecordingNoticeContainer">
+                            <i class="fa fa-microphone"></i>
+                            <bold id="audioRecordingNotice">I am preparing to listen.</bold><br>
+                            <canvas id="audiovis" style="height:25px; width:200px;"></canvas>
+                            <input type="text" class="textInput continue" style="text-align:center; font-size:x-large; width:100%" id="transcription" value="{{transcript}}" disabled>
+                        </p>
+                        {{else}}
                         <form>
                         <input type="text" class="textInput" style="font-size:x-large; width:100%" id="response">
                         </form>
+                        {{/if}}
                         <br>
                         <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="{{question.value}}">Save and Continue</button>
                         <div class="alert" id="refutation" role="alert" hidden>
@@ -43,14 +52,36 @@
                     {{/if}}
                     {{#if question.typeLongText}}
                         <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                        {{#if question.audioRecording}}
+                        <p id="audioRecordingNoticeContainer">
+                            <i class="fa fa-microphone"></i>
+                            <bold id="audioRecordingNotice">I am preparing to listen.</bold><br>
+                            <canvas id="audiovis" style="height:25px; width:200px;"></canvas>
+                            <form>
+                                <textarea style="height:100px; width:100%;" class="textareaInput continue" id="transcription" disabled>{{transcript}}</textarea>
+                            </form>
+                        </p>
+                        <br>
+                        <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+                        {{else}}
                         <form>
                             <textarea style="height:100px; width:100%;" class="textareaInput"></textarea>
                         </form>
                         <br>
                         <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+                        {{/if}}
                     {{/if}}
                     {{#if question.typeMultiChoice}}
                     <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                    {{#if question.audioRecording}}
+                    <p id="audioRecordingNoticeContainer">
+                        <canvas id="visualizer"></canvas>
+                        <i class="fa fa-microphone"></i>
+                        <bold id="audioRecordingNotice">I am preparing to listen.</bold><br>
+                        <canvas id="audiovis" style="height:25px; width:200px;"></canvas>
+                        <input type="text" class="textInput continue" style="text-align:center; font-size:x-large; width:100%" id="transcription" value="{{transcript}}" disabled>
+                    </p>
+                    {{/if}}
                     <form>
                         {{#each question.answers}}
                             {{#if this.image}}

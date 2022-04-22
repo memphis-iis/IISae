@@ -199,7 +199,7 @@ Template.adminControlPanel.events({
         if (e.currentTarget.files && e.currentTarget.files[0]) {
           // We upload only one file, in case
           // multiple files were selected
-          const upload = Images.insert({
+          const upload = FileStore.insert({
             file: e.currentTarget.files[0],
             chunkSize: 'dynamic'
           }, false);

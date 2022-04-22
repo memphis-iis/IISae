@@ -16,7 +16,7 @@ serviceAccountData = null;
 Meteor.startup(async function() {
     if (Meteor.isServer) {
         Meteor.publish('files.images.all', function () {
-          return Images.find().cursor;
+          return FileStore.find().cursor;
         });
     }
 
@@ -340,7 +340,11 @@ Meteor.methods({
             });
         return results;
     },
+    initiateNewResponse: function (moduleData){
+        ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+    },
     saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
+        console.log(moduleData);
         response = moduleData.responses[moduleData.responses.length - 1].response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
@@ -444,7 +448,7 @@ Meteor.methods({
         if(typeof org.files === "undefined"){
             org.files = [];
         }
-        image = Images.findOne({})
+        image = FileStore.findOne({})
         data = {
             filePath: filePath,
             name: fileName,
@@ -455,7 +459,7 @@ Meteor.methods({
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: org.files} })
     },
     deleteFileFromOrg: function(fileName){
-        Images.remove({name: fileName})
+        FileStore.remove({name: fileName})
         org = Orgs.findOne({_id: Meteor.user().organization});
         orgFiles = org.files
         index = orgFiles.findIndex(x => x.name === fileName);
@@ -487,10 +491,77 @@ Meteor.methods({
             const audioDataEncoded = response.audioContent;
             return audioDataEncoded;
         });
-    }
+    },
+    processAudio(arrayBuffer, fileName, moduleId, ){
+        FileStore.write(arrayBuffer, {
+            fileName: fileName,
+            meta: {moduleId: moduleId}
+        }, async function(writeError, fileRef){
+            if(writeError){
+                console.log(writeError);
+                return false;
+            } else {
+                moduleId = fileRef.meta.moduleId;
+                link = FileStore.link(fileRef);
+                console.log(link, moduleId);
+                moduleData = ModuleResults.findOne({_id: moduleId});
+                moduleData.responses[moduleData.responses.length - 1].audioClip = link;
+                ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            }
+        });
+        if(true){
+            moduleData = ModuleResults.findOne({_id: moduleId});
+            makeGoogleSpeechRequest(arrayBuffer, moduleData.moduleId, moduleId)
+        }
+    },
 });
 
 //Server Methods
+
+async function makeGoogleSpeechRequest(buffer, trialId=false, moduleId) {
+    var audioString = Buffer.from(buffer).toString('base64');
+    console.log(trialId, audioString);
+    if(trialId !== false){
+        curModule = Modules.findOne({_id: trialId});
+        if(curModule.googleAPIKey){
+            speechAPIkey = curModule.googleAPIKey;
+        } 
+    }
+    const request = JSON.stringify({
+        'config':{
+            "encoding": 'WEBM_OPUS',
+            "sampleRateHertz": 48000,
+            "languageCode": "en-US",
+            "enableWordTimeOffsets": false
+        },
+        'audio':{
+            'content': audioString
+        }
+    });
+    const options = {
+        hostname: 'speech.googleapis.com',
+        path: '/v1/speech:recognize?key=' + speechAPIkey,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+        }
+    }
+    return await makeHTTPSrequest(options, request).then(data => {
+        console.log(data.toString('utf-8'));
+        response = JSON.parse(data.toString('utf-8'));
+        moduleData = ModuleResults.findOne({_id: moduleId});
+        if(response.results[0].alternatives[0].confidence > 0.65){
+            moduleData.responses[moduleData.responses.length - 1].transcription = response.results;
+            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            console.log(moduleId, response, response.results[0].alternatives[0].confidence);
+        } else {
+            moduleData.responses[moduleData.responses.length - 1].transcription = false;
+            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            console.log(moduleId, response, response.results[0].alternatives[0].confidence);
+        }
+    });
+}
+
 function addUserToRoles(uid, roles){
     Roles.addUsersToRoles(uid, roles);
     Meteor.users.update({ _id: uid }, { $set: { role: Roles.getRolesForUser(uid)[0] }});

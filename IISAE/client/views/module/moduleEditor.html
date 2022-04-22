@@ -71,6 +71,14 @@
             <input class="markCorrect"  data-field="enableAutoTutor" data-value="true" type="checkbox" >
             {{/if}}        
           </div>
+          <div class="form-check">
+            Enable Audio Recording:
+            {{#if module.audioRecording}}
+            <input class="markCorrect"  data-field="audioRecording" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="audioRecording" data-value="true" type="checkbox" >
+            {{/if}}        
+          </div>
         {{/if}}
         Feedback Timeout: {{module.feedbackTimeout}}<a id="open-editor" data-value={{module.feedbackTimeout}} data-field="feedbackTimeout"> Edit</a><br>
         {{/if}}
