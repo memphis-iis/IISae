@@ -111,7 +111,7 @@
                 "pageFlowVars" : {
                     "score" : 0
                 },
-                "googleAPIKey" : "AIzaSyAjxoQ8qRAw88SI2H3F97TT7bPyOhxz-B0",
+                "googleAPIKey" : "",
                 "enableFeedback" : true,
                 "enableAutoTutor" : true,
                 "audioRecording" : true,
