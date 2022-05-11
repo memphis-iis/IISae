@@ -1,29 +1,29 @@
 <template name="profile">
     <div class="px-4 py-5 my-5 text-center container">
        {{#if assignment}}
-       <h1>What's Next?.</h1>
+       <h1>Let's start here today.</h1>
+       <h4>To continue, please complete the following.</h4>
         <div class="assessment" style="margin-top:5px;">
             <hr>
-            <h3>{{assignment.title}}</h3>
-            <p>{{assignment.description}}</p>
-            {{#if assignment.isAssessment}}
-            <button id="startAssessment" data-assessment-id="{{assignment._id}}" class="startAssessment btn btn-primary startAssessment">Begin {{assignment.title}}</button>
-            {{/if}}
-            {{#if assignment.isModule}}
-            <button id="startModule" data-assessment-id="{{assignment._id}}" class="startModule btn btn-primary startAssessment">Begin {{assignment.title}}</button>
-            {{/if}}
+            <button id="startModule" data-assessment-id="{{assignment._id}}" class="startModule btn btn-primary startAssessment">{{assignment.title}}</button>
         </div>
        {{else}}
-       <h1>Hello {{currentUser.firstname}}.</h1>
+       <h1>Hello there, {{currentUser.firstname}}.</h1>
        {{#if isInRole 'user'}}
-            <h3>Next Module</h3>
-            <p>The modules present exercises to improve your understanding.</p>
-            <button id="moduleCenter" class="btn btn-primary">Module Center</button>
+            <button id="moduleCenter" class="btn btn-primary btn-wide">
+            <h4><span class="glyphicon glyphicon-star-empty"></span> Classrooms</h4>
+            </button>
+            <button id="joinClass" class="btn btn-primary btn-wide">
+            <h4><span class="glyphicon glyphicon-qrcode"></span> Join New Class</h4>
+            </button>
         {{else}}
-        <h3>Control Panel</h3>
-            <p>Access tools and settings for your organization and students.</p>
-            <button id="controlPanel" class="btn btn-primary">Control Panel</button>
+        <button id="controlPanel" class="btn btn-primary btn-wide">
+        <h4><span class="glyphicon glyphicon-cog"></span> Control Panel</h4>
+        </button>
         {{/if}}
+        <button id="calendar" class="btn btn-primary btn-wide">
+        <h4><span class="glyphicon glyphicon-calendar"></span> Calendar</h4>
+        </button>
        {{/if}}
     </div>
 </template>

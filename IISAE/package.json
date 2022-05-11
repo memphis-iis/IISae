@@ -27,6 +27,7 @@
     "meteor-node-stubs": "^1.1.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "recorder-js": "^1.0.7"
+    "recorder-js": "^1.0.7",
+    "svd-js": "^1.1.1"
   }
 }

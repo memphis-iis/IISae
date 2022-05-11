@@ -1,0 +1,89 @@
+<template name="lsacreate">
+    <h1>LSA Corpera Creator</h1>
+    <h2>New Corpera</h2>
+    <form>
+        <label htmlFor="corpera">Corpera Name</label>
+    
+        <input
+        id="corperaName"
+        type="text"
+        placeholder="Corpera Name"
+        name="corpera"
+        required
+        />
+        <br><br>
+      
+        <button class="btn btn-primary" id="create-corpera">Create Corpera</button>
+    </form>
+    <h2>Existing Corpera</h2>
+    <table class="table" id="corperaList">
+        <thead>
+            <th scope="col" width="20%">ID</th>
+            <th scope="col" width="40%">Name</th>
+            <th scope="col" width="40%">Vocabulary</th>
+        </thead>
+        <tbody>
+            {{#each corperas}}
+                <tr>
+                    <td>{{this._id}}</td>
+                    <td>{{this.name}}</td>
+                    <td>{{this.wordCount}}</td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <h2>Add Corpus to Corpera</h2>
+    
+    <form>
+        <label htmlFor="corpera">Corpera to append to</label>
+        <select id="corperaToAppendTo">
+        {{#each corperas}}
+            <option value="{{this._id}}">{{this.name}}</option>
+        {{/each}}
+        </select>
+        <br>
+        <label htmlFor="corpera">Corpus Text</label>
+    
+        <textarea style="height:100px; width:100%;" class="textareaInput continue" id="corpusText"></textarea>
+      
+        <button class="btn btn-primary" id="add-corpus">Add Corpus</button>
+    </form>
+    <h2>Test Corpera</h2>
+    <form>
+        <label htmlFor="corpera">Corpera to test against</label>
+        <select
+        id="corpusToTextAgainst">
+        <br>
+        {{#each corperas}}
+            <option value="{{this._id}}">{{this.name}}</option>
+        {{/each}}
+        </select>
+        <br>
+        <label htmlFor="corpera">Response Text</label>
+    
+        <textarea style="height:100px; width:100%;" class="textareaInput continue" id="responseText"></textarea>
+      
+        <button class="btn btn-primary" id="test-response">Test Response</button>
+        <br>
+        <label htmlFor="corpera">Cosine Similarity to Corpus</label>
+    
+        <input
+        id="cossim"
+        type="text"
+        placeholder="CosSim"
+        name="corpera"
+        required
+        />
+        <br>
+        <label htmlFor="corpera">Euclidean Distance from Corpus Cluster Center</label>
+    
+        <input
+        id="eucdist"
+        type="text"
+        placeholder="EuclideanDist"
+        name="corpera"
+        required
+        />
+        <br>
+    </form>
+</template>

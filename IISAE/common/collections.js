@@ -7,6 +7,8 @@ Modules = new Meteor.Collection('modules');
 ModuleResults = new Meteor.Collection('modresults');
 Events = new Meteor.Collection('events');
 AutoTutorCharacters = new Mongo.Collection('autoTutorCharacters');
+LSASpaces = new Meteor.Collection('lsaSpaces');
+Classes = new Mongo.Collection('classes');
 
 //Init DynamicAssets Collection
 FileStore = new FilesCollection({

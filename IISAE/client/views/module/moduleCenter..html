@@ -1,16 +1,25 @@
 <template name="moduleCenter">
     <div class="px-4 py-5 my-5 text-center">
        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-        <h1>Module Center</h1>
-        <p class="lead mb-4">Below are a list of available modules.</p>
-            {{#each modules}} 
+        <h1>Classrooms</h1>
+        {{#if classes}}
+        <p class="lead mb-4">Below are a list of classes you are enrolled in.</p>
+            {{#each classes}} 
             <hr>
-                <div class="module" style="margin-top:5px;">
-                    <h3>{{this.title}}</h3>
-                    <p>{{this.description}}</p>
-                    <button id="{{this._id}}" class="startModule btn btn-primary startAssessment">Begin {{nexModule.title}}</button>
-                </div>
+            <h2>{{this.name}}</h2>
+                {{#if this.hasModules}}
+                    {{#each this.flow}}
+                        <div class="module" style="margin-top:5px;">
+                            <button id="{{this.moduleId}}" class="startModule btn btn-primary startAssessment">{{this.title}}</button>
+                        </div>
+                    {{/each}}
+                {{else}}
+                There are no modules in this class.
+                {{/if}}
             {{/each}}
+        {{else}}
+                You are not enrolled in any classes.
+        {{/if}}
         </div>
     </div>
 </template>

@@ -1,12 +1,26 @@
 // Answer Assessment Engine
 
-function answerAssess(correctAnswer, response, type="simpleMatch"){
+import {LSA} from './macineLearning/LSA'
+export function answerAssess(correctAnswer, response, type="simpleMatch"){
+    console.log(correctAnswer, response);
     if(type == "simpleMatch"){
-        if(response.toLowerCase() == correctAnswer.toLowerCase()){
-            feedback = true;
-        } else {
-            feedback = false;
-        }
-        return feedback;
+        data = simpleMatch(correctAnswer.toLowerCase(), response.toLowerCase());
     }
+    if(type == "simpleMatchLSAFallback"){
+    };
+    return data;
+}
+function simpleMatch(correctAnswer, response){
+    if(response.toLowerCase() == correctAnswer.toLowerCase()){
+        isCorrect = true;
+    } else {
+        isCorrect = false;
+    }
+    data = {
+        isCorrect: isCorrect
+    }
+    return data;
+}
+function simpleMatchLSAFallback(corperaId, response){
+
 }

@@ -1,0 +1,140 @@
+<template name="classAdmin">
+    <div class="container">
+        <ul class="nav nav-tabs" style>
+            <li class="nav-item">
+            <a class="nav-link active" id="toggle-general-tab" aria-current="page" href="/control-panel">General</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="toggle-modules-tab" aria-current="page" href="/modulesAdmin">Modules</a>
+                </li>
+            <li class="nav-item">
+            <a class="nav-link toggle-classes-tab" href="/classAdmin">Classes</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link toggle-users-view" href="/usersAdmin">Users</a>
+            </li>
+        </ul>
+    </div>
+    <div class="px-4 py-5 my-5 container">
+        <div class="col-4" id="modules">
+        <h3>Class List</h3>
+        {{#if classes}}
+        <table class="table" id="assessmentList">
+            <thead>
+                <th scope="col" width="30%">Class</th>
+                <th scope="col" width="20%">Invite Code</th>
+                <th scope="col" width="50%">Actions</th>
+            </thead>
+            <tbody>
+                {{#each classes}}
+                    <tr>
+                        <td>
+                            {{this.name}}
+                        </td>
+                        <td>
+                            {{this.inviteLink}}
+                        </td>
+                        <td>
+                            <a href="#" id="copy-class" data-class="{{this._id}}">Copy Class</a><br>
+                            <a href="#" id="delete-class" data-class="{{this._id}}">Delete Class</a><br>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{/if}}
+        <a href="#" id="new-class">New Empty Class</a><br>
+        <a href="#" id="new-class-defaults">New Default Flow Class</a>
+        </div>
+        <h3>Select Class</h3>
+        <label htmlFor="class">Class</label>
+        <select
+        id="selectClass"     
+        name="class"
+        required
+        class="form-control">
+        <option value="false">Select</option>
+        {{#each classes}}
+          <option value="{{this._id}}">{{this.name}}</option>
+        {{/each}}
+        </select>
+        <br>
+        {{#if selectedClass}}
+        <label htmlFor="className">Class Name:</label>
+        <input
+        id="className"
+        type="text"
+        placeholder="{{selectedClass.name}}"
+        value = "{{selectedClass.name}}"
+        name="className"
+
+        />     
+        <button class="btn btn-primary" id="changeClassName">Change Class Name</button>  
+        <br>
+        <h4>Class Roster</h4>
+            {{#if selectedClass.students}}
+                <table class="table" id="assessmentList">
+                <thead>
+                    <th scope="col" width="50%">Student</th>
+                    <th scope="col" width="50%">Actions</th>
+                </thead>
+                <tbody>
+                {{#each selectedClass.students}}
+                    <tr>
+                        <td>{{this.lastName}}, {{this.firstName}}</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+            {{else}}
+                No students are enrolled in this class.
+            {{/if}}
+        <h4>Class Flow</h4>
+            {{#if selectedClass.flow}}
+            <table class="table" id="assessmentList">
+                <thead>
+                    <th scope="col" width="50%">Module</th>
+                    <th scope="col" width="50%">Actions</th>
+                </thead>
+                <tbody>
+                {{#each selectedClass.flow}}
+                    <tr>
+                        <td>{{this.title}}</td>
+                        <td>
+                            {{#if this.first}}
+                            {{else}}
+                            <a id="moveup-module" data-index="{{@index}}">Move Up</a><br>
+                            {{/if}}
+                            {{#if this.last}}
+                            {{else}}
+                            <a id="movedown-module" data-index="{{@index}}">Move Down</a><br>
+                            {{/if}}
+                            <a id="remove-module" data-index="{{@index}}">Unassign</a></td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+            {{else}}
+                No class flow set for this class.
+            {{/if}}
+            <h4>Available Modules</h4>
+            {{#if module}}
+            <table class="table" id="assessmentList">
+                <thead>
+                    <th scope="col" width="30%">Module</th>
+                    <th scope="col" width="70%">Actions</th>
+                </thead>
+                <tbody>
+                {{#each module}}
+                    <tr>
+                        <td>{{this.title}}</td>
+                        <td><a id="assign-module" data-module-id="{{this._id}}">Add to Class Flow</a><br>
+                        <a id="assign-module-to-all" data-module-id="{{this._id}}">Assign to All Students</a></td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+            {{/if}}
+            {{/if}}
+</div>
+</template>

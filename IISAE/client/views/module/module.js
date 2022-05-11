@@ -17,7 +17,6 @@ Template.module.onRendered(function (){
     const t = Template.instance();
     autoTutorReadsPrompt = moduleData.autoTutorReadsPrompt;
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
-    console.log(Meteor.user().curModule.questionId);
     if(autoTutorReadsPrompt && promptToRead){
         readTTS(t, promptToRead);
     } 
@@ -167,7 +166,7 @@ Template.module.events({
                 questionData = {};
                 if(curModule.audioRecording){
                     questionData.audioRecorded = chunks;
-                    console.log('audio saved as ', chunks);
+
                 }
                 if(questionData.questionType == "blank"){
                     response = $('.textInput').val();
@@ -238,7 +237,6 @@ Template.module.events({
             if(!curModule.enableAdaptivePages && curModule.pages[thisPage].nextFlow.length == 0){
                 nextQuestion = thisQuestion + 1;
                 nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
-                console.log(thisPage, nextQuestion, nextQuestionData);
                 if(typeof nextQuestionData !== "undefined"){
                     target = "/module/" + curModule._id + "/" + thisPage + "/" + nextQuestion; 
                 } else {
