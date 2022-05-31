@@ -29,7 +29,12 @@ const restrictedRoutes = [
   'createOrg',
   'profile',
   'moduleCenter',
-  'calendar'
+  'calendar',
+  'lsacreate',
+  'modulesAdmin',
+  'classAdmin',
+  'usersAdmin',
+  'joinClass'
 ]
 
 
@@ -81,7 +86,7 @@ Router.route('/control-panel', function () {
       this.render('adminControlPanel');
     }
     else if (Roles.userIsInRole(Meteor.user(), 'supervisor')) {
-      this.render('supervisorControlPanel');
+      this.render('adminControlPanel');
     }
     else{
       Router.go('/');
@@ -220,7 +225,6 @@ Router.route('/module/:_id/:_pageid/:_questionid', {
         prompt: questionPrompt,
         autoTutorReadsPrompt: true
       }
-      console.log("Route Data", data);
       return data
     }
   }

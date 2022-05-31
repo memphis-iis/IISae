@@ -76,3 +76,6 @@ img #logo-color{
     max-width:100px;
     border-radius: 20px;
 }
+.btn{
+    width:100%;
+}

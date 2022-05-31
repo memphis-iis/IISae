@@ -2,16 +2,34 @@ import { Template }    from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FilesCollection } from 'meteor/ostrio:files';
 
-Template.adminControlPanel.helpers({
+Template.modulesAdmin.helpers({
     'supervisorsList': () => Meteor.users.find({ role: 'supervisor' }, { sort: {lastname: 1, firstname: 1, _id: 1}}).fetch(),
 
     'userInfo': () => Meteor.users.find({role: 'user'}),
 
-    'author': function(){
-        return Meteor.user().author;
-    } ,
     currentUpload() {
         return Template.instance().currentUpload.get();
+    },
+    'assignments': function(){
+        data =  Orgs.findOne({_id: Meteor.user().organization}).newUserAssignments;
+        console.log(data);
+        for(i = 0; i < data.length; i++){
+            data.first = false;
+            data.last =  false;
+            if(data[i].type == "assessment"){
+                data[i] = Assessments.findOne({_id: data[i].assignment});
+            }
+            if(data[i].type == "module"){
+                data[i] = Modules.findOne({_id: data[i].assignment});
+            }
+            if(i == 0){
+                data[i].first = true;
+            }
+            if(i == data.length - 1){
+                data[i].last = true;
+            }
+        }
+        return data;
     },
     'files':  function(){
         files = Orgs.findOne({_id: Meteor.user().organization}).files;
@@ -36,15 +54,23 @@ Template.adminControlPanel.helpers({
                 data[i].status += "Assigned to new users. ";
                 data[i].newUserRequired = true;
             } 
-            if(data[i].owner == org._id){
-                data[i].status += "Created by your organization."
+            if(data[i].orgOwnedBy == org._id){
+                data[i].status += "Owned by your organization. "
+                data[i].owned = false;
+            }
+            if(data[i].owner == Meteor.userId()){
+                data[i].status += "Created by you. "
                 data[i].owned = true;
+            }
+            if(data[i].public == false){
+                data[i].status += "Private. "
+            }
+            if(data[i].public == true){
+                data[i].status += "Publically available. "
             }
             if(data[i].owner == false){
-                data[i].status += "Uploaded by App Administrator."
-            }
-            if(Meteor.user().author){
-                data[i].owned = true;
+                data[i].status += "Uploaded by App Administrator. "
+                data[i].owned = false;
             }
         }
           return data;
@@ -78,7 +104,7 @@ Template.adminControlPanel.helpers({
     'showToken': true,
 })
 
-Template.adminControlPanel.events({
+Template.modulesAdmin.events({
     'click #supervisorsEditButton': function(){
         alert("edit click")
     },
@@ -99,19 +125,36 @@ Template.adminControlPanel.events({
         t.selectedUser.set(event.target.value);
         $('#user-select').val(t.selectedUser.get())
     },
+    'click #assign-new': function(event){
+        event.preventDefault();
+        org = Orgs.findOne({_id: Meteor.user().organization});
+        assignment = $(event.target).data("assessment-id");
+        data = {
+            type: "assessment",
+            assignment: assignment
+        }
+        org.newUserAssignments.push(data);
+        Meteor.call('changeAssignmentToNewUsers', org.newUserAssignments);
+    },
     'click #assign-new-module': function(event){
         event.preventDefault();
         org = Orgs.findOne({_id: Meteor.user().organization});
         assignment = $(event.target).data("module-id");
         data = {
             type: "module",
-            assignment: assignment,
-            class: "Organization"
+            assignment: assignment
         }
         org.newUserAssignments.push(data);
         Meteor.call('changeAssignmentToNewUsers', org.newUserAssignments);
     },
-
+    'click #unassign-new': function(event){
+        event.preventDefault();
+        org = Orgs.findOne({_id: Meteor.user().organization});
+        assignment = $(event.target).data("assessment-id");
+        index = org.newUserAssignments.findIndex(x => x.assignment === assignment);
+        org.newUserAssignments.splice(index, 1);
+        Meteor.call('changeAssignmentToNewUsers', org.newUserAssignments);
+    },
     'click #unassign-new-module': function(event){
         event.preventDefault();
         org = Orgs.findOne({_id: Meteor.user().organization});
@@ -167,7 +210,7 @@ Template.adminControlPanel.events({
         deletedAssessment= event.target.getAttribute('data-assessment-id');
         Meteor.call('deleteAssessment',deletedAssessment);
         $('#alert-confirm').removeAttr('assessment-id');
-        $('#alert').hide();
+        $('#alert').hde();
     },
     'click #add-module': function (event){
         Meteor.call('createModule');
@@ -241,15 +284,9 @@ Template.adminControlPanel.events({
         assigned[index + 1] = a;
         Meteor.call('changeAssignmentToNewUsers', assigned);
     },
-    'click #gen-key': function(event){
-        Meteor.call('generateApiToken', Meteor.userId());
-    },
-    'click #regen-link': function(event){
-        Meteor.call('generateInvite', Meteor.userId());
-    },
 })
 
-Template.adminControlPanel.onCreated(function() {
+Template.modulesAdmin.onCreated(function() {
     Meteor.subscribe('getUsersInOrg');
     Meteor.subscribe('getSupervisorsInOrg');
     Meteor.subscribe('getUserModuleResults');

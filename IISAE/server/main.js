@@ -5,6 +5,8 @@ import { calculateScores } from './subscaleCalculations.js';
 import { Push } from 'meteor/activitree:push';
 import { FilesCollection } from 'meteor/ostrio:files';
 import { insertSeedData } from './seedData'
+import { LSA } from './macineLearning/LSA'
+import { answerAssess } from './answerAssess'
 
 export { addUserToRoles }
 
@@ -12,6 +14,9 @@ export { addUserToRoles }
 serviceAccountData = null;
 //Public Dynamic Assets
 
+//LSA Defaults
+const defaultStopWords = ['a','and','an','are','as','at','be','by','for','from','has','he','in','is','it','its','of','on','that','the','to','was','were','will','with','she'];
+const defaultIgnoreChars = ['\'','!','.',',','!','?',';',':'];
 
 Meteor.startup(async function() {
     if (Meteor.isServer) {
@@ -45,11 +50,6 @@ Meteor.methods({
                     password: pass,
                     email: emailAddr
                 });
-                const authors = Meteor.settings.public.authors;
-                author = false;
-                if(authors.indexOf(emailAddr) !== -1){
-                    author = true;
-                }
                 Meteor.users.update({ _id: uid }, 
                     {   $set: 
                         {
@@ -184,8 +184,10 @@ Meteor.methods({
         newModule = input.module;
         copiedModule = Modules.findOne({_id: newModule});
         delete copiedModule._id;
-        copiedModule.owner = orgId;
+        copiedModule.owner = Meteor.userId();
         copiedModule.title = copiedModule.title + " copy";
+        copiedModule.orgOwnedBy = orgId;
+        copiedModule.public = false;
         Modules.insert(copiedModule);
     },
     createModule: function(){
@@ -196,7 +198,9 @@ Meteor.methods({
             display: false,
             description: "Description",
             pages: [],
-            owner: orgId,
+            public: false,
+            owner: this.userId,
+            orgOwnedBy: orgId,
             fallbackRoute: "nextPage",
             pageFlowVars: {
                 score: 0
@@ -282,6 +286,14 @@ Meteor.methods({
                 text = "curModule." + field + "=[data]";
                 eval(text);
             }
+            if(addedField == 'answerCorpera'){
+                data = 
+                {
+                    corpus: "text script",
+                };
+            text = "curModule." + field + "=[data]";
+            eval(text);
+            }
             if(addedField == 'nextFlow'){
                 data =  
                     {
@@ -344,8 +356,8 @@ Meteor.methods({
         ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
     },
     saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
-        console.log(moduleData);
-        response = moduleData.responses[moduleData.responses.length - 1].response;
+        console.log(moduleData, moduleId, pageId, questionId, response, answerValue)
+        response = response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
         feedback = "disabled";
@@ -361,7 +373,7 @@ Meteor.methods({
                 questionWeight = curModule.pages[pageId].questions[0].weight
             }
             if(enableFeedback){
-                feedback = answerAssess(correctAnswer, response);
+                feedback = answerAssess(correctAnswer, response).isCorrect;
             }
             if(feedback == true){
                 moduleData.score += parseInt(answerValue) * parseFloat(questionWeight);
@@ -503,7 +515,6 @@ Meteor.methods({
             } else {
                 moduleId = fileRef.meta.moduleId;
                 link = FileStore.link(fileRef);
-                console.log(link, moduleId);
                 moduleData = ModuleResults.findOne({_id: moduleId});
                 moduleData.responses[moduleData.responses.length - 1].audioClip = link;
                 ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
@@ -514,13 +525,204 @@ Meteor.methods({
             makeGoogleSpeechRequest(arrayBuffer, moduleData.moduleId, moduleId)
         }
     },
+
+    // LSA Functions
+    createCorpera(spacename, stopWords=defaultStopWords, ignorechars=defaultIgnoreChars){
+        newLSA = new LSA(spacename, stopWords, ignorechars);
+        data = newLSA.dump();
+        id = LSASpaces.insert(data);
+        return id;
+    },
+    addCorpus(id, corpusText){
+        newLSA = new LSA(spacename="temp",stopWords=defaultStopWords, ignorechars=defaultIgnoreChars);
+        lsaData = LSASpaces.findOne({_id: id});
+        console.log(lsaData);
+        newLSA.restore(lsaData);
+        newLSA.parse(corpusText);
+        newLSA.build();
+        newLSA.TFIDF();
+        newLSA.calc();
+        data = newLSA.dump();
+        dataConverted = {};
+        keys = Object.keys(data);
+        values = Object.values(data);
+        
+        LSASpaces.update({'_id': data._id},{dataConverted}
+        );
+    },
+    testResponse(id, responseText){
+        newLSA = new LSA(spacename="temp",stopWords=defaultStopWords, ignorechars=defaultIgnoreChars);
+        lsaData = LSASpaces.findOne({_id: id});
+        newLSA.restore(lsaData);
+        return newLSA.assess(responseText);
+    },
+    createClass(flow=[]){
+        var link = '';
+        var length = 5;
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        var unique = false;
+        while(unique == false){;
+            for ( var i = 0; i < length; i++ ) {
+                link += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }  
+            linkFound = Classes.find({inviteLink: link}).fetch().length; 
+            if(linkFound == 0){
+                unique = true;
+            } else {
+                link = "";
+            }
+        }
+        data = {
+            owner: this.userId,
+            organization: Meteor.user().organization,
+            students: [],
+            flow: flow,
+            inviteLink: link,
+            name: "New Class"
+        }
+        Classes.insert(data);
+    },
+    joinClassByCode(code){
+        userId = Meteor.userId();
+        user = Meteor.users.findOne({_id: userId});
+        addClass = Classes.findOne({inviteLink: code});
+        data = {
+            classId: addClass._id,
+            assignments: []
+        }
+        classList = user.classList || [];
+        classList.push(data);
+        Meteor.users.update({ _id: userId }, 
+            {   $set: 
+                {
+                    classList: classList
+                }
+            });
+        students = Classes.findOne({inviteLink: code}).students;
+        student = {
+            id: userId,
+            firstName: user.firstname,
+            lastName: user.lastname
+        }
+        students.push(student);
+        Classes.update({inviteLink: code},{
+            $set:
+            {
+                students: students
+            }
+        })
+    },
+    addUserToClass(classId,userId){
+        user = Meteor.users.findOne({_id: userId});
+        addClass = Classes.findOne({_id: classId});
+        data = {
+            classId: classId,
+            assignments: []
+        }
+        classList = user.classList || [];
+        classList.push(data);
+        Meteor.users.update({ _id: userId }, 
+            {   $set: 
+                {
+                    classList: classList
+                }
+            });
+        students = Classes.findOne({"_id":classId}).students;
+        student = {
+            id: userId,
+            firstName: user.firstname,
+            lastName: user.lastname
+        }
+        students.push(student);
+        Classes.update({_id: classId},{
+            $set:
+            {
+                students: students
+            }
+        })
+    },
+    removeUserFromClass(classId, userId){
+        user = Meteor.users.findOne({_id: userId});
+        classList = user.classList || [];
+        classList.splice(classId,1);
+        Meteor.users.update({ _id: userId }, 
+            {   $set: 
+                {
+                    classList: classList
+                }
+            });
+        students = Classes.findOne({"_id":classId}).students;
+        students = students.filter(function(obj){
+            return obj.id !== userId;
+        });
+        Classes.update({_id: classId},{
+            $set:
+            {
+                students: students
+            }
+        })
+    },
+    deleteClass(id){
+        Classes.remove({"_id": id});
+    },
+    copyClass(id){
+        data = Classes.findOne({"_id": id});
+        var link = '';
+        var length = 5;
+        var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        var unique = false;
+        while(unique == false){;
+            for ( var i = 0; i < length; i++ ) {
+                link += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }  
+            linkFound = Classes.find({inviteLink: link}).fetch().length; 
+            if(linkFound == 0){
+                unique = true;
+            } else {
+                link = "";
+            }
+        }
+        dataNew = {
+            owner: this.userId,
+            organization: Meteor.user().organization,
+            students: [],
+            flow: data.flow,
+            name: data.name + " copy",
+            inviteLink: link
+        } 
+        Classes.insert(dataNew);
+    },
+    assignModuleToClass(classId,moduleId){
+        moduleName = Modules.findOne({"_id":moduleId}).title;
+        prevFlow = Classes.findOne({"_id":classId}).flow;
+        newFlow = prevFlow;
+        data = {
+            moduleId: moduleId,
+            title: moduleName
+        }
+        newFlow.push(data);
+        Classes.update({"_id":classId}, {$set:{flow: newFlow}});
+    },
+    removeModuleFromClass(classId,index){
+        prevFlow = Classes.findOne({"_id":classId}).flow;
+        newFlow = prevFlow;
+        newFlow.splice(index, 1);
+        Classes.update({"_id":classId}, {$set:{flow: newFlow}});
+    },
+    changeClassAssignment(classId, flow){
+        Classes.update({"_id":classId}, {$set:{flow: flow}});
+    },
+    changeClassName(classId, name){
+        Classes.update({"_id":classId}, {$set:{name: name}});
+    }
 });
 
 //Server Methods
 
 async function makeGoogleSpeechRequest(buffer, trialId=false, moduleId) {
     var audioString = Buffer.from(buffer).toString('base64');
-    console.log(trialId, audioString);
     if(trialId !== false){
         curModule = Modules.findOne({_id: trialId});
         if(curModule.googleAPIKey){
@@ -547,7 +749,6 @@ async function makeGoogleSpeechRequest(buffer, trialId=false, moduleId) {
         }
     }
     return await makeHTTPSrequest(options, request).then(data => {
-        console.log(data.toString('utf-8'));
         response = JSON.parse(data.toString('utf-8'));
         moduleData = ModuleResults.findOne({_id: moduleId});
         if(response.results[0].alternatives[0].confidence > 0.65){
@@ -590,15 +791,6 @@ function getInviteInfo(inviteCode) {
     targetOrgName = organization.orgName;
     return {targetOrgId, targetOrgName, targetSupervisorId, targetSupervisorName};
 }
-function answerAssess(correctAnswer, response){
-    if(response.toLowerCase() == correctAnswer.toLowerCase()){
-        feedback = true;
-    } else {
-        feedback = false;
-    }
-    return feedback;
-}
-
 async function insertDefaultAssignments(){
     if(Modules.find().count() === 0){
         console.log('Importing Default Modules into Mongo.')

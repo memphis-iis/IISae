@@ -1,5 +1,21 @@
-<template name="supervisorControlPanel">
-    <div class="row">
+<template name="usersAdmin">
+    <div class="container">
+        <ul class="nav nav-tabs" style>
+            <li class="nav-item">
+            <a class="nav-link active" id="toggle-general-tab" aria-current="page" href="/control-panel">General</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" id="toggle-modules-tab" aria-current="page" href="/modulesAdmin">Modules</a>
+                </li>
+            <li class="nav-item">
+            <a class="nav-link toggle-classes-tab" href="/classAdmin">Classes</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link toggle-users-view" href="/usersAdmin">Users</a>
+            </li>
+        </ul>
+    </div>
+    <div class="px-4 py-5 my-5 container">
         <div class="col-4">
             <h3>Users</h3>
         </div>
@@ -18,12 +34,6 @@
                     <th scope="row">{{this.lastname}}</th>
                     <td>{{this.firstname}}</td>
                     <td>
-                        <a id="usersEditButton" href="#" data-UserID="{{this._id}}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                            </svg>
-                        </a>
                         {{#if isInRole 'supervisor'}}
                         <a id="viewItemButton" href="/userAssessmentReport/supervisor/{{this._id}}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
@@ -50,23 +60,44 @@
             {{/each}}
         </tbody>
     </table>
-    <div class="row">
+    <div class="px-4 py-5 my-5 container">
         <div class="col-4">
-            <h3>User Flow</h3>
+            
+            <h3>User Select</h3>
             <select id="user-select">
-                <option value="none">None</option>
+                <option value="false">None</option>
             {{#each usersList}}
                 <option value="{{this._id}}">{{this.lastname}}, {{this.firstname}}</option>
             {{/each}}
            </select><br><br>
+           {{#if userSelected}}
+            <h3>{{userSelected.lastname}}, {{userSelected.firstname}}</h3>
             {{#if orgViewOn}}
                  User Flow can be seen when selecting an individual user  that you supervise.
             {{else}}
-            <h4>Assignments</h4>
+            {{#if userSelected.editedClassList}}
+            <h4>Entrolled Classes</h4>
+            <table class="table" id="classList">
+                <thead>
+                    <th scope="col" width="50%">Classes</th>
+                    <th scope="col" width="50%">Actions</th>
+                </thead>
+                <tbody>
+                {{#each userSelected.editedClassList}}
+                    <tr>
+                        <td>{{this.name}}</td>
+                        <td>
+                            <a id="unassign-class" data-class-id="{{this.classId}}">Remove From Class</a></td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+            {{/if}}
             {{#if assignments}}
+            <h4>Individual Assignments</h4>
             <table class="table" id="assessmentList">
                 <thead>
-                    <th scope="col" width="50%">Module/Assignment</th>
+                    <th scope="col" width="50%">Assignment</th>
                     <th scope="col" width="50%">Actions</th>
                 </thead>
                 <tbody>
@@ -87,28 +118,26 @@
                 {{/each}}
                 </tbody>
             </table>
-            {{else}}
-                No assignments for this user.
             {{/if}}
-            <h4>Available Assessments</h4>
-            {{#if assessmentsAvailable}}
+            {{#if classes}}
+            <h4>Available Classes</h4>
             <table class="table" id="assessmentList">
                 <thead>
-                    <th scope="col" width="70%">Assessment</th>
+                    <th scope="col" width="70%">Class</th>
                     <th scope="col" width="30%">Actions</th>
                 </thead>
                 <tbody>
-                {{#each assessmentsAvailable}}
+                {{#each classes}}
                     <tr>
-                        <td>{{this.title}}</td>
-                        <td><a id="assign-assessment" data-assessment-id="{{this._id}}">Assign to User</a></td>
+                        <td>{{this.name}}</td>
+                        <td><a id="assign-class" data-class-id="{{this._id}}">Enroll User</a></td>
                     </tr>
                 {{/each}}
                 </tbody>
             </table>
             {{/if}}
-            <h4>Available Modules</h4>
             {{#if modulesAvailable}}
+            <h4>Available Assignments</h4>
             <table class="table" id="assessmentList">
                 <thead>
                     <th scope="col" width="70%">Module</th>
@@ -125,32 +154,6 @@
             </table>
             {{/if}}
             <h4>History</h4>
-            {{#if assessments}}
-            <table class="table" id="moduleList">
-                <thead>
-                    <th scope="col" width="40%">Date Last Accessed</th>
-                    <th scope="col" width="40%">Assessment</th>
-                    <th scope="col" width="15%">Progress</th>
-                    <th scope="col" width="5%">Results</th>
-                </thead>
-                <tbody>
-                    {{#each assessments}}
-                        <tr>
-                            <td>{{this.lastAccessed}}</td>
-                            <td>{{this.title}}</td>
-                            {{#if this.completed}}
-                            <td>Completed</td>
-                            {{else}}
-                            <td>Page {{this.lastPage}} of {{this.totalPages}} / {{this.percentDone}}% </td>
-                            {{/if}}
-                            <td><a href="/assessmentReport/{{this.id}}">Report</a></td>
-                        </tr>
-                    {{/each}}
-                </tbody>
-            </table>
-            {{else}}
-            No assessments have been started by this user.<br>
-            {{/if}}
             {{#if modules}}
             <table class="table" id="moduleList">
                 <thead>
@@ -178,23 +181,7 @@
             No modules have been started by this user.
             {{/if}}
             {{/if}}
+            {{/if}}
         </div>
-    </div>
-    <div class="row">
-        <h3>Invite Code and Link</h3>
-        <p>This code invites a new user to your organization and becomes supervised by you: 
-        <h4>{{orgCode}}</h4>
-        <a href="{{orgLink}}">{{orgLink}}</a> </p> 
-        <p>
-        <br><button id="regen-link" class="btn btn-caution">Regenerate Link</button>
-        </p>
-    </div>
-    <div class="row">
-        <p><h3>API Information</h3>API allows you to get raw anonymized JSON data about your organization for use in other apps.<br>{{#if apiKeys.expired}} is expired. {{else}} (Expires {{apiKeys.expires}}):<br>
-        <b>[x-user-id]:</b> {{currentUser.username}}<br>
-        <b>[x-auth-token]:</b> {{apiKeys.token}} {{/if}} <br> 
-        Example CURL command:<br> <code>{{apiKeys.curlExample}}</code><br>
-        </p> 
-        <button id='gen-key' class="btn btn-caution">Generate New 30 Day Key</button>
     </div>
 </template>

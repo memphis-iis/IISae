@@ -17,7 +17,6 @@ Template.module.onRendered(function (){
     const t = Template.instance();
     autoTutorReadsPrompt = moduleData.autoTutorReadsPrompt;
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
-    console.log(Meteor.user().curModule.questionId);
     if(autoTutorReadsPrompt && promptToRead){
         readTTS(t, promptToRead);
     } 
@@ -160,27 +159,27 @@ Template.module.events({
         thisPage = Meteor.user().curModule.pageId;
         thisQuestion = Meteor.user().curModule.questionId;
         answerValue = 0;
-        transcript = t.transcript.get();
+        transcript = t.transcript.get() || "";
         $('#audioRecordingNotice').html("Waiting for AutoTutor to finish.");
         if(t.pageType.get() == "activity"){
             if(transcript == "" || !transcript){
-                questionData = {};
+                questionData = curModule.pages[thisPage].questions[thisQuestion];
                 if(curModule.audioRecording){
                     questionData.audioRecorded = chunks;
-                    console.log('audio saved as ', chunks);
+
                 }
-                if(questionData.questionType == "blank"){
-                    response = $('.textInput').val();
-                    answerValue = parseInt($(event.target).getAttr('value'));
+                if(questionData.type == "blank"){
+                    response = $(".textInput").val();
+                    answerValue = parseInt($(event.target).val());
                 }
-                if(questionData.questionType == "multiChoice"){
+                if(questionData.type == "multiChoice"){
                     response = $(event.target).html();
-                    answerValue = parseInt($(event.target).getAttr('value'));
+                    answerValue = parseInt($(event.target).val());
                 }
-                if(questionData.questionType == "longText"){
+                if(questionData.type == "longtext"){
                     response = $('.textareaInput').val();
                 }
-                if(questionData.questionType == "combo"){
+                if(questionData.type == "combo"){
                     allInput = document.getElementsByClassName('combo');
                     response = [];
                     for(i = 0; i < allInput.length; i++){
@@ -208,6 +207,7 @@ Template.module.events({
             moduleData.responses[moduleData.responses.length - 1]=data;
             moduleData.nextPage = thisPage;
             moduleData.nextQuestion = thisQuestion + 1;
+            console.log(response);
             Meteor.call("saveModuleData", moduleData, curModule._id , thisPage, thisQuestion, response, answerValue, function(err, res){
                 feedback = t.feedback.get();
                 type = "danger"
@@ -238,7 +238,6 @@ Template.module.events({
             if(!curModule.enableAdaptivePages && curModule.pages[thisPage].nextFlow.length == 0){
                 nextQuestion = thisQuestion + 1;
                 nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
-                console.log(thisPage, nextQuestion, nextQuestionData);
                 if(typeof nextQuestionData !== "undefined"){
                     target = "/module/" + curModule._id + "/" + thisPage + "/" + nextQuestion; 
                 } else {
@@ -391,6 +390,7 @@ async function playAudio(template){
     window.currentAudioObj.play();
 }
 function setupRecording(template){
+    console.log("Setting up audio");
     /// Setup Audio Recording
     template = template;
     navigator.getUserMedia({ audio : true}, onMediaSuccess, function(){});

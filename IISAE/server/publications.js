@@ -28,6 +28,9 @@ Meteor.publish('getSupervisorsInOrg', function() {
         return Meteor.users.find({ organization: Meteor.user().organization, role: 'supervisor' });
     }
 });
+Meteor.publish('getClasses', function () {
+    return Classes.find();
+});
 
 //Allow users access to Org information
 Meteor.publish(null, function() {
@@ -66,6 +69,12 @@ Meteor.publish(null, function() {
     return Events.find({createdBy: this.userId});
 });
 
+Meteor.publish('corperas', function() {
+    return LSASpaces.find({});
+});
+Meteor.publish('getClasses', function() {
+    return Classes.find({});
+});
 //get all organization events
 Meteor.publish('events', function() {
     console.log(Meteor.user().organization, this.userId)

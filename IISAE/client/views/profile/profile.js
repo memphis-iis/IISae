@@ -1,18 +1,9 @@
 Template.profile.helpers({
     'assignment': function(){
-        assigned = Meteor.user().assigned || []; 
-        assignment = {};
-        if(assigned.length === 0){
-            assignment = false;
-        } else {
-            assignment.show = true;
-            assignment.isAssessment = false;
-            assignment.isModule = false;
-            if(assigned[0].type == "module"){
-                assignment = Modules.findOne({_id: assigned[0].assignment});
-                assignment.isModule = true;
-            }
-        }
+        assigned = Meteor.user().assigned[0].assignment || false;
+        console.log(assigned);
+        assignment = Modules.findOne({"_id": assigned});
+        console.log(assignment);
         return assignment;
     },
     'userIsAdminOrSupervisor': () => Roles.userIsInRole(Meteor.userId(), ['admin', 'supervisor']),
@@ -37,6 +28,10 @@ Template.profile.events({
         target = "/moduleCenter/";
         Router.go(target);
     },
+    'click #joinClass': function(){
+        target = "/joinClass/";
+        Router.go(target);
+    },
     'click #controlPanel': function(){
         target = "/control-panel/";
         Router.go(target);
@@ -53,5 +48,5 @@ Template.profile.events({
 
 
 Template.profile.onCreated(function() {
-    Meteor.subscribe('assessments');
+    Meteor.subscribe('modules');
 })

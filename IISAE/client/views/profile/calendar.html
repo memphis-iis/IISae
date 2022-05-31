@@ -1,32 +1,17 @@
 <template name="calendar">
-    <div>
-        <ul class="nav nav-pills justify-content-center nav-calendar" style>
+    <div class="container">
+        <ul class="nav nav-tabs" style>
             <li class="nav-item">
             <a class="nav-link active" id="toggle-month-view" aria-current="page" href="#">Month View</a>
             </li>
             <li class="nav-item">
             <a class="nav-link toggle-agenda-view" href="#">Agenda View</a>
             </li>
-            <li class="nav-item">
-            <a class="nav-link toggle-create-view" href="#">Create Event</a>
-            </li>
         </ul>
     </div>
     <div class="row text-center" id="month-view">
-        <h3>{{calendar.Month}} / {{calendar.Year}}</h3>
-        <p>
-            <ul class="nav nav-pills justify-content-center nav-calendar">
-                <li class="nav-item">
-                    <a href="#" class="nav-link" id="decrement-month">Previous Month</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" id="select-today">Today</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" id="increment-month">Next Month</a>
-                </li>
-            </ul>
-        </p>
+        <h3><a href="#" class="nav-link" id="decrement-month"><span class="glyphicon glyphicon-chevron-left"></span></a> {{calendar.Month}} / {{calendar.Year}} <a href="#" class="nav-link" id="increment-month"><span class="glyphicon glyphicon-chevron-right"></span></a></h3>
+
         <table class="table" style="width:100%">
             <thead>
                 <th scope="col" width="1%"></th>
@@ -58,9 +43,10 @@
                                     <span class="glyphicon glyphicon-list-alt"></span>
                                 {{/if}}
                             </a></h5>
-                                {{else}}
+                            {{else}}
+
                                 <h5><a class="toggle-create-view" data-month="{{calendar.NumMonth}}" data-day="{{this.dayNum}}" data-year="{{calendar.Year}}">{{this.dayNum}}</a></h5>
-                                {{/if}}
+                        {{/if}}
                         </td>
                         {{else}}
                         <td class="text-align-top text-align-left">
@@ -91,18 +77,11 @@
         </table>
     </div>
     <div class="row" id="agenda-view" hidden>
-        <h3 class="text-center">{{agenda.monthName}} {{agenda.day}}, {{agenda.year}}</h3>
-        <ul class="nav nav-pills justify-content-center nav-calendar">
-            <li class="nav-item">
-                <a href="#" class="nav-link"  id="decrement-day">Previous</a>
-            </li>
-            <li class="nav-item">
+        <h3 class="text-center"><a href="#" class="nav-link"  id="decrement-day"><span class="glyphicon glyphicon-chevron-left"></span></a>&nbsp;{{agenda.monthName}} {{agenda.day}}, {{agenda.year}}             <a href="#" class="nav-link" id="increment-day"><span class="glyphicon glyphicon-chevron-right"></span></a></h3>
+        <p class="text-center">
                 <a href="#" class="nav-link"  id="select-today">Today</a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" id="increment-day">Next Day</a>
-            </li>
-        </ul>
+    </p>
+        <h3 class="text-center">Events</h3>
         {{#if agenda.events}}
             <table class="table" >
                 <thead>
@@ -133,9 +112,26 @@
                 </tbody>
             </table>
             {{else}}
-            <br><br>
-            There are no agenda events for this day.
+            <p class="text-center">
+                There are no events for this day.
+            </p>
         {{/if}}
+        <h3 class="text-center">Journal Entry</h3>
+        {{#if agenda.entries}}
+                {{#each agenda.entries}}  
+                        <p class="text-center">
+                        {{this.text}}
+                        </p>
+                        <br>
+                {{/each}}
+        {{else}}
+        <br><br>
+        <p class="text-center">
+            There are no journal entries for this day.
+        </p>
+    {{/if}}
+    
+        
   </div>
    <div class="row text-center" id="create-view" hidden>
         <h3>
