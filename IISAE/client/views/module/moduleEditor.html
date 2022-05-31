@@ -214,7 +214,7 @@
                 <th scope="col" width="5%">Type</th>
                 <th scope="col" width="10%">Header</th>
                 <th scope="col" width="10%">Subheader</th>
-                <th scope="col" width="40%">Text</th>
+                <th scope="col" width="40%">Text/HTML</th>
                 <th scope="col" width="10%">Image</th>
                 <th scope="col" width="10%">Image Below Text?</th>
                 <th scope="col" width="10%">Actions</th>
@@ -226,6 +226,8 @@
                         <select id="type" class="combo-save" data-field="pages[{{@index}}].type">
                             <option >{{this.type}}</option>
                             <option>text</option>
+                            <option>embed</option>
+                            <option>image</option>
                             <option>activity</option>
                         </select>
                     </div>
@@ -241,19 +243,30 @@
                         </div>
                     </td>
                     <td>
+                        {{#if this.isEmbed}}
+                            <textarea id="textarea-editor">{{this.embeddedHTML}}</textarea>
+                            <button class="btn btn-primary" id="button-save-direct" data-field="pages[{{@index}}].embeddedHTML">Save</button>
+                        {{else}}
                         <div id="pages-{{@index}}-text">
                             {{this.text}}<a id="open-editor" data-field="pages[{{@index}}].text" data-target="pages-{{@index}}-text" data-value="{{this.text}}"> Edit</a><br>
                         </div>
+                        {{/if}}
                     </td>
                     <td>
+                        {{#if this.isEmbed}}
+                        {{else}}
                         <div id="pages-{{@index}}-image">
                             {{this.image}}<a id="open-editor" data-field="pages[{{@index}}].image" data-target="pages-{{@index}}-image" data-value="{{this.image}}"> Edit</a><br>
                         </div>
+                        {{/if}}
                     </td>
                     <td>
+                        {{#if this.isEmbed}}
+                        {{else}}
                         <div id="pages-{{@index}}-imageBelow">
                             {{this.imageBelow}}<a id="open-editor" data-field="pages[{{@index}}].imageBelow" data-target="pages-{{@index}}-imageBelow" data-value="{{this.imageBelow}}"> Edit</a><br>
                         </div>
+                        {{/if}}
                     </td>
                     <td>
                         <div id="page-{{this.id}}">

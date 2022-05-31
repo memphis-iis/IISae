@@ -6,12 +6,16 @@ Template.moduleEditor.helpers({
         curModule.pageFlowVarNames = Object.keys(curModule.pageFlowVars);
         for(i = 0; i < pages.length; i++){
             pages[i].isActivity = false;
+            pages[i].isEmbed = false;
             nextFlowParms = pages[i].nextFlow;
             for(j=0;j < nextFlowParms.length; j++){
                 pages[i].nextFlow[j].parent=i;
                 pages[i].nextFlow[j].pageFlowVars = Object.keys(curModule.pageFlowVars);
                 pages[i].nextFlow[j].pageList = pages;
                 
+            }
+            if(pages[i].type == "embed"){
+                pages[i].isEmbed = true;
             }
             if(pages[i].type == "activity"){
                 pages[i].isActivity = true;
@@ -145,6 +149,15 @@ Template.moduleEditor.events({
         moduleId = $('#moduleId').val();
         changeModule(moduleId, field, result);
         $('#clone').remove();
+    },
+    'click #button-save-direct': function(event){
+        event.preventDefault();
+        field = event.target.getAttribute('data-field');
+        resultToReplace = $('#textarea-editor').val();
+        result = "\"" + resultToReplace.replace(/"/g, '\\"') + "\"";
+        alert(result);
+        moduleId = $('#moduleId').val();
+        changeModule(moduleId, field, result);
     },
     'change .combo-save': function(event){
         field = event.target.getAttribute('data-field');

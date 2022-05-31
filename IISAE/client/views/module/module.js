@@ -72,6 +72,10 @@ Template.module.helpers({
                 page.typeActivity = true;
                 t.pageType.set("activity");
             };
+            if(page.type == "embed"){
+                page.typeEmbed = true;
+                t.pageType.set("typeEmbed");
+            };
             if(!page.imgStyle){
                 page.imgStyle = "max-width:50%; height:auto; margin:10px;"
             }
