@@ -24,6 +24,21 @@
                     {{/if}}
                     <button id="contine" class="btn btn-primary continue">Save and Continue</button>
                 {{/if}}
+                {{#if page.typeEmbed}}
+                <h3><b>{{page.header}}</b></h3>
+                <h4><b>{{page.subheader}}</b></h4>
+                {{#if page.imageAbove}}
+                    <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
+                    <br>
+                {{/if}}
+                <div id="embedContainer">{{{page.embeddedHTML}}}</div>
+                <br>
+                {{#if page.imageBelow}}
+                    <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
+                    <br>
+                {{/if}}
+                <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+            {{/if}}
                 {{#if this.questionId}}
                     <h3><b>Activity: {{page.header}}</b></h3>
                     <h5>Question {{questionid}}</h5>
