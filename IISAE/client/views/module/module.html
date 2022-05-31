@@ -147,6 +147,16 @@
                         <button  class="btn btn-primary continue" id="continue" name="">Save and Continue</button>
                         <br>
                     {{/if}}
+                    {{#if question.typeScroll}}
+                        <div id="scrollArea" style="overflow-y: scroll; font-size: large; max-height: 300px;">{{{this.prompt}}}</div>
+                        <br>
+                        <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                    {{/if}}
+                    {{#if question.typeLink}}
+                    <div id="linkArea" style="overflow-y: scroll; font-size: large; max-height: 300px;">{{{question.prompt}}}</div>
+                    <br>
+                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                {{/if}}
                 {{else}}
                      {{#if page.typeActivity}}
                          <h3><b>Activity: {{page.header}}</b></h3>

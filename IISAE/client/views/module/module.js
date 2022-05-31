@@ -2,9 +2,17 @@ import hark from 'hark';
 import { FilesCollection } from 'meteor/ostrio:files';
 import FileReader from 'filereader';
 
+
 var chunks = [];
 
 Template.module.onRendered(function (){
+    $('#scrollArea').scroll(function(){
+        element = document.getElementById('scrollArea');
+        if(Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) === 0){
+            console.log('enable');
+            $(".continue").prop( "disabled", false );
+        }
+    });
     $('#visualizer').hide();
     moduleData = Modules.findOne();
     let moduleId = Meteor.user().curModule.moduleId;
@@ -19,7 +27,6 @@ Template.module.onRendered(function (){
     autoTutorReadsScript = moduleData.autoTutorReadsScript;
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript;
-    console.log(scriptsToRead, autoTutorReadsScript);
     if(autoTutorReadsScript && scriptsToRead.length > 0){
         for(let script of scriptsToRead){
             console.log(script);
@@ -91,6 +98,16 @@ Template.module.helpers({
         question.audioRecording = curModule.audioRecording;
         if(question.type == "blank"){
             question.typeBlank = true;
+        };
+        if(question.type == "scrollbar"){
+            question.typeScroll = true;
+        };
+        if(question.type == "link"){
+            question.typeLink = true;
+            console.log('hi');
+            b = question.prompt.replace(/<a>/gm,"<a id='continueLink'>");
+            question.prompt = b;
+            console.log(question.prompt);
         };
         if(question.type == "multiChoice"){
             question.typeMultiChoice = true;
@@ -185,6 +202,14 @@ Template.module.events({
                 if(questionData.type == "blank"){
                     response = $(".textInput").val();
                     answerValue = parseInt($(event.target).val());
+                }
+                if(questionData.type == "scrollbar"){
+                    response = thisQuestion.correctAnswer || true;
+                    answerValue = answerValue;
+                }
+                if(questionData.type == "link"){
+                    response = thisQuestion.correctAnswer || true;
+                    answerValue = answerValue;
                 }
                 if(questionData.type == "multiChoice"){
                     response = $(event.target).html();
@@ -345,6 +370,9 @@ Template.module.events({
     'click #goBack': function(event){
         target = "/profile/"
         window.location.href=target;
+    },
+    'click #continueLink': function(){
+        $(".continue").prop( "disabled", false );
     }
 })
 Template.module.onCreated(function(){
@@ -512,4 +540,3 @@ function visualize(stream){
 
     }
 }
-
