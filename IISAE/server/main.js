@@ -184,8 +184,10 @@ Meteor.methods({
         newModule = input.module;
         copiedModule = Modules.findOne({_id: newModule});
         delete copiedModule._id;
-        copiedModule.owner = orgId;
+        copiedModule.owner = Meteor.userId();
         copiedModule.title = copiedModule.title + " copy";
+        copiedModule.orgOwnedBy = orgId;
+        copiedModule.public = false;
         Modules.insert(copiedModule);
     },
     createModule: function(){
@@ -284,6 +286,14 @@ Meteor.methods({
                 text = "curModule." + field + "=[data]";
                 eval(text);
             }
+            if(addedField == 'answerCorpera'){
+                data = 
+                {
+                    corpus: "text script",
+                };
+            text = "curModule." + field + "=[data]";
+            eval(text);
+            }
             if(addedField == 'nextFlow'){
                 data =  
                     {
@@ -346,7 +356,8 @@ Meteor.methods({
         ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
     },
     saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
-        response = moduleData.responses[moduleData.responses.length - 1].response;
+        console.log(moduleData, moduleId, pageId, questionId, response, answerValue)
+        response = response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
         feedback = "disabled";

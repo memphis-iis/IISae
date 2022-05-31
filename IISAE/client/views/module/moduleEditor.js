@@ -22,6 +22,7 @@ Template.moduleEditor.helpers({
                         questions[j].showTextOptions = true;
                         questions[j].isCombo = false;
                         questions[j].isMultiChoice = false;
+                        questions[j].enableLSA = curModule.enableLSA;
                         if(questions[j].autoTutorScript){
                             autoTutorScripts = pages[i].questions[j].autoTutorScript;
                             for(k=0;k < autoTutorScripts.length; k++){
@@ -59,6 +60,15 @@ Template.moduleEditor.helpers({
                             answers = questions[j].answers;
                             questions[j].isMultiChoice = true;
                             questions[j].showTextOptions = false;
+                            if(typeof answers !== "undefined"){
+                                for(k = 0; k < answers.length; k++){
+                                    answers[k].parent = j;
+                                    answers[k].page = i;
+                                }
+                            }
+                        }
+                        if(questions[j].answerCorpera){
+                            answers = questions[j].answerCorpera;
                             if(typeof answers !== "undefined"){
                                 for(k = 0; k < answers.length; k++){
                                     answers[k].parent = j;

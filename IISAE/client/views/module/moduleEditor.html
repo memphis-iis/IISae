@@ -61,6 +61,19 @@
             <input class="markCorrect"  data-field="enableFeedback" data-value="true" type="checkbox" >
             {{/if}}        
           </div>
+          {{#if module.enableFeedback}}
+          <div class="form-check">
+            Enable Linguistic Semantic Analysis (LSA) for blank and longtext evaluation. This is a fallback for a simple match:
+            {{#if module.enableLSA}}
+            <input class="markCorrect"  data-field="enableLSA" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="enableLSA" data-value="true" type="checkbox" >
+            {{/if}}        
+          </div>
+          {{#if module.enableLSA}}
+          <p>LSA Threshold (0 being no match, 1 being perfect): {{module.lsaThreshold}}<a id="open-editor" data-value={{module.lsaThreshold}} data-field="lsaThreshold"> Edit</a><br></p>
+          {{/if}}
+        {{/if}}
         {{#if module.enableFeedback}}
         {{#if module.googleAPIKey}}
         <div class="form-check">
@@ -306,8 +319,11 @@
                     </td>
                     <td>
                         {{#if this.showTextOptions}}
+                        {{#if this.enableLSA}}
+                        {{else}}
                         <b>Correct Answer:</b>{{this.correctAnswer}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].correctAnswer" data-value="{{this.correctAnswer}}"> Edit</a><br>
                         <b>Value: </b>{{this.value}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
+                        {{/if}}
                         {{/if}}
                         {{#if this.isMultiChoice}}
                         <b>Correct Answer:</b>
@@ -331,9 +347,25 @@
                         {{#if this.isMultiChoice}}
                         <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answers">Add Choice</a>
                         {{/if}}
+                        {{#if this.showTextOptions}}
+                        {{#if this.enableLSA}}
+                        <br><a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answerCorpera">Add LSA Answer Corpera</a>
+                        {{/if}}
+                        {{/if}}
                         
                     </td>
                 </tr>
+                {{#each this.answerCorpera}}
+                <tr>
+                    <td>LSA Answer-></td>
+                    <td><b>Answer: </b>{{this.corpus}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answerCorpera[{{@index}}].corpus" data-value="{{this.corpus}}"> Edit</a><br>
+                  </td>
+                    <td></td>
+                    <td>
+                        <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].answerCorpera[{{@index}}]">Delete Answer</a><br>
+                    </td>
+                </tr>
+                {{/each}}
                 {{#each this.autoTutorScript}}
                 <tr>
                     <td>AutoTutor-></td>
