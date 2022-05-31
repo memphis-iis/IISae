@@ -16,7 +16,17 @@ Template.module.onRendered(function (){
     Meteor.call('initiateNewResponse',moduleResults);
     const t = Template.instance();
     autoTutorReadsPrompt = moduleData.autoTutorReadsPrompt;
+    autoTutorReadsScript = moduleData.autoTutorReadsScript;
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
+    scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript;
+    console.log(scriptsToRead, autoTutorReadsScript);
+    if(autoTutorReadsScript && scriptsToRead.length > 0){
+        for(let script of scriptsToRead){
+            console.log(script);
+            character = script.character;
+            readTTS(t,script.script,script.character);
+        }
+    } 
     if(autoTutorReadsPrompt && promptToRead){
         readTTS(t, promptToRead);
     } 
@@ -348,7 +358,7 @@ Template.module.onCreated(function(){
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-function readTTS(template, message){
+function readTTS(template, message, options={}){
     let moduleId =  Modules.findOne()._id;
     let audioActive = template.audioActive.get();
     let TTSQueue = template.TTSQueue.get();

@@ -479,12 +479,14 @@ Meteor.methods({
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
     },
     makeGoogleTTSApiCall: async function(message, moduleId=false) {
+        console.log(message,moduleId);
         if(moduleId !== false){
             curModule = Modules.findOne({_id: moduleId});
             if(curModule.googleAPIKey){
                 ttsAPIKey = curModule.googleAPIKey;
             } 
         }
+        console.log(ttsAPIKey);
         const request = JSON.stringify({
             input: {text: message},
             voice: {languageCode: 'en-US', ssmlGender: 'FEMALE'},
