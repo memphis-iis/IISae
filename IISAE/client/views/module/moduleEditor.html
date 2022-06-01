@@ -82,7 +82,6 @@
           <p>LSA Threshold (0 being no match, 1 being perfect): {{module.lsaThreshold}}<a id="open-editor" data-value={{module.lsaThreshold}} data-field="lsaThreshold"> Edit</a><br></p>
           {{/if}}
         {{/if}}
-        {{#if module.enableFeedback}}
         {{#if module.googleAPIKey}}
         <div class="form-check">
             Enable AutoTutor:
@@ -101,6 +100,7 @@
             {{/if}}        
           </div>
         {{/if}}
+        {{#if module.enableFeedback}}
         Feedback Timeout: {{module.feedbackTimeout}}<a id="open-editor" data-value={{module.feedbackTimeout}} data-field="feedbackTimeout"> Edit</a><br>
         {{/if}}
         {{#if module.enableAdaptivePages}}
@@ -170,11 +170,17 @@
           <br>
           {{#if module.autoTutorCharacter}}
           <h4>AutoTutor Characters</h4>
+          Who Reads Prompts and Refutation?
+          <select id="type" class="combo-save" data-field="characterReadsPrompts">
+            <option>{{module.characterReadsPrompts}}</option>
+            {{#each module.autoTutorCharacter}}
+            <option>{{this.name}}</option>
+            {{/each}}
+        </select>
           <table class="table" id="autoTutorCharacters">
             <thead>
                 <th scope="col" width="25%">Name</th>
-                <th scope="col" width="25%">Role</th>
-                <th scope="col" width="25%">Template</th>
+                <th scope="col" width="25%">Voice</th>
                 <th scope="col" width="25%">Actions</th>
             </thead>
             <tbody>
@@ -184,20 +190,15 @@
                         {{this.name}}<a id="open-editor" data-field="autoTutorCharacter[{{@index}}].name"  data-value="{{this.name}}"> Edit</a><br>
                     </td>
                     <td>
-                        <select id="type" class="combo-save" data-field="autoTutorCharacter[{{@index}}].role">
-                            <option >{{this.role}}</option>
-                            <option>teacher</option>
-                            <option>student</option>
+                        <select id="type" class="combo-save" data-field="autoTutorCharacter[{{@index}}].voice">
+                            <option>{{this.voice}}</option>
+                            <option value="en-US-Standard-A">Male 1</option>
+                            <option value="en-US-Standard-B">Male 2</option>
+                            <option value="en-US-Standard-C">Female 1</option>
+                            <option value="en-US-Standard-E">Female 2</option>
                         </select>
                     </td>
-                    <td>
-                        <select id="type" class="combo-save" data-field="autoTutorCharacter[{{@index}}].role">
-                            <option >{{this.template}}</option>
-                            {{#each AutoTutorCharacters}}
-                               <option>{{this.name}}</option>
-                            {{/each}}
-                        </select>
-                    </td>
+                    <td></td>
                     <td>
                         <a id="delete-item" data-field="autoTutorCharacter[{{@index}}]">Delete Character</a><br>
                     </td>
