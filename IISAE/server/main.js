@@ -360,6 +360,12 @@ Meteor.methods({
         response = response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
+        answerTags = moduleData.answerTags  || {};
+        if(curModule.enableAnswerTags){
+            answerTagKey = curModule.pages[pageId].questions[questionId].answerTag;
+            answerTags[answerTagKey] = response;
+        }
+        moduleData.answerTags = answerTags;
         feedback = "disabled";
         if(curModule && pageId !== "completed"){
             correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer

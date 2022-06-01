@@ -91,6 +91,8 @@ Template.module.helpers({
     },
     'question': function(){
         curModule = Modules.findOne();
+        moduleId = Meteor.user().curModule.moduleId;
+        moduleData = ModuleResults.findOne({_id: moduleId});
         autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
         page = Modules.findOne().pages[parseInt(this.pageId)];
         question = page.questions[parseInt(this.questionId)];
@@ -141,6 +143,15 @@ Template.module.helpers({
         question.length = question.length;
         if(!question.imgStyle){
             question.imgStyle = "max-width:50%; height:auto; margin:10px;";
+        }
+        if(curModule.enableAnswerTags){
+           if(typeof moduleData.answerTags !== "undefined"){
+               for(let keys of Object.keys(moduleData.answerTags)){
+                   pattern = "<(" + keys + ")>"
+                   regex = new RegExp(pattern)
+                   question.prompt = question.prompt.replace(regex,moduleData.answerTags[keys]);
+               }
+           }
         }
         return question;
     },
@@ -251,7 +262,7 @@ Template.module.events({
                 feedback = t.feedback.get();
                 type = "danger"
                 message = question.incorrectFeedback || "Incorrect."
-                if(res != "disabled"){
+                if(res != "disabled" && (!question.noRefutation || curModule.enableFeedback)){
                     if(res == true){ 
                         type = "success";
                         message = "Correct!";

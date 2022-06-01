@@ -19,6 +19,14 @@
             <input class="markCorrect"  data-field="enableScoring" data-value="true" type="checkbox" >
             {{/if}}        
           </div>
+          <div class="form-check">
+            Enable Answer Tags:
+            {{#if module.enableAnswerTags}}
+            <input class="markCorrect"  data-field="enableAnswerTags" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="enableAnswerTags" data-value="true" type="checkbox" >
+            {{/if}}        
+          </div>
           {{#if module.enableScoring}}
           <div class="form-check">
             Enable Score Display:
@@ -349,9 +357,17 @@
                             {{/each}}
                         </select><br>
                         {{/if}}
+                        <b>Skip refutation</b>
+                        {{#if this.noRefutation}}
+                        <input class="markCorrect"  data-field="pages[{{this.parent}}].questions[{{@index}}].noRefutation" data-value="false" type="checkbox"  checked>
+                        {{else}}
+                        <input class="markCorrect"  data-field="pages[{{this.parent}}].questions[{{@index}}].noRefutation" data-value="true" type="checkbox" >
+                        {{/if}}        
+                        <br>
                         <b>Refutational Feedback:</b>{{this.incorrectFeedback}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].incorrectFeedback" data-value="{{this.incorrectFeedback}}"> Edit</a><br>
                         <b>Question Weight:</b>{{this.weight}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].weight" data-value="{{this.weight}}"> Edit</a><br>
                         <b>Image Attached:</b>{{this.image}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].image" data-value="{{this.image}}"> Edit</a><br>
+                        <b>Answer Tag:</b>{{this.answerTag}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].answerTag" data-value="{{this.answerTag}}"> Edit</a><br>
                     </td>
                     <td>
                         <a id="delete-item" data-field="pages[{{this.parent}}].questions[{{@index}}]">Delete</a><br>
