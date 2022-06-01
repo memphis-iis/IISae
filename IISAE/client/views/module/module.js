@@ -24,16 +24,27 @@ Template.module.onRendered(function (){
     Meteor.call('initiateNewResponse',moduleResults);
     const t = Template.instance();
     autoTutorReadsPrompt = moduleData.autoTutorReadsPrompt;
+    autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
     autoTutorReadsScript = moduleData.autoTutorReadsScript;
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript;
     if(autoTutorReadsScript && scriptsToRead.length > 0){
         for(let script of scriptsToRead){
-            console.log(script);
             character = script.character;
-            readTTS(t,script.script,script.character);
+            voice = moduleData.autoTutorCharacter.find(o => o.name == script.character).voice;
+            readTTS(t,script.script,voice);
         }
     } 
+    questionPrompt = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
+    if(moduleData.enableAnswerTags){
+        if(typeof moduleResults.answerTags !== "undefined"){
+            for(let keys of Object.keys(moduleResults.answerTags)){
+                pattern = "<(" + keys + ")>"
+                regex = new RegExp(pattern)
+                promptToRead = questionPrompt.replace(regex,moduleResults.answerTags[keys]);
+            }
+        }
+     }
     if(autoTutorReadsPrompt && promptToRead){
         readTTS(t, promptToRead);
     } 
@@ -401,11 +412,11 @@ Template.module.onCreated(function(){
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-function readTTS(template, message, options={}){
+function readTTS(template, message, voice){
     let moduleId =  Modules.findOne()._id;
     let audioActive = template.audioActive.get();
     let TTSQueue = template.TTSQueue.get();
-    Meteor.call('makeGoogleTTSApiCall', message, moduleId, function(err, res) {
+    Meteor.call('makeGoogleTTSApiCall', message, moduleId, voice, function(err, res) {
         if(err){
             console.log("Something went wrong with TTS, ", err)
         }
