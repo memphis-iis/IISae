@@ -181,6 +181,7 @@
             <thead>
                 <th scope="col" width="25%">Name</th>
                 <th scope="col" width="25%">Voice</th>
+                <th scope="col" width="25%">Art URL</th>
                 <th scope="col" width="25%">Actions</th>
             </thead>
             <tbody>
@@ -198,7 +199,9 @@
                             <option value="en-US-Standard-E">Female 2</option>
                         </select>
                     </td>
-                    <td></td>
+                    <td>
+                        <img src="{{this.art}}" style="max-width: 100px;" /><a id="open-editor" data-field="autoTutorCharacter[{{@index}}].art"  data-value="{{this.art}}"> Edit</a><br>
+                    </td>
                     <td>
                         <a id="delete-item" data-field="autoTutorCharacter[{{@index}}]">Delete Character</a><br>
                     </td>
@@ -335,6 +338,7 @@
                                 <option>combo</option>
                                 <option>scrollbar</option>
                                 <option>link</option>
+                                <option>autotutorscript</option>
                             </select>
                         </div>
                     </td>

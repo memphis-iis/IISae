@@ -25,16 +25,35 @@ Template.module.onRendered(function (){
     const t = Template.instance();
     autoTutorReadsPrompt = moduleData.autoTutorReadsPrompt;
     autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
+    autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
+    art = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
     autoTutorReadsScript = moduleData.autoTutorReadsScript;
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript;
     if(autoTutorReadsScript && scriptsToRead.length > 0){
-        for(let script of scriptsToRead){
+        for(let scriptIndex in scriptsToRead){
+            script = scriptsToRead[scriptIndex];
+            console.log(script);
+            scriptToAdd = ""
             character = script.character;
             voice = moduleData.autoTutorCharacter.find(o => o.name == script.character).voice;
-            readTTS(t,script.script,voice);
+            art = moduleData.autoTutorCharacter.find(o => o.name == script.character).art;
+            if(moduleData.enableAnswerTags){
+                if(typeof moduleResults.answerTags !== "undefined"){
+                    for(let keys of Object.keys(moduleResults.answerTags)){
+                        pattern = "<(" + keys + ")>"
+                        regex = new RegExp(pattern)
+                        scriptToAdd = script.script.replace(regex,moduleResults.answerTags[keys]);
+                    }
+                    readTTS(t,scriptToAdd,voice,character, art);
+                } else {
+                    readTTS(t,script.script,voice,character, art);
+                }
+            } else {
+                readTTS(t,script.script,voice,character, art);
+            }
         }
-    } 
+    }
     questionPrompt = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
     if(moduleData.enableAnswerTags){
         if(typeof moduleResults.answerTags !== "undefined"){
@@ -46,7 +65,7 @@ Template.module.onRendered(function (){
         }
      }
     if(autoTutorReadsPrompt && promptToRead){
-        readTTS(t, promptToRead);
+        readTTS(t, promptToRead, autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
     } 
     if(moduleData.audioRecording && !moduleData.enableAutoTutor){
         setupRecording(t);
@@ -115,6 +134,9 @@ Template.module.helpers({
         if(question.type == "scrollbar"){
             question.typeScroll = true;
         };
+        if(question.type == "autotutorscript"){
+            question.typeATScript = true;
+        }
         if(question.type == "link"){
             question.typeLink = true;
             console.log('hi');
@@ -197,7 +219,9 @@ Template.module.events({
         curModule = Modules.findOne();
         const t = Template.instance();
         if(curModule.autoTutorReadsResponse && response){
-            readTTS(t, response);
+            autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
+            autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
+            readTTS(t, response, autoTutorPromptCharacterVoice);
          }
     },
     'click .continue': async function(event) {
@@ -224,6 +248,10 @@ Template.module.events({
                 if(questionData.type == "blank"){
                     response = $(".textInput").val();
                     answerValue = parseInt($(event.target).val());
+                }
+                if(questionData.type == "autotutorscript"){
+                    response = "continue";
+                    answerValue = 0;
                 }
                 if(questionData.type == "scrollbar"){
                     response = thisQuestion.correctAnswer || true;
@@ -263,6 +291,8 @@ Template.module.events({
             data.response =  response;
             data.responseTimeStamp = Date.now().toString();
             if(curModule.autoTutorReadsResponse && response){
+                autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
+                autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
                 readTTS(t, response);
              }
             moduleData.responses[moduleData.responses.length - 1]=data;
@@ -283,6 +313,8 @@ Template.module.events({
                     $('#refutation').text(message);
                     $('#refutation').show();
                     if(curModule.autoTutorReadsRefutation){
+                        autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
+                        autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
                         readTTS(t, message);
                     }
                 }
@@ -406,23 +438,31 @@ Template.module.onCreated(function(){
     this.statsData = new ReactiveVar({});
     this.audioActive = new ReactiveVar(false);
     this.TTSQueue = new ReactiveVar([]);
+    const audioObj = new Audio();
+    this.audioQueueIndex = new ReactiveVar(0);
+    this.audioObject = new ReactiveVar(audioObj);
     this.audioToSave = new ReactiveVar("");
     this.transcript = new ReactiveVar("");
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-function readTTS(template, message, voice){
+function readTTS(template, message, voice, character,characterArt){
+    console.log(character);
     let moduleId =  Modules.findOne()._id;
     let audioActive = template.audioActive.get();
     let TTSQueue = template.TTSQueue.get();
+    template.audioActive.set(true);
+    let displayMessage = character + ": " + message;
     Meteor.call('makeGoogleTTSApiCall', message, moduleId, voice, function(err, res) {
         if(err){
             console.log("Something went wrong with TTS, ", err)
         }
         if(res != undefined){
-            TTSQueue.push(res);
+            console.log(voice)
+            TTSQueue.push({order: TTSQueue.length, res:res, displayMessage:displayMessage, art:characterArt});
             if(!audioActive){
+                template.audioActive.set(true);
                 playAudio(template);
             }
         }
@@ -430,12 +470,22 @@ function readTTS(template, message, voice){
 }
 
 async function playAudio(template){
-    template.audioActive.set(true);
     let TTSQueue = template.TTSQueue.get();
-    const audioObj = new Audio('data:audio/ogg;base64,' + TTSQueue.shift());
+    const audioObj = template.audioObject.get();
+    let audioQueueIndex = template.audioQueueIndex.get();
+    console.log("Playing Audio Trac ", audioQueueIndex, " of ", TTSQueue.length - 1);
+    console.log(TTSQueue);
+    let autoTutorObj = TTSQueue[TTSQueue.findIndex(x => x.order == TTSQueue.length - 1 - audioQueueIndex)];
+    audioObj.src = "data:audio/ogg;base64," + autoTutorObj.res;
+    $('#script').html(autoTutorObj.displayMessage);
+    $('#script').prop('hidden', false);
+    $('#currentAvatar').html("<img src='" + autoTutorObj.art + "' style='max-width:100%; padding=20px;'><br>");
+    audioQueueIndex++;
+    template.audioQueueIndex.set(audioQueueIndex);
     window.currentAudioObj = audioObj;
     window.currentAudioObj.addEventListener('ended', function(){
-        if(TTSQueue.length > 0){
+        console.log(audioQueueIndex, TTSQueue.length);
+        if(TTSQueue.length > audioQueueIndex){
             playAudio(template);
         }
         else{
@@ -446,6 +496,10 @@ async function playAudio(template){
                 moduleData = Modules.findOne({});
                 if(moduleData.audioRecording){
                     setupRecording(template);
+                }
+                questionType = template.questionType.get();
+                if(questionType == "autotutorscript"){
+                    $('.continue').click();
                 }
                 }
             );
