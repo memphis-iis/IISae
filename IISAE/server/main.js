@@ -368,8 +368,9 @@ Meteor.methods({
         moduleData.answerTags = answerTags;
         feedback = "disabled";
         if(curModule && pageId !== "completed"){
-            correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer
-            enableFeedback = curModule.enableFeedback
+            correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer;
+            enableFeedback = curModule.enableFeedback;
+            skipFeedback = curModule.pages[pageId].questions[questionId].noRefutation;
             enableWeightedQuestions = curModule.enableWeightedQuestions;
             questionWeight = 1;
             if(!moduleData.score){
@@ -378,12 +379,12 @@ Meteor.methods({
             if(enableWeightedQuestions){
                 questionWeight = curModule.pages[pageId].questions[0].weight
             }
-            if(enableFeedback){
+            if(enableFeedback && !skipFeedback){
                 feedback = answerAssess(correctAnswer, response).isCorrect;
             }
             if(feedback == true){
                 moduleData.score += parseInt(answerValue) * parseFloat(questionWeight);
-            } else; {
+            } else {
                 moduleData.score = parseInt(moduleData.score);
             }
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});

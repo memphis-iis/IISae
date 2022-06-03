@@ -79,3 +79,6 @@ img #logo-color{
 .btn{
     width:100%;
 }
+.speaker img{
+    max-height:100px;
+}

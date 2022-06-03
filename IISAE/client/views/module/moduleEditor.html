@@ -317,7 +317,7 @@
         </table>
         {{#if this.isActivity}}
         {{#each questions}}
-        Question {{@index}}
+        Activity {{@index}}
        <div>
         <table class="table" id="questionList">
             <thead>
@@ -338,6 +338,8 @@
                                 <option>combo</option>
                                 <option>scrollbar</option>
                                 <option>link</option>
+                                <option>html</option>
+                                <option>video</option>
                                 <option>autotutorscript</option>
                             </select>
                         </div>
@@ -509,7 +511,7 @@
         </table>
         </div>
         {{/each}}
-        <a id="add-item" data-field="pages[{{@index}}].questions">Add Question</a><br>
+        <a id="add-item" data-field="pages[{{@index}}].questions">Add Activity</a><br>
         {{/if}}
         {{#if this.nextFlow}}
         <h4><u>Page Routes</u></h4>
