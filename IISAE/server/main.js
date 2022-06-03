@@ -271,7 +271,9 @@ Meteor.methods({
             if(addedField == "questions"){
                 data = {
                     type :"multiChoice",
-                    prompt: "New"
+                    prompt: "Button",
+                    value: 0,
+                    feedback: ""
                 }
                 text = "curModule." + field + "=[data]";
                 eval(text);

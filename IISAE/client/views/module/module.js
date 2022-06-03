@@ -241,6 +241,7 @@ Template.module.events({
         moduleData.lastAccessed = Date.now().toString();
         thisPage = Meteor.user().curModule.pageId;
         thisQuestion = Meteor.user().curModule.questionId;
+        thisQuestionData = curModule.pages[thisPage].questions[thisQuestion]
         answerValue = 0;
         transcript = t.transcript.get() || "";
         $('#audioRecordingNotice').html("Waiting for AutoTutor to finish.");
@@ -278,6 +279,11 @@ Template.module.events({
                 if(questionData.type == "multiChoice"){
                     response = $(event.target).html();
                     answerValue = parseInt($(event.target).val());
+                    index = event.target.getAttribute('id');
+                    console.log(thisQuestion, index)
+                    if(thisQuestionData.answers[index].feedback != "" || typeof thisQuestionData.answers[index].feedback != "undefined"){
+                        refutation = thisQuestionData.answers[index].feedback;
+                    }
                 }
                 if(questionData.type == "longtext"){
                     response = $('.textareaInput').val();
@@ -316,11 +322,11 @@ Template.module.events({
             Meteor.call("saveModuleData", moduleData, curModule._id , thisPage, thisQuestion, response, answerValue, function(err, res){
                 feedback = t.feedback.get();
                 type = "danger"
-                message = question.incorrectFeedback || "Incorrect."
+                message = refutation || question.incorrectFeedback || "Incorrect."
                 if(res != "disabled"){
                     if(res == true){ 
                         type = "success";
-                        message = "Correct!";
+                        message = refutation || "Correct!";
                     } 
                     addedClass = 'alert-' + type;
                     $('#refutation').addClass(addedClass);
@@ -328,8 +334,8 @@ Template.module.events({
                     $('#refutation').show();
                     if(curModule.autoTutorReadsRefutation){
                         autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
-                        autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
-                        readTTS(t, message);
+                        autoTutorCharacter = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts);
+                        readTTS(t, message, autoTutorCharacter.voice, autoTutorCharacter.name, autoTutorCharacter.art);
                     }
                 }
             });

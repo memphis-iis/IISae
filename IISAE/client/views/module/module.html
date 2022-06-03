@@ -157,7 +157,7 @@
                     <form>
                         {{#each question.answers}}
                             {{#if this.image}}
-                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
+                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
                                     <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
                                 </button>
                             {{else}}
@@ -169,40 +169,6 @@
                     Message: {{feedback.message}}
                     </div>
                     <br>
-                    {{/if}}
-                    {{#if question.typeCombo}}
-                    <h3>{{{question.prompt}}}</h3><br>
-                        <form>
-                        {{#each question.fields}}
-                            {{#if this.typeBlank}}
-                                <h3>{{this.text}}</h3>
-                                    <input class="combo" type="text">
-                            {{/if}}
-                            {{#if this.typeLongText}}
-                            <h3>{{this.text}}</h3><br>
-                            <form>
-                                <textarea style="height:100px; width:100%;" class="combo"></textarea>
-                            </form>
-                            <br>
-                          {{/if}}
-                          {{#if this.typeMultiChoice}}
-                                <h3>{{this.text}}</h3>
-                                {{#each this.answers}}
-                                    {{#if this.image}}
-                                    <button  class="btn btn-primary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">
-                                        <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
-                                    </button>
-                                    {{else}}
-                                    <button  class="btn btn-primary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">{{this.answer}}</button>
-                                    {{/if}}
-                                {{/each}}
-                            {{/if}}
-                            <br>
-                        {{/each}}
-                        </form> 
-                        <br>
-                        <button  class="btn btn-primary continue" id="continue" name="">Save and Continue</button>
-                        <br>
                     {{/if}}
                     {{#if question.typeScroll}}
                         <div class="row" style="padding:20px;">
