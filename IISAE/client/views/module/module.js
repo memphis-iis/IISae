@@ -147,6 +147,12 @@ Template.module.helpers({
         if(question.type == "multiChoice"){
             question.typeMultiChoice = true;
         };
+        if(question.type == "html"){
+            question.typeHTML = true;
+        };
+        if(question.type == "video"){
+            question.typeVideo = true;
+        };
         if(question.type == "longtext"){
             question.typeLongText = true;
         };
@@ -253,6 +259,14 @@ Template.module.events({
                     response = "continue";
                     answerValue = 0;
                 }
+                if(questionData.type == "video"){
+                    response = "continue";
+                    answerValue = 0;
+                }
+                if(questionData.type == "html"){
+                    response = "continue";
+                    answerValue = 0;
+                }
                 if(questionData.type == "scrollbar"){
                     response = thisQuestion.correctAnswer || true;
                     answerValue = answerValue;
@@ -303,7 +317,7 @@ Template.module.events({
                 feedback = t.feedback.get();
                 type = "danger"
                 message = question.incorrectFeedback || "Incorrect."
-                if(res != "disabled" && (!question.noRefutation || curModule.enableFeedback)){
+                if(res != "disabled"){
                     if(res == true){ 
                         type = "success";
                         message = "Correct!";
@@ -437,12 +451,10 @@ Template.module.onCreated(function(){
     this.feedback = new ReactiveVar(false);
     this.statsData = new ReactiveVar({});
     this.audioActive = new ReactiveVar(false);
-    this.TTSQueue = new ReactiveVar([]);
-    const audioObj = new Audio();
-    this.audioQueueIndex = new ReactiveVar(0);
-    this.audioObject = new ReactiveVar(audioObj);
+    this.audioObjects = new ReactiveVar([]);
     this.audioToSave = new ReactiveVar("");
     this.transcript = new ReactiveVar("");
+    this.TTSTracPlaying = new ReactiveVar(0);
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -451,17 +463,25 @@ function readTTS(template, message, voice, character,characterArt){
     console.log(character);
     let moduleId =  Modules.findOne()._id;
     let audioActive = template.audioActive.get();
-    let TTSQueue = template.TTSQueue.get();
     template.audioActive.set(true);
     let displayMessage = character + ": " + message;
+    let audioObj = new Audio();
+    let audioObjects = template.audioObjects.get();
+    audioObjects.push({obj:audioObj, art:characterArt, character:character, displayMessage:displayMessage});
+    let order = audioObjects.length;
+    template.audioObjects.set(audioObjects);
     Meteor.call('makeGoogleTTSApiCall', message, moduleId, voice, function(err, res) {
         if(err){
             console.log("Something went wrong with TTS, ", err)
         }
         if(res != undefined){
-            console.log(voice)
-            TTSQueue.push({order: TTSQueue.length, res:res, displayMessage:displayMessage, art:characterArt});
+            let audioObjects = template.audioObjects.get();
+            console.log(order, audioObjects[order]);
+            audioObjects[order - 1].obj.src = "data:audio/ogg;base64," + res;
+            template.audioObjects.set(audioObjects)
             if(!audioActive){
+                $(':button').prop('disabled', true); 
+                $(':button').prop('hidden', true); 
                 template.audioActive.set(true);
                 playAudio(template);
             }
@@ -470,34 +490,45 @@ function readTTS(template, message, voice, character,characterArt){
 }
 
 async function playAudio(template){
-    let TTSQueue = template.TTSQueue.get();
-    const audioObj = template.audioObject.get();
-    let audioQueueIndex = template.audioQueueIndex.get();
-    console.log("Playing Audio Trac ", audioQueueIndex, " of ", TTSQueue.length - 1);
-    console.log(TTSQueue);
-    let autoTutorObj = TTSQueue[TTSQueue.findIndex(x => x.order == TTSQueue.length - 1 - audioQueueIndex)];
-    audioObj.src = "data:audio/ogg;base64," + autoTutorObj.res;
-    $('#script').html(autoTutorObj.displayMessage);
+    let TTSTracPlaying = template.TTSTracPlaying.get();
+    let audioObjs = template.audioObjects.get();
+    const audioObj = audioObjs[TTSTracPlaying].obj;
+    console.log(audioObjs);
+    $('#script').html(audioObjs[TTSTracPlaying].displayMessage);
     $('#script').prop('hidden', false);
-    $('#currentAvatar').html("<img src='" + autoTutorObj.art + "' style='max-width:100%; padding=20px;'><br>");
-    audioQueueIndex++;
-    template.audioQueueIndex.set(audioQueueIndex);
+    $('#currentAvatar').html("<img src='" + audioObjs[TTSTracPlaying].art + "' style='max-width:100%; padding=20px;'><br>");
+    console.log(TTSTracPlaying, "of" , audioObjs.length) - 1;
+    template.TTSTracPlaying.set(TTSTracPlaying + 1);
     window.currentAudioObj = audioObj;
     window.currentAudioObj.addEventListener('ended', function(){
-        console.log(audioQueueIndex, TTSQueue.length);
-        if(TTSQueue.length > audioQueueIndex){
-            playAudio(template);
+        TTSTracPlaying++;
+        template.TTSTracPlaying.set(TTSTracPlaying);
+        if(audioObjs.length > TTSTracPlaying){
+            sleep(1000).then(function(){
+                playAudio(template);
+            });
         }
         else{
             sleep(1000).then(function(){
+                questionType = template.questionType.get();
+                console.log(questionType);
                 template.audioActive.set(false);
                 $('#audioRecordingNotice').html("I am listening.");
+                
                 $('#audiovis').show();
                 moduleData = Modules.findOne({});
                 if(moduleData.audioRecording){
                     setupRecording(template);
                 }
                 questionType = template.questionType.get();
+                if(questionType == "video" || questionType == "link" || questionType == "scrollbar"){
+                    console.log("test");
+                    $(':button').prop('disabled', true); 
+                    $(':button').prop('hidden', true); 
+                } else {
+                    $(':button').prop('disabled', false); 
+                    $(':button').prop('hidden', false); 
+                }
                 if(questionType == "autotutorscript"){
                     $('.continue').click();
                 }
