@@ -416,6 +416,7 @@ Meteor.methods({
     },
     overrideUserDataRoutes: function (moduleData){
         console.log('overriding user progress', moduleData.nextPage, moduleData.nextQuestion)
+        ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
         Meteor.users.update(Meteor.userId(), {
             $set: {
                 curModule: {

@@ -373,6 +373,10 @@ Template.module.events({
                             routePicked = true;
                             moduleData.nextPage = conditions[i].route;
                             moduleData.nextQuestion = 0;
+                            console.log(conditions[i].clearScoring);
+                            if(conditions[i].clearScoring){
+                                moduleData.score = 0;
+                            }
                             Meteor.call("overrideUserDataRoutes",moduleData); 
                         }
                     }
