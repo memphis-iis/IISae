@@ -356,7 +356,11 @@ Template.module.events({
                 } else {
                     nextPage = thisPage + 1;
                     if(typeof curModule.pages[nextPage] !== "undefined"){
-                        target = "/module/" + curModule._id + "/" + nextPage; 
+                        if(curModule.pages[nextPage].type="activity" && curModule.skipInterstitials){
+                            target = "/module/" + curModule._id + "/" + nextPage + "/0"; 
+                        } else {
+                            target = "/module/" + curModule._id + "/" + nextPage; 
+                        }
                     } else {
                         target = "/module/" + curModule._id + "/completed"; 
                     }
@@ -369,7 +373,11 @@ Template.module.events({
                         conditionStatement = "moduleData." + conditions[i].condition + conditions[i].operand + conditions[i].threshold;
                         conditionState = eval(conditionStatement);
                         if(conditionState){
-                            target = "/module/" + curModule._id + "/" + conditions[i].route; 
+                            if(curModule.pages[conditions[i].route].type="activity" && curModule.skipInterstitials){
+                                target = "/module/" + curModule._id + "/" + conditions[i].route + "/0"; 
+                            } else {
+                                target = "/module/" + curModule._id + "/" + conditions[i].route; 
+                            }
                             routePicked = true;
                             moduleData.nextPage = conditions[i].route;
                             moduleData.nextQuestion = 0;

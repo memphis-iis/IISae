@@ -20,6 +20,14 @@
             {{/if}}        
           </div>
           <div class="form-check">
+            Skip Interstital Pages for Activities:
+            {{#if module.skipInterstitials}}
+            <input class="markCorrect"  data-field="skipInterstitials" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="skipInterstitials" data-value="true" type="checkbox" >
+            {{/if}}        
+          </div>
+          <div class="form-check">
             Enable Answer Tags:
             {{#if module.enableAnswerTags}}
             <input class="markCorrect"  data-field="enableAnswerTags" data-value="false" type="checkbox"  checked>
