@@ -230,6 +230,59 @@ Template.module.events({
             readTTS(t, response, autoTutorPromptCharacterVoice);
          }
     },
+    'click .btn-repeat': function (event){
+        moduleData = Modules.findOne();
+        let moduleId = Meteor.user().curModule.moduleId;
+        moduleResults = ModuleResults.findOne({_id: moduleId});
+        const t = Template.instance();
+        autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
+        autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
+        autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
+        art = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
+        autoTutorReadsScript = moduleData.autoTutorReadsScript;
+        promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
+        scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
+        if(autoTutorReadsScript && scriptsToRead.length > 0){
+            for(let scriptIndex in scriptsToRead){
+                script = scriptsToRead[scriptIndex];
+                scriptToAdd = ""
+                character = script.character;
+                voice = moduleData.autoTutorCharacter.find(o => o.name == script.character).voice;
+                art = moduleData.autoTutorCharacter.find(o => o.name == script.character).art;
+                if(moduleData.enableAnswerTags){
+                    if(typeof moduleResults.answerTags !== "undefined"){
+                        for(let keys of Object.keys(moduleResults.answerTags)){
+                            pattern = "<(" + keys + ")>"
+                            regex = new RegExp(pattern)
+                            scriptToAdd = script.script.replace(regex,moduleResults.answerTags[keys]);
+                        }
+                        readTTS(t,scriptToAdd,voice,character, art);
+                    } else {
+                        readTTS(t,script.script,voice,character, art);
+                    }
+                } else {
+                    readTTS(t,script.script,voice,character, art);
+                }
+            }
+        }
+        questionPrompt = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
+        if(moduleData.enableAnswerTags){
+            if(typeof moduleResults.answerTags !== "undefined"){
+                for(let keys of Object.keys(moduleResults.answerTags)){
+                    pattern = "<(" + keys + ")>"
+                    regex = new RegExp(pattern)
+                    promptToRead = questionPrompt.replace(regex,moduleResults.answerTags[keys]);
+                }
+            }
+         }
+        if(autoTutorReadsPrompt && promptToRead){
+            readTTS(t, promptToRead, autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
+        } 
+        if(moduleData.audioRecording && !moduleData.enableAutoTutor){
+            setupRecording(t);
+        }
+
+    },
     'click .continue': async function(event) {
         $(':button').prop('disabled', true); 
         const t = Template.instance();
