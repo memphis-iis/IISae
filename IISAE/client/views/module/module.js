@@ -381,7 +381,7 @@ Template.module.events({
                     routing = curModule.fallbackRoute
                     if(routing == 'nextPage'){
                         moduleData.nextPage = thisPage + 1;
-                        if(typeof curModule.pages[nextPage] !== "undefined"){
+                        if(typeof curModule.pages[thisPage + 1] !== "undefined"){
                             moduleData.nextQuestion = 0;
                             routePicked = true;
                             target = "/module/" + curModule._id + "/" + moduleData.nextPage;
