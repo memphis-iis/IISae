@@ -335,7 +335,6 @@
                                 <option>longtext</option>
                                 <option>blank</option>
                                 <option>multiChoice</option>
-                                <option>combo</option>
                                 <option>scrollbar</option>
                                 <option>link</option>
                                 <option>html</option>
@@ -379,9 +378,6 @@
                     <td>
                         <a id="delete-item" data-field="pages[{{this.parent}}].questions[{{@index}}]">Delete</a><br>
                         <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].autoTutorScript">Add AutoTutor</a>
-                        {{#if this.isCombo}}
-                        <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].fields">Add Combo Question</a>
-                        {{/if}}
                         {{#if this.isMultiChoice}}
                         <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answers">Add Choice</a>
                         {{/if}}
@@ -422,72 +418,6 @@
                     </td>
                 </tr>
                 {{/each}}
-                {{#if this.isCombo}}
-                    {{#each this.fields}}
-                    <tr>
-                        <td>
-                            <div id="pages[{{this.page}}]-questions[{{this.parent}}]-fields[{{@index}}]-type">
-                                <select id="type" class="combo-save" data-field="pages[{{this.page}}].questions[{{this.parent}}].fields[{{@index}}].type">
-                                    <option >{{this.type}}</option>
-                                    <option>longtext</option>
-                                    <option>blank</option>
-                                    <option>multiChoice</option>
-                                </select>
-                            </div>
-                        </td>
-                        <td>
-                            <div id="pages[{{this.page}}]-questions[{{this.parent}}]-fields[{{@index}}]-text">
-                                {{this.text}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].fields[{{@index}}].text" data-value="{{this.text}}"> Edit</a><br>
-                            </div>
-                        </td>
-                        <td>
-                            {{#if this.showTextOptions}}
-                            <b>Correct Answer:</b>{{this.correctAnswer}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].fields[{{@index}}].correctAnswer" data-value="{{this.correctAnswer}}"> Edit</a><br>
-                            {{/if}}
-                            <b>Refutational Feedback:</b>{{this.incorrectFeedback}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].fields[{{@index}}].incorrectFeedback" data-value="{{this.incorrectFeedback}}"> Edit</a><br>
-                            <b>Question Weight:</b>{{this.weight}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].fields[{{@index}}].weight" data-value="{{this.weight}}"> Edit</a><br>
-                            <b>Image Attached:</b>{{this.image}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].fields[{{@index}}].image" data-value="{{this.image}}"> Edit</a><br>
-                        </td>
-                        <td>
-                            <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].fields[{{@index}}]">Delete</a>
-                            {{#if this.isMultiChoice}}
-                            <br> <a id="add-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].fields[{{@index}}].answers">Add Choice</a>
-                            {{/if}}
-                            
-                        </td>
-                    </tr>
-                        {{#if this.isMultiChoice}}
-                            {{#each this.answers}}
-                            <tr>
-                                <td>
-                                    Answer --->
-                                </td>
-                                <td>
-                                    <div id="pages[{{this.page}}]-questions[{{this.question}}]-fields[{{this.parent}}]-answers[{{@index}}].answer">
-                                        {{this.answer}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].answer" data-value="{{this.answer}}"> Edit</a><br>
-                                    </div>
-                                </td>
-                                <td>
-                                    <b>Image Attached:</b><img src="{{this.image}}" style="max-width:40px;"><a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].image" data-value="{{this.image}}"> Edit</a><br>
-                                    <b>Refultational Feedback: </b><img src="{{this.incorrectFeedback}}" style="max-width:40px;"><a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].incorrectFeedback" data-value="{{this.incorrectFeedback}}"> Edit</a><br>
-                                    <b>Value: </b>{{this.value}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
-                                    <div class="form-check">
-                                        <b>Correct Answer: </b>
-                                        {{#if this.isCorrect}}
-                                        <input class="markCorrect"  data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].isCorrect" data-value="false" type="checkbox"  checked>
-                                        {{else}}
-                                        <input class="markCorrect"  data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}].isCorrect" data-value="true" type="checkbox" >
-                                        {{/if}}        
-                                      </div>
-                                </td>
-                                <td>
-                                    <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.question}}].fields[{{this.parent}}].answers[{{@index}}]">Delete</a>
-                                </td>
-                            </tr>
-                            {{/each}}
-                        {{/if}}
-                    {{/each}}
-                {{/if}}
                 {{#if this.isMultiChoice}}
                     {{#each this.answers}}
                     <tr>
@@ -500,6 +430,7 @@
                         <td>
                             <b>Image Attached:</b><img src="{{this.image}}" style="max-width:40px;"><a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].image" data-value="{{this.image}}"> Edit</a><br>
                             <b>Value:</b>{{this.value}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
+                            <b>Feedback:</b>{{this.feedback}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].feedback" data-value="{{this.feedback}}"> Edit</a><br>
                         </td>
                         <td>
                             <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}]">Delete</a>

@@ -271,7 +271,9 @@ Meteor.methods({
             if(addedField == "questions"){
                 data = {
                     type :"multiChoice",
-                    prompt: "New"
+                    prompt: "Button",
+                    value: 0,
+                    feedback: ""
                 }
                 text = "curModule." + field + "=[data]";
                 eval(text);
@@ -400,7 +402,7 @@ Meteor.methods({
             return feedback;
         } else {
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-            Meteor.users.upsert(Meteor.userId(), {
+            Meteor.users.update(Meteor.userId(), {
                 $set: {
                     curModule: {
                         moduleId: Meteor.user().curModule.moduleId,
@@ -413,8 +415,8 @@ Meteor.methods({
         }
     },
     overrideUserDataRoutes: function (moduleData){
-        ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-        Meteor.users.upsert(Meteor.userId(), {
+        console.log('overriding user progress', moduleData.nextPage, moduleData.nextQuestion)
+        Meteor.users.update(Meteor.userId(), {
             $set: {
                 curModule: {
                     moduleId: Meteor.user().curModule.moduleId,

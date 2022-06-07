@@ -41,16 +41,6 @@
                 </div>
                 <br>
                 {{/if}}
-                {{#if page.imageAbove}}
-                    <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
-                    <br>
-                {{/if}}
-                <div id="embedContainer">{{{page.embeddedHTML}}}</div>
-                <br>
-                {{#if page.imageBelow}}
-                    <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
-                    <br>
-                {{/if}}
                 <button id="contine" class="btn btn-primary continue">Save and Continue</button>
             {{/if}}
                 {{#if this.questionId}}
@@ -66,16 +56,20 @@
                     {{#if question.promptImg}}
                         <img src="{{question.promptImg}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
                     {{/if}}
-                    {{#if question.typeATScript}}
+                    {{#if question.typeATScript}}      
                         {{#if module.enableAutoTutor}}
                         <div class="row">
                             <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
                             <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
                             <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
                         </div>
-                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
                         <br>
                         {{/if}}
+                        {{#if question.image}}
+                        <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                        <br>
+                        {{/if}}
+                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
                     {{/if}}
                         {{#if question.typeVideo}}
                         {{#if module.enableAutoTutor}}
@@ -107,6 +101,9 @@
                         {{else}}
                         <h3 id="prompt">{{{question.prompt}}}</h3><br>
                         {{/if}}
+                        {{#if question.image}}
+                            <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                        {{/if}}
                         {{#if question.audioRecording}}
                         <p id="audioRecordingNoticeContainer">
                             <i class="fa fa-microphone"></i>
@@ -129,6 +126,9 @@
                         {{#if module.autoTutorReadsPrompt}}
                         {{else}}
                         <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                        {{/if}}
+                        {{#if question.image}}
+                        <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
                         {{/if}}
                         {{#if question.audioRecording}}
                         <p id="audioRecordingNoticeContainer">
@@ -154,10 +154,13 @@
                     {{else}}
                     <h3 id="prompt">{{{question.prompt}}}</h3><br>
                     {{/if}}
+                    {{#if question.image}}
+                    <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                    {{/if}}
                     <form>
                         {{#each question.answers}}
                             {{#if this.image}}
-                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
+                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
                                     <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
                                 </button>
                             {{else}}
@@ -169,40 +172,6 @@
                     Message: {{feedback.message}}
                     </div>
                     <br>
-                    {{/if}}
-                    {{#if question.typeCombo}}
-                    <h3>{{{question.prompt}}}</h3><br>
-                        <form>
-                        {{#each question.fields}}
-                            {{#if this.typeBlank}}
-                                <h3>{{this.text}}</h3>
-                                    <input class="combo" type="text">
-                            {{/if}}
-                            {{#if this.typeLongText}}
-                            <h3>{{this.text}}</h3><br>
-                            <form>
-                                <textarea style="height:100px; width:100%;" class="combo"></textarea>
-                            </form>
-                            <br>
-                          {{/if}}
-                          {{#if this.typeMultiChoice}}
-                                <h3>{{this.text}}</h3>
-                                {{#each this.answers}}
-                                    {{#if this.image}}
-                                    <button  class="btn btn-primary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">
-                                        <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
-                                    </button>
-                                    {{else}}
-                                    <button  class="btn btn-primary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">{{this.answer}}</button>
-                                    {{/if}}
-                                {{/each}}
-                            {{/if}}
-                            <br>
-                        {{/each}}
-                        </form> 
-                        <br>
-                        <button  class="btn btn-primary continue" id="continue" name="">Save and Continue</button>
-                        <br>
                     {{/if}}
                     {{#if question.typeScroll}}
                         <div class="row" style="padding:20px;">

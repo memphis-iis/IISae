@@ -186,7 +186,11 @@ Router.route('/module/:_id', {
     return Meteor.subscribe('curModule', this.params._id);
   },
   action: function(){
-    this.render('module');
+    this.render('module', {
+      data:{
+        moduleId: this.params._id
+      }
+    });
   }
 });
 //module page id
@@ -201,6 +205,7 @@ Router.route('/module/:_id/:_pageid', {
     this.render('module', {
       data:{
         pageId: this.params._pageid,
+        moduleId: this.params._id
       }
     });
   }
