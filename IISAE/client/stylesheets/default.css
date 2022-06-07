@@ -82,3 +82,6 @@ img #logo-color{
 .speaker img{
     max-height:100px;
 }
+.module-img{
+    max-height:300px;
+}

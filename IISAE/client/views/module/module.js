@@ -23,17 +23,17 @@ Template.module.onRendered(function (){
     moduleResults.responses.push(data);
     Meteor.call('initiateNewResponse',moduleResults);
     const t = Template.instance();
-    autoTutorReadsPrompt = moduleData.autoTutorReadsPrompt;
+    autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
     autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
     autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
     art = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
     autoTutorReadsScript = moduleData.autoTutorReadsScript;
-    promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt;
-    scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript;
+    console.log(moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId], Meteor.user().curModule.pageId,Meteor.user().curModule.questionId);
+    promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
+    scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
     if(autoTutorReadsScript && scriptsToRead.length > 0){
         for(let scriptIndex in scriptsToRead){
             script = scriptsToRead[scriptIndex];
-            console.log(script);
             scriptToAdd = ""
             character = script.character;
             voice = moduleData.autoTutorCharacter.find(o => o.name == script.character).voice;
@@ -348,7 +348,7 @@ Template.module.events({
             $(':button').prop('disabled', false); 
             $(':button').removeClass('btn-info');
             moduleData = ModuleResults.findOne({_id: moduleId});
-            if(!curModule.enableAdaptivePages && curModule.pages[thisPage].nextFlow.length == 0){
+            if(!curModule.enableAdaptivePages || curModule.pages[thisPage].questions.length > thisQuestion + 1){
                 nextQuestion = thisQuestion + 1;
                 nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
                 if(typeof nextQuestionData !== "undefined"){
@@ -369,8 +369,11 @@ Template.module.events({
                         conditionStatement = "moduleData." + conditions[i].condition + conditions[i].operand + conditions[i].threshold;
                         conditionState = eval(conditionStatement);
                         if(conditionState){
-                            target = "/module/" + curModule._id + "/" + condition.route; 
+                            target = "/module/" + curModule._id + "/" + conditions[i].route; 
                             routePicked = true;
+                            moduleData.nextPage = conditions[i].route;
+                            moduleData.nextQuestion = 0;
+                            Meteor.call("overrideUserDataRoutes",moduleData); 
                         }
                     }
                 }
@@ -406,6 +409,7 @@ Template.module.events({
                         routePicked = true;
                         target = "/moduleCenter";
                     }
+                    Meteor.call("overrideUserDataRoutes",moduleData); 
                 }
             }
         }
@@ -451,7 +455,8 @@ Template.module.events({
 })
 Template.module.onCreated(function(){
     params = Router.current().params;
-    Meteor.subscribe('curModule', params.moduleId);
+    console.log(params);
+    Meteor.subscribe('curModule', params._id);
     this.questionType = new ReactiveVar("");
     this.pageType = new ReactiveVar("");
     this.feedback = new ReactiveVar(false);
