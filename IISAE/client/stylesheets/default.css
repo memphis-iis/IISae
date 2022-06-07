@@ -85,3 +85,6 @@ img #logo-color{
 .module-img{
     max-height:300px;
 }
+.btn-repeat{
+    width:auto !important;
+}

@@ -17,6 +17,7 @@
                         <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
                         <div class="speaker col-xs-4" style="width: 50; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px; margin-bottom: 20px;" id="script" hidden></div>
                         <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
+                        <button class="btn" id="autotutor-repeat">Repeat</button>
                     </div>
                     <br>
                     {{/if}}
@@ -37,8 +38,9 @@
                 <div class="row">
                     <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
                     <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                    <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
+                     <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
                 </div>
+                {{#if module.autoTutorRepeat}} <button class="btn btn-primary btn-repeat" id="autotutor-repeat">Repeat</button>{{/if}}
                 <br>
                 {{/if}}
                 <button id="contine" class="btn btn-primary continue">Save and Continue</button>
@@ -49,7 +51,7 @@
                     <div class="row">
                         <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
                         <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                        <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
+                         <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
                     </div>
                     <br>
                     {{/if}}
@@ -61,8 +63,9 @@
                         <div class="row">
                             <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
                             <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                            <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
+                             <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
                         </div>
+                        {{#if module.autoTutorRepeat}} <button class="btn btn-primary btn-repeat" id="autotutor-repeat">Repeat</button>{{/if}}
                         <br>
                         {{/if}}
                         {{#if question.image}}
@@ -76,8 +79,9 @@
                         <div class="row">
                             <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
                             <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                            <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
+                             <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
                         </div>
+                        {{#if module.autoTutorRepeat}} <button class="btn btn-primary btn-repeat" id="autotutor-repeat">Repeat</button>{{/if}}
                         {{/if}}
                         <div class="col-md-6 col-xs-1"></div>
                         <div class="col-md-6 col-xs-10"><video id="videoPrompt" autoplay style="width:100%" onended="$('.continue').prop('disabled',false); $('.continue').click()"><source src="{{question.prompt}}"></video></div>
@@ -89,8 +93,9 @@
                     <div class="row">
                         <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
                         <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                        <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
+                         <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
                     </div>
+                    {{#if module.autoTutorRepeat}} <button class="btn btn-primary btn-repeat" id="autotutor-repeat">Repeat</button>{{/if}}
                     {{{question.prompt}}}
                     <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
                     <br>
