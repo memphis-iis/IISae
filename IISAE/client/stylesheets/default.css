@@ -77,14 +77,34 @@ img #logo-color{
     border-radius: 20px;
 }
 .btn{
-    width:100%;
+    width:50%%;
+}
+.avatar{
+    text-align: center;
 }
 .speaker img{
-    max-height:100px;
+    width:50px;
+    height: 50px;
+    border-radius: 100px;
 }
+
 .module-img{
     max-height:300px;
 }
-.btn-repeat{
-    width:auto !important;
+.scrollbar{
+    text-align: left;
+}
+.attemplate{
+    margin-bottom: 1px;
+    min-height:100px;
+    
+}
+.attemplate .script{
+    min-height:100px;
+}
+.autoTutorHistory{
+    overflow-y: scroll;
+    overflow-x:hidden;
+    min-height: 100px;
+    max-height: 200px;
 }

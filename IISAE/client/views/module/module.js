@@ -147,6 +147,9 @@ Template.module.helpers({
         if(question.type == "multiChoice"){
             question.typeMultiChoice = true;
         };
+        if(question.type == "reading"){
+            question.typeReading = true;
+        };
         if(question.type == "html"){
             question.typeHTML = true;
         };
@@ -230,7 +233,23 @@ Template.module.events({
             readTTS(t, response, autoTutorPromptCharacterVoice);
          }
     },
+    'click .btn-read': function (event){
+        console.log('reading prompt text')
+        moduleData = Modules.findOne();
+        let moduleId = Meteor.user().curModule.moduleId;
+        moduleResults = ModuleResults.findOne({_id: moduleId});
+        const t = Template.instance();
+        autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
+        autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
+        autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
+        art = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
+        textToRead = moduleData.pages[Meteor.user().curModule.pageId].text || false;
+        textToReadStripped = $(textToRead).text();
+        readTTS(t, "Let me read that for you.", autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
+        readTTS(t, textToReadStripped, autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
+    },
     'click .btn-repeat': function (event){
+        $('#autoTutorHistory').html("");
         moduleData = Modules.findOne();
         let moduleId = Meteor.user().curModule.moduleId;
         moduleResults = ModuleResults.findOne({_id: moduleId});
@@ -324,6 +343,10 @@ Template.module.events({
                 if(questionData.type == "scrollbar"){
                     response = thisQuestion.correctAnswer || true;
                     answerValue = answerValue;
+                }
+                if(questionData.type == "reading"){
+                    response = thisQuestion.correctAnswer || true;
+                    answerValue = 0;
                 }
                 if(questionData.type == "link"){
                     response = thisQuestion.correctAnswer || true;
@@ -536,14 +559,16 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function readTTS(template, message, voice, character,characterArt){
-    console.log(character);
-    let moduleId =  Modules.findOne()._id;
+    let curModule = Modules.findOne();
+    let moduleId =  curModule._id;
     let audioActive = template.audioActive.get();
     template.audioActive.set(true);
     let displayMessage = character + ": " + message;
+    const characterSearch = (element) => element.name == character;
+    let characterIndex = curModule.autoTutorCharacter.findIndex(characterSearch);
     let audioObj = new Audio();
     let audioObjects = template.audioObjects.get();
-    audioObjects.push({obj:audioObj, art:characterArt, character:character, displayMessage:displayMessage});
+    audioObjects.push({obj:audioObj, art:characterArt, character:character, displayMessage:displayMessage, characterIndex:characterIndex});
     let order = audioObjects.length;
     template.audioObjects.set(audioObjects);
     Meteor.call('makeGoogleTTSApiCall', message, moduleId, voice, function(err, res) {
@@ -570,9 +595,14 @@ async function playAudio(template){
     let audioObjs = template.audioObjects.get();
     const audioObj = audioObjs[TTSTracPlaying].obj;
     console.log(audioObjs);
-    $('#script').html(audioObjs[TTSTracPlaying].displayMessage);
-    $('#script').prop('hidden', false);
-    $('#currentAvatar').html("<img src='" + audioObjs[TTSTracPlaying].art + "' style='max-width:100%; padding=20px;'><br>");
+    let atTemplate = "#ATTemplate" + audioObjs[TTSTracPlaying].characterIndex;
+    var clone = $(atTemplate).clone().prependTo('.autoTutorHistory');
+    $('.autoTutorHistory').show();
+    let scriptHandle = atTemplate + " .script";
+    let avatarHandle = atTemplate + " .avatar";
+    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art + "' style='max-width:100%; padding=20px;'><br>");
+    $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
+    $(clone).fadeIn();
     console.log(TTSTracPlaying, "of" , audioObjs.length) - 1;
     template.TTSTracPlaying.set(TTSTracPlaying + 1);
     window.currentAudioObj = audioObj;
@@ -589,6 +619,10 @@ async function playAudio(template){
                 questionType = template.questionType.get();
                 console.log(questionType);
                 template.audioActive.set(false);
+                $('.autoTutorHistory').fadeOut();
+                sleep(3000).then(function(){
+                    $('.autoTutorHistory').html("");
+                });
                 $('#audioRecordingNotice').html("I am listening.");
                 
                 $('#audiovis').show();
@@ -606,7 +640,9 @@ async function playAudio(template){
                     $(':button').prop('hidden', false); 
                 }
                 if(questionType == "autotutorscript"){
-                    $('.continue').click();
+                    sleep(3000).then(function(){
+                        $('.continue').click();
+                    })
                 }
                 }
             );
