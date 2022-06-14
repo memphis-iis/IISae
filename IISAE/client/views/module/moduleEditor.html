@@ -352,6 +352,7 @@
                                 <option >{{this.type}}</option>
                                 <option>longtext</option>
                                 <option>blank</option>
+                                <option>wordbank</option>
                                 <option>multiChoice</option>
                                 <option>scrollbar</option>
                                 <option>link</option>
@@ -399,6 +400,9 @@
                         {{#if this.isMultiChoice}}
                         <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answers">Add Choice</a>
                         {{/if}}
+                        {{#if this.isWordBank}}
+                        <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answers">Add Word or Phrase</a>
+                        {{/if}}
                         {{#if this.showTextOptions}}
                         {{#if this.enableLSA}}
                         <br><a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answerCorpera">Add LSA Answer Corpera</a>
@@ -436,6 +440,23 @@
                     </td>
                 </tr>
                 {{/each}}
+                {{#if this.isWordBank}}
+                {{#each this.answers}}
+                <tr>
+                    <td>
+                        Word Bank -->
+                    </td>
+                    <td>
+                        {{this.answer}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].answer" data-value="{{this.answer}}"> Edit</a><br>
+                    </td>
+                    <td>
+                    </td>
+                    <td>
+                        <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}]">Delete</a>
+                    </td>
+                </tr>
+                {{/each}}
+                {{/if}}
                 {{#if this.isMultiChoice}}
                     {{#each this.answers}}
                     <tr>

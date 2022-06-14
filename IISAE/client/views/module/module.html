@@ -178,6 +178,30 @@
                     </div>
                     <br>
                     {{/if}}
+                    {{#if question.typeWordBank}}
+                    {{#if module.autoTutorReadsPrompt}}
+                    {{else}}
+                    <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                    {{/if}}
+                    {{#if question.image}}
+                    <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                    {{/if}}
+                    <br>
+                    <input type="text" class="textBank" style="text-align:center; font-size:x-large; width:100%" id="transcription" value="{{transcript}}" disabled>
+                    <br>
+                    <br>
+                    <form>
+                        {{#each question.answers}}
+                                <button  class="btn btn-primary text-nowrap btn-lg btn-block btn-wordbank-add" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.answer}}</button>
+                        {{/each}}
+                    </form>
+                    <button  class="btn btn-warning text-nowrap btn-lg btn-block btn-wordbank-clear">Clear Selection</button>
+                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                    <div class="alert" id="refutation" role="alert" hidden>
+                    Message: {{feedback.message}}
+                    </div>
+                    <br>
+                    {{/if}}
                     {{#if question.typeScroll}}
                         <div class="row" style="padding:20px;">
                             <div class="col-md-4 col-xs-1"></div>

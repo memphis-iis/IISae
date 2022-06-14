@@ -358,7 +358,6 @@ Meteor.methods({
         ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
     },
     saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
-        console.log(moduleData, moduleId, pageId, questionId, response, answerValue)
         response = response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
@@ -370,7 +369,19 @@ Meteor.methods({
         moduleData.answerTags = answerTags;
         feedback = "disabled";
         if(curModule && pageId !== "completed"){
-            correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer;
+            if(curModule.pages[pageId].questions[questionId].type == "wordbank"){
+                correctAnswer = "";
+                for(let answer of curModule.pages[pageId].questions[questionId].answers){
+                    if(correctAnswer ==""){
+                        correctAnswer = answer.answer;    
+                    } else {
+                        correctAnswer = correctAnswer + "," + answer.answer;
+                    }
+                }
+            } else {
+                correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer;
+            }
+            console.log(correctAnswer, response);
             enableFeedback = curModule.enableFeedback;
             skipFeedback = curModule.pages[pageId].questions[questionId].noRefutation;
             enableWeightedQuestions = curModule.enableWeightedQuestions;
@@ -399,6 +410,7 @@ Meteor.methods({
                     },
                 }
             });
+            console.log(feedback);
             return feedback;
         } else {
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
