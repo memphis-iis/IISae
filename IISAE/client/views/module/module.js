@@ -140,12 +140,23 @@ Template.module.helpers({
         if(question.type == "link"){
             question.typeLink = true;
             console.log('hi');
+            question.promptNoBlanks = "Hi";
             b = question.prompt.replace(/<a>/gm,"<a id='continueLink'>");
             question.prompt = b;
             console.log(question.prompt);
         };
         if(question.type == "multiChoice"){
             question.typeMultiChoice = true;
+        };
+        if(question.type == "wordbank"){
+            question.typeWordBank = true;
+            let clozeCount = question.prompt.split("_").length - 1;
+            for(i = 0; i < clozeCount; i++){
+                clozeNumber = i+1;
+                clozeNumber = "<u>Answer " + clozeNumber + "</u>";
+                question.prompt = question.prompt.replace("_",clozeNumber);
+                console.log(clozeNumber);
+            }
         };
         if(question.type == "html"){
             question.typeHTML = true;
@@ -230,6 +241,22 @@ Template.module.events({
             readTTS(t, response, autoTutorPromptCharacterVoice);
          }
     },
+    'click .btn-wordbank-add': function(event){
+        event.preventDefault();
+        array = $(".textBank").val();
+        $('.continue').prop('disabled', false); ;
+        addToArray = $(event.target).html();
+        if(array == ""){
+            array = addToArray;
+        } else {
+            array = array + "," +  addToArray;
+        }
+        $(".textBank").val(array);
+    },
+    'click .btn-wordbank-clear': function(event){
+        event.preventDefault();
+        $(".textBank").val("");
+    },
     'click .btn-repeat': function (event){
         moduleData = Modules.findOne();
         let moduleId = Meteor.user().curModule.moduleId;
@@ -307,7 +334,11 @@ Template.module.events({
                 }
                 if(questionData.type == "blank"){
                     response = $(".textInput").val();
-                    answerValue = parseInt($(event.target).val());
+                    answerValue = 0;
+                }
+                if(questionData.type == "wordbank"){
+                    response = $(".textBank").val();
+                    answerValue = 0;
                 }
                 if(questionData.type == "autotutorscript"){
                     response = "continue";
@@ -379,6 +410,7 @@ Template.module.events({
                 if(res != "disabled"){
                     if(res == true){ 
                         type = "success";
+                        console.log(refutation);
                         message = refutation || "Correct!";
                     } 
                     addedClass = 'alert-' + type;
