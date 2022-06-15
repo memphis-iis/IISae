@@ -1,0 +1,664 @@
+{
+    "_id" : "7uEwht4Msuz6T8G2G",
+    "title" : "ARC: Lesson 9",
+    "identifier" : "ARC09",
+    "display" : false,
+    "description" : "Lesson 9",
+    "pages" : [ 
+        {
+            "type" : "activity",
+            "text" : "",
+            "nextFlow" : [],
+            "pageFlowVars" : {
+                "score" : 0
+            },
+            "questions" : [ 
+                {
+                    "type" : "autotutorscript",
+                    "prompt" : "",
+                    "value" : 0,
+                    "feedback" : "",
+                    "autoTutorScript" : [ 
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "<name> and Jordan Welcome back."
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Jordan",
+                            "script" : "<name> and Cristina, hello. What are we learning about today?"
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "<name> and Jordan, today we will be clarifying pronouns. This means we will be clearing up confusion about pronouns. A pronoun is a word used instead of a noun such as he, it, and their to name a few. He went to the store. Jane needs to fix it. Their backyard is huge. "
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Cristina",
+                            "script" : "Pronouns are important text signals. These are all examples of pronouns and how they can be used."
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Jordan",
+                            "script" : "<name>, Cristina, I think that I may need help to clarify pronouns"
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Cristina",
+                            "script" : "Jordan, don't worry. It will be fun and I am sure we can both help you."
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "Here is what the first question will look like. For today's activity all you need to do is mouse-over the highlighted nouns to replace the pronoun underlined in each sentence. This will help you to see what the best answer could be. To select an answer click on the the noun of your choice."
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Jordan",
+                            "script" : ": I think I get it. So, in this example the underlined pronoun is her. We need to clarify who or what the pronoun, her, is referring to. by replacing it with the correct highlighted noun."
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "Exactly. it will be helpful to read the paragraphs first so that you know what is going on. This will help to give you context for clarifying the pronouns."
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Jordan",
+                            "script" : "Scr <name>, I'm ready. let's get started."
+                        }
+                    ]
+                }
+            ],
+            "header" : "ARC Lesson 9",
+            "subheader" : "Introduction"
+        },
+        {
+            "type" : "activity",
+            "text" : "",
+            "nextFlow" : [],
+            "pageFlowVars" : {
+                "score" : 0
+            },
+            "questions" : [ 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Here is another sentence. Kim sees her  every month for checkups. Click on the noun that best replaces the pronoun, her.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Kim"
+                        }, 
+                        {
+                            "answer" : "Ben"
+                        }, 
+                        {
+                            "answer" : "a doctor"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Which of the highlighted nouns best replaces the pronoun, she, in this sentence? Then she takes Kim's blood pressure and gets a blood sample.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "the nurse"
+                        }, 
+                        {
+                            "answer" : "Kim"
+                        }, 
+                        {
+                            "answer" : "the doctor"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Button",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Button"
+                        }, 
+                        {
+                            "answer" : "Button"
+                        }, 
+                        {
+                            "answer" : "Button"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Which noun could replace the pronoun, she, in this sentence?: She also lets Kim and Ben listen.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Kim"
+                        }, 
+                        {
+                            "answer" : "The nurse"
+                        }, 
+                        {
+                            "answer" : "the doctor"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Here is the next sentence. It is very exciting for them to hear the 'thump, thump, thump' of their little one's heart. Which choice replaces the word, their, in this sentence?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "The nurse"
+                        }, 
+                        {
+                            "answer" : "the doctor"
+                        }, 
+                        {
+                            "answer" : "Kim and Ben"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Who does the pronoun her refer to in this sentence? The doctor reminds her to eat healthy food and drink lots of water.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "the nurse"
+                        }, 
+                        {
+                            "answer" : "Kim"
+                        }, 
+                        {
+                            "answer" : "the doctor"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Can you help me with this one? Here is the sentence: They could harm the baby's health. Which word should we put in place of the pronoun, they?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Good foods, water and vitamins"
+                        }, 
+                        {
+                            "answer" : "The doctor"
+                        }, 
+                        {
+                            "answer" : "the harmful effects"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Here is another sentence. The doctor also tells Kim and Ben what to expect as it grows. In that sentence the pronoun,It, can be best replaced by which noun.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "he baby"
+                        }, 
+                        {
+                            "answer" : "he harmful effects"
+                        }, 
+                        {
+                            "answer" : "health"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "We just have a few more to knock out. How would you replace the pronoun, they, in the sentence: they are eager to visit?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Kim and Ben"
+                        }, 
+                        {
+                            "answer" : "the birthing rooms"
+                        }, 
+                        {
+                            "answer" : "the nurses"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "In this next sentence, how would you replace the pronoun, their. These classes are a good way to meet other parents and learn about their baby.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Kim and Ben"
+                        }, 
+                        {
+                            "answer" : "classes"
+                        }, 
+                        {
+                            "answer" : "partsen"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "What do you think about this sentence? They will also discuss feeding, dressing, diapering, and bathing babies. What could we put in place of the pronoun, they?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Kim and Ben"
+                        }, 
+                        {
+                            "answer" : "parents"
+                        }, 
+                        {
+                            "answer" : "Teachers"
+                        }
+                    ]
+                }
+                
+            ],
+            "header" : "ARC Lesson 9",
+            "subheader" : "Pronouns: Level 1"
+        },
+        {
+            "type" : "activity",
+            "text" : "",
+            "nextFlow" : [],
+            "pageFlowVars" : {
+                "score" : 0
+            },
+            "questions" : [ 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Which noun best replaces the pronoun, she, in this sentence? She made the U.S. olympic team.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Tracy"
+                        }, 
+                        {
+                            "answer" : "Lanny"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "In this sentence which noun best replaces the pronoun, it. It was all over the news.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "the U.S. Olympic team"
+                        }, 
+                        {
+                            "answer" : "Her choice"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : " I am really not sure about this next one. What does the pronoun, she, refer to in this sentence. She was shocked by the level of interest. Can you help me?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Tracy"
+                        }, 
+                        {
+                            "answer" : "Lanny"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Let's keep going. How would you replace the pronoun, she, in this sentence? Lanny was having a good season this winter, but she got sick during a set of races in Italy.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Tracy"
+                        }, 
+                        {
+                            "answer" : "Lanny"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "In the sentence, But she would not change her mind, the pronoun, she, is used. What does she refer to here?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Tracy"
+                        }, 
+                        {
+                            "answer" : "Lanny"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "How would you replace the word, her, in the sentence: once I let her know how much it meant to me, she realized it was a good thing to do.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Tracy"
+                        }, 
+                        {
+                            "answer" : "Lanny"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Which noun does the word, it, refer to in this sentence? But she doesn't mind missing it.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Olympics"
+                        }, 
+                        {
+                            "answer" : "Turin Games"
+                        }, 
+                        {
+                            "answer" : "Vancouver Games"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "What is the best replacement for the pronoun, she, in this sentence?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Tracy"
+                        }, 
+                        {
+                            "answer" : "Lanny"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "What does the pronoun, She, refer to in this sentence. She is close to earning a degree in marketing.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Tracy"
+                        }, 
+                        {
+                            "answer" : "Lanny"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "I think I need a little help here. I am not sure what the correct answer is. Which is the best choice to replace the word, that, in this phrase? That, is helping a business to sell its products",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "a degree"
+                        }, 
+                        {
+                            "answer" : "marketing"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Let's see what you come up with for another pronoun in this sentence. What is the best replacement for the pronoun, its?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "marketing"
+                        }, 
+                        {
+                            "answer" : "hunters"
+                        },
+                        {
+                            "answer" : "the twins"
+                        }
+                    ]
+                }
+            ],
+            "header" : "ARC Lesson 9",
+            "subheader" : "Pronouns: Level 2"
+        },
+        {
+            "type" : "activity",
+            "text" : "",
+            "nextFlow" : [],
+            "pageFlowVars" : {
+                "score" : 0
+            },
+            "questions" : [ 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Click on the noun that best replaces the pronoun, they, in this sentence. Often ocean currents can quickly move pieces of debris miles away from where they are spotted.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "planes"
+                        }, 
+                        {
+                            "answer" : "ocean currents"
+                        }, 
+                        {
+                            "answer" : "pieces"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Which do you think is the correct noun to replace the pronoun, it, in this sentence? They hope it is a clue that could help solve the mystery of the missing plane; however, instead, they learn that it is garbage, a piece of fishing equipment, or it is a box that fell from a passing ship.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "An object"
+                        }, 
+                        {
+                            "answer" : "location"
+                        }, 
+                        {
+                            "answer" : "the sea"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "In 1997, he discovered what is now known as the Great Pacific Garbage Patch which is located between Hawaii and California.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Curtis Ebbesmeyer"
+                        }, 
+                        {
+                            "answer" : "Andy Scott"
+                        }, 
+                        {
+                            "answer" : "Captain Charles Moore"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "What noun should replace the pronoun, it, in this sentence: It, is at least the size of Texas. Will you help me to find the best answer for this one?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "the Great Pacific Garbage Patch"
+                        }, 
+                        {
+                            "answer" : "Hawaii"
+                        }, 
+                        {
+                            "answer" : "California"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Which of the nouns best replaces the word, it, in this sentence? The debris has a negative effect on marine life because much of it is not decomposed.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "the debris"
+                        }, 
+                        {
+                            "answer" : "marine life"
+                        }, 
+                        {
+                            "answer" : "Texas"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Pick the best noun to replace the pronoun, that, for this phrase. That, means the water moves around in a circle.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "a negative effect"
+                        }, 
+                        {
+                            "answer" : "biodegradable"
+                        }, 
+                        {
+                            "answer" : "gyre"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Here's the next sentence. Some of it is dumped into rivers that carry it to the ocean, while some is swept into the sea by tsunamis. How would you replace the pronoun, it?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "energy"
+                        }, 
+                        {
+                            "answer" : "supplies"
+                        }, 
+                        {
+                            "answer" : "the trash"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Let's try another one. Here is the sentence. Those are huge waves caused by earthquakes under the sea. how would you replace the pronoun, those? I think the answer is rivers. What about you?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "oceans"
+                        }, 
+                        {
+                            "answer" : "rivers"
+                        }, 
+                        {
+                            "answer" : "tsunamis"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Try this sentence. They are dangerous, floating around for months. what is the best noun to replace the pronoun, they?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "tsunamis"
+                        }, 
+                        {
+                            "answer" : "huge shipping containers"
+                        }, 
+                        {
+                            "answer" : "cargo ships"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Which noun best replaces the pronoun, they, in this sentence? They understand the challenges garbage poses.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "animals"
+                        }, 
+                        {
+                            "answer" : "Searchers"
+                        }, 
+                        {
+                            "answer" : "The experts"
+                        }
+                    ]
+                },
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "here is the Last one. how would you replace the pronoun, it, in this sentence: Not only is debris in the oceans an issue for finding the missing plane, but it also has a greater global impact on the environment.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "debris"
+                        }, 
+                        {
+                            "answer" : "the oceans"
+                        }, 
+                        {
+                            "answer" : "the missing plane"
+                        }
+                    ]
+                }
+            ],
+            "header" : "ARC Lesson 9",
+            "subheader" : "Pronouns: Level 3"
+        }
+    ],
+    "public" : false,
+    "owner" : "DurzHWk27yTGcMxs8",
+    "orgOwnedBy" : "ZrPoovwSF3JDSQS74",
+    "fallbackRoute" : "nextPage",
+    "pageFlowVars" : {
+        "score" : 0
+    },
+    "enableScoring" : true,
+    "randomChoice" : true,
+    "skipInterstitials" : true,
+    "showScoring" : true,
+    "enableAdaptivePages" : true,
+    "enableFeedback" : true,
+    "feedbackTimeout" : "3"
+}
