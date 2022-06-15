@@ -128,8 +128,41 @@ Template.module.helpers({
         question = page.questions[parseInt(this.questionId)];
         const t = Template.instance();
         question.audioRecording = curModule.audioRecording;
+        console.log(question.type);
         if(question.type == "blank"){
             question.typeBlank = true;
+        };
+        if(question.type == "questionSelectionBoard"){
+            question.typeQuestionSelectBoard = true;
+            questionsAvailable = page.questions;
+            question.currentScore = moduleData.questionBoardScore || 0;
+            scoreWidth = (question.currentScore / parseInt(question.goalScore)) * 100 + "%" || "5%";
+            if(scoreWidth == "100%"){
+                $(".selectionboard").prop("disabled",true);
+                $(".continue").prop("disabled",false);
+            }
+            $('.scorebar').width(scoreWidth);
+            console.log(questionsAvailable);
+            for(index in questionsAvailable){
+                questionsAvailable[index].index = parseInt(index);
+            }
+            console.log(moduleData.questionBoardAnswered);
+            if(moduleData.questionBoardAnswered){
+                console.log("questions already answered");
+                for(questionIndex of moduleData.questionBoardAnswered){
+                    console.log("Question answered",questionIndex, typeof questionIndex);
+                    questionIndex = parseInt(questionIndex);
+                    let findIndex = questionsAvailable.map(e => e.index).indexOf(questionIndex);
+                    console.log("Found Index ", findIndex);
+                    questionsAvailable.splice(findIndex, 1);
+                }
+            }
+            questionsAvailable.shift()
+            let shuffled = questionsAvailable
+                .map(value => ({ value, sort: Math.random() }))
+                .sort((a, b) => a.sort - b.sort)
+                .map(({ value }) => value)
+            question.availableQuestions = shuffled;
         };
         if(question.type == "scrollbar"){
             question.typeScroll = true;
@@ -342,17 +375,32 @@ Template.module.events({
         }
 
     },
+    'click .selectionboard': function(event){
+        $(':button').prop('disabled', true); 
+        event.preventDefault();
+        moduleData = ModuleResults.findOne({_id: moduleId});
+        nextQuestion =  event.target.getAttribute("data-index");
+        moduleId = Modules.findOne()._id;
+        thisPage = Meteor.user().curModule.pageId;
+        moduleData.nextQuestion = nextQuestion;
+        moduleData.nextPage = thisPage;
+        Meteor.call("overrideUserDataRoutes",moduleData); 
+        target = "/module/" + moduleId + "/" + thisPage + "/" + nextQuestion + "/return"; 
+        console.log(target);
+        window.location.href = target;
+    },
     'click .continue': async function(event) {
         $(':button').prop('disabled', true); 
         const t = Template.instance();
         event.preventDefault();
         curModule = Modules.findOne()
+        command = t.command.get();
         target = "";
         moduleId = Meteor.user().curModule.moduleId;
         moduleData = ModuleResults.findOne({_id: moduleId});
         moduleData.lastAccessed = Date.now().toString();
         thisPage = Meteor.user().curModule.pageId;
-        thisQuestion = Meteor.user().curModule.questionId;
+        thisQuestion = parseInt(Meteor.user().curModule.questionId);
         thisQuestionData = curModule.pages[thisPage].questions[thisQuestion]
         answerValue = 0;
         transcript = t.transcript.get() || "";
@@ -360,6 +408,7 @@ Template.module.events({
         if(t.pageType.get() == "activity"){
             if(transcript == "" || !transcript){
                 questionData = curModule.pages[thisPage].questions[thisQuestion];
+                console.log(questionData, thisPage, thisQuestion,moduleData, Meteor.user().curModule);
                 if(curModule.audioRecording){
                     questionData.audioRecorded = chunks;
 
@@ -367,6 +416,10 @@ Template.module.events({
                 if(questionData.type == "blank"){
                     response = $(".textInput").val();
                     answerValue = parseInt($(event.target).val());
+                }
+                if(questionData.type == "questionSelectionBoard"){
+                    response = "continue"
+                    answerValue = moduleData.questionBoardScore;
                 }
                 if(questionData.type == "wordbank"){
                     response = $(".textBank").val();
@@ -468,12 +521,33 @@ Template.module.events({
             $(':button').prop('disabled', false); 
             $(':button').removeClass('btn-info');
             moduleData = ModuleResults.findOne({_id: moduleId});
-            if(!curModule.enableAdaptivePages || curModule.pages[thisPage].questions.length > thisQuestion + 1){
-                nextQuestion = thisQuestion + 1;
-                nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
+            if(!curModule.enableAdaptivePages || curModule.pages[thisPage].questions.length > thisQuestion + 1 || command == "return"){
+                if(command == "return"){
+                    nextQuestion = 0;
+                    nextPage = thisPage;
+                    nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
+                    if(nextQuestionData.type == "questionSelectionBoard"){
+                        if(moduleData.questionBoardScore){
+                            moduleData.questionBoardScore += answerValue;
+                        } else {
+                            moduleData.questionBoardScore = answerValue;
+                        }
+                        if(moduleData.questionBoardAnswered){
+                            moduleData.questionBoardAnswered.push(thisQuestion);
+                        }else{
+                            moduleData.questionBoardAnswered = [thisQuestion];
+                        }
+                    }
+                    moduleData.nextQuestion = 0;
+                    moduleData.nextPage = thisPage;
+                    Meteor.call("overrideUserDataRoutes",moduleData); 
+                } else {
+                    nextQuestion = thisQuestion + 1;
+                    nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
+                }
                 if(typeof nextQuestionData !== "undefined"){
                     target = "/module/" + curModule._id + "/" + thisPage + "/" + nextQuestion; 
-                } else {
+                } else {   
                     nextPage = thisPage + 1;
                     if(typeof curModule.pages[nextPage] !== "undefined"){
                         if(curModule.pages[nextPage].type="activity" && curModule.skipInterstitials){
@@ -589,6 +663,7 @@ Template.module.onCreated(function(){
     params = Router.current().params;
     console.log(params);
     Meteor.subscribe('curModule', params._id);
+    this.command = new ReactiveVar(params._command);
     this.questionType = new ReactiveVar("");
     this.pageType = new ReactiveVar("");
     this.feedback = new ReactiveVar(false);

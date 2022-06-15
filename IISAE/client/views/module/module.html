@@ -153,7 +153,7 @@
                                     <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
                                 </button>
                             {{else}}
-                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.answer}}</button>
+                            <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.answer}}</button>
                             {{/if}}
                         {{/each}}
                     </form>
@@ -161,6 +161,30 @@
                     Message: {{feedback.message}}
                     </div>
                     <br>
+                    {{/if}}
+                    {{#if question.typeQuestionSelectBoard}}
+                    {{#if module.autoTutorReadsPrompt}}
+                    {{else}}
+                    <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                    {{/if}}
+                    <div class="row text-left">
+                        Score: {{question.currentScore}} / {{question.goalScore}}
+                    </div>
+                    <div class="row scorebarcontainer">
+                        <div class="scorebar">
+                        </div>
+                    </div>
+                    <br>
+                    {{#if question.image}}
+                    <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                    {{/if}}
+                    <form>
+                        {{#each question.availableQuestions}}
+                        <button  class="btn btn-primary text-nowrap selectionboard" data-index="{{this.index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.value}}</button>
+                        {{/each}}
+                    </form>
+                    <br>
+                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
                     {{/if}}
                     {{#if question.typeWordBank}}
                     {{#if module.autoTutorReadsPrompt}}

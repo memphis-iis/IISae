@@ -363,6 +363,7 @@
                                 <option>wordbank</option>
                                 <option>multiChoice</option>
                                 <option>scrollbar</option>
+                                <option>questionSelectBoard</option>
                                 <option>link</option>
                                 <option>html</option>
                                 <option>video</option>
@@ -379,6 +380,9 @@
                         {{else}}
                         <b>Correct Answer:</b>{{this.correctAnswer}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].correctAnswer" data-value="{{this.correctAnswer}}"> Edit</a><br>
                         <b>Value: </b>{{this.value}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
+                        {{#if this.isQuestionSelectBoard}}
+                        <b>Goal Score:</b>{{this.goalScore}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].goalScore" data-value="{{this.goalScore}}"> Edit</a><br>
+                        {{/if}}
                         {{/if}}
                         {{/if}}
                         {{#if this.isMultiChoice}}

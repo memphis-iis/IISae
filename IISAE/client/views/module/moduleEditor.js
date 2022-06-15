@@ -26,6 +26,7 @@ Template.moduleEditor.helpers({
                         questions[j].showTextOptions = true;
                         questions[j].isCombo = false;
                         questions[j].isMultiChoice = false;
+                        questions[j].isQuestionSelectBoard = false;
                         questions[j].isWordBank = false;
                         questions[j].enableLSA = curModule.enableLSA;
                         if(questions[j].autoTutorScript){
@@ -61,6 +62,9 @@ Template.moduleEditor.helpers({
                                 }
                             }
                         } 
+                        if(questions[j].type == "questionSelectionBoard"){
+                            questions[j].isQuestionSelectBoard = true;
+                        }
                         if(questions[j].type == "multiChoice"){
                             answers = questions[j].answers;
                             questions[j].isMultiChoice = true;
