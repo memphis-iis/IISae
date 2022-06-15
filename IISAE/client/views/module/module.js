@@ -342,11 +342,16 @@ Template.module.events({
                 voice = moduleData.autoTutorCharacter.find(o => o.name == script.character).voice;
                 art = moduleData.autoTutorCharacter.find(o => o.name == script.character).art;
                 if(moduleData.enableAnswerTags){
-                    if(typeof moduleResults.answerTags !== "undefined"){
+                    if(typeof moduleResults.answerTags !== "undefined" || typeof Meteor.user().persistantAnswerTags !== "undefined"){
                         for(let keys of Object.keys(moduleResults.answerTags)){
                             pattern = "<(" + keys + ")>"
                             regex = new RegExp(pattern)
                             scriptToAdd = script.script.replace(regex,moduleResults.answerTags[keys]);
+                        }
+                        for(let keys of Object.keys(Meteor.user().persistantAnswerTags)){
+                            pattern = "<(" + keys + ")>"
+                            regex = new RegExp(pattern)
+                            scriptToAdd = scriptToAdd.replace(regex,Meteor.user().persistantAnswerTags[keys]);
                         }
                         readTTS(t,scriptToAdd,voice,character, art);
                     } else {
