@@ -107,3 +107,14 @@ img #logo-color{
     min-height: 100px;
     max-height: 200px;
 }
+.scorebarcontainer{
+    background-color:#d9eaf4;
+    border-radius: 10px;
+    height:20px;
+}
+.scorebar{
+    border-radius: 10px;
+    height:20px;
+    width:2%;
+    background-color: #74c3f0;
+}
