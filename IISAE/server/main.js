@@ -63,6 +63,7 @@ Meteor.methods({
                             gender: gender,
                             assigned: organization.newUserAssignments || [],
                             nextModule: 0,
+                            persistantAnswerTags: {},
                             author: author
                         }
                     });
@@ -365,6 +366,17 @@ Meteor.methods({
         if(curModule.enableAnswerTags){
             answerTagKey = curModule.pages[pageId].questions[questionId].answerTag;
             answerTags[answerTagKey] = response;
+        }
+        console.log(curModule.pages[pageId].questions[questionId].persistantAnswerTag);
+        if(curModule.pages[pageId].questions[questionId].persistantAnswerTag){
+            answerTagKey = curModule.pages[pageId].questions[questionId].answerTag;
+            curAnswerTags = Meteor.user().persistantAnswerTags || {};
+            curAnswerTags[answerTagKey] = response;
+            Meteor.users.update(Meteor.userId(), {
+                $set: {
+                    persistantAnswerTags: curAnswerTags
+                }
+            });
         }
         moduleData.answerTags = answerTags;
         feedback = "disabled";
