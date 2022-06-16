@@ -2,7 +2,7 @@
 
 import {LSA} from './macineLearning/LSA'
 export function answerAssess(correctAnswer, response, type="simpleMatch"){
-    console.log(correctAnswer, response);
+    console.log("Assess Answer:", correctAnswer, response);
     if(type == "simpleMatch"){
         data = simpleMatch(correctAnswer.toLowerCase(), response.toLowerCase());
     }

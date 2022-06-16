@@ -63,6 +63,7 @@ Meteor.methods({
                             gender: gender,
                             assigned: organization.newUserAssignments || [],
                             nextModule: 0,
+                            persistantAnswerTags: {},
                             author: author
                         }
                     });
@@ -271,7 +272,9 @@ Meteor.methods({
             if(addedField == "questions"){
                 data = {
                     type :"multiChoice",
-                    prompt: "New"
+                    prompt: "Button",
+                    value: 0,
+                    feedback: ""
                 }
                 text = "curModule." + field + "=[data]";
                 eval(text);
@@ -356,7 +359,6 @@ Meteor.methods({
         ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
     },
     saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
-        console.log(moduleData, moduleId, pageId, questionId, response, answerValue)
         response = response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
@@ -365,10 +367,33 @@ Meteor.methods({
             answerTagKey = curModule.pages[pageId].questions[questionId].answerTag;
             answerTags[answerTagKey] = response;
         }
+        console.log(curModule.pages[pageId].questions[questionId].persistantAnswerTag);
+        if(curModule.pages[pageId].questions[questionId].persistantAnswerTag){
+            answerTagKey = curModule.pages[pageId].questions[questionId].answerTag;
+            curAnswerTags = Meteor.user().persistantAnswerTags || {};
+            curAnswerTags[answerTagKey] = response;
+            Meteor.users.update(Meteor.userId(), {
+                $set: {
+                    persistantAnswerTags: curAnswerTags
+                }
+            });
+        }
         moduleData.answerTags = answerTags;
         feedback = "disabled";
         if(curModule && pageId !== "completed"){
-            correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer;
+            if(curModule.pages[pageId].questions[questionId].type == "wordbank"){
+                correctAnswer = "";
+                for(let answer of curModule.pages[pageId].questions[questionId].answers){
+                    if(correctAnswer ==""){
+                        correctAnswer = answer.answer;    
+                    } else {
+                        correctAnswer = correctAnswer + "," + answer.answer;
+                    }
+                }
+            } else {
+                correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer;
+            }
+            console.log(correctAnswer, response);
             enableFeedback = curModule.enableFeedback;
             skipFeedback = curModule.pages[pageId].questions[questionId].noRefutation;
             enableWeightedQuestions = curModule.enableWeightedQuestions;
@@ -397,10 +422,11 @@ Meteor.methods({
                     },
                 }
             });
+            console.log(feedback);
             return feedback;
         } else {
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-            Meteor.users.upsert(Meteor.userId(), {
+            Meteor.users.update(Meteor.userId(), {
                 $set: {
                     curModule: {
                         moduleId: Meteor.user().curModule.moduleId,
@@ -413,8 +439,9 @@ Meteor.methods({
         }
     },
     overrideUserDataRoutes: function (moduleData){
+        console.log('overriding user progress', moduleData.nextPage, moduleData.nextQuestion)
         ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
-        Meteor.users.upsert(Meteor.userId(), {
+        Meteor.users.update(Meteor.userId(), {
             $set: {
                 curModule: {
                     moduleId: Meteor.user().curModule.moduleId,

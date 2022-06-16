@@ -186,7 +186,11 @@ Router.route('/module/:_id', {
     return Meteor.subscribe('curModule', this.params._id);
   },
   action: function(){
-    this.render('module');
+    this.render('module', {
+      data:{
+        moduleId: this.params._id
+      }
+    });
   }
 });
 //module page id
@@ -201,6 +205,7 @@ Router.route('/module/:_id/:_pageid', {
     this.render('module', {
       data:{
         pageId: this.params._pageid,
+        moduleId: this.params._id
       }
     });
   }
@@ -224,6 +229,29 @@ Router.route('/module/:_id/:_pageid/:_questionid', {
         moduleId: this.params._id,
         prompt: questionPrompt,
         autoTutorReadsPrompt: true
+      }
+      return data
+    }
+  }
+});
+Router.route('/module/:_id/:_pageid/:_questionid/:_command', {
+  template: 'module',
+  waitOn: function(){
+    subs = [];
+    subs.push(Meteor.subscribe('curModule', this.params._id));
+    subs.push(Meteor.subscribe('getUserModuleResults'));
+    return subs;
+  },
+  data: function(){
+    if(this.ready()){
+      questionPrompt = Modules.findOne().pages[this.params._pageid].questions[this.params._questionid].prompt;
+      data = {
+        pageId: this.params._pageid,
+        questionId: this.params._questionid,
+        moduleId: this.params._id,
+        prompt: questionPrompt,
+        autoTutorReadsPrompt: true,
+        command: this.params._command
       }
       return data
     }

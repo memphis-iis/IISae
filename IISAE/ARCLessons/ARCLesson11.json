@@ -1,0 +1,405 @@
+{
+    "_id" : "7uEwht4Msuz6T8G2G",
+    "title" : "ARC: Review 1",
+    "identifier" : "ARC11",
+    "display" : false,
+    "description" : "Review 1",
+    "pages" : [ 
+        {
+            "type" : "activity",
+            "text" : "",
+            "nextFlow" : [],
+            "pageFlowVars" : {
+                "score" : 0
+            },
+            "questions" : [ 
+                {
+                    "type" : "questionSelectionBoard",
+                    "prompt" : "",
+                    "value" : 0,
+                    "feedback" : "",
+                    "autoTutorScript" : [ 
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "<name> and Jordan, hi!"
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Jordan",
+                            "script" : "Cristina, hi. what are we working on today?"
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "We are going to try a bit of trivia to review the skills we have learned."
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Jordan",
+                            "script" : "Great! What do we need to do?" 
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "Here is the game board."
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Cristina",
+                            "script" : "You see that there are four categories for the questions." 
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "Text signals, writer's purpose, using clues, and mixed review."
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Jordan",
+                            "script" : " see. So, what are the numbers under each category?"
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "Each category has 4 questions with point values of 100, 200, 300, and 400. The 400 point questions are the most difficult."
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Cristina",
+                            "script" : "Choose a question by clicking on one of the numbers below a category."
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Jordan",
+                            "script" : "Cool. So, what happens when we click a number?"
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Cristina",
+                            "script" : "A question will appear. You can answer a question by clicking on the answer buttons."
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Jordan",
+                            "script" : "What happens next?"
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Cristina",
+                            "script" : "You will go back to the main page to pick your next question. After correct answers, the score bar at the top will fill with the amount of points that the question was worth."
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Cristina",
+                            "script" : "When you have completely filled the bar you have completed the activity."
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Cristina",
+                            "script" : "Correct answers will be indicated in green. Incorrect answers will be red."
+                        },
+                        {
+                            "role" : "teacher",
+                            "character" : "Jordan",
+                            "script" : "Cristina I think I understand!"
+                        }, 
+                        {
+                            "role" : "New",
+                            "character" : "Cristina",
+                            "script" : "Awesome! Let's start the game then!"
+                        },
+                        {
+                            "role" : "New",
+                            "character" : "Jordan",
+                            "script" : "Sweet! Let's try it!"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "What type of text signal is displayed in the box below?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "print cue"
+                        }, 
+                        {
+                            "answer" : "title or subtitle"
+                        }, 
+                        {
+                            "answer" : "visual cue"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "The italics, colors, and text size in this text are examples of this.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "print cues"
+                        }, 
+                        {
+                            "answer" : "title or subtitles"
+                        }, 
+                        {
+                            "answer" : "visual cues"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Based on the text signals, what kind of book do you think this is?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Main Street Station"
+                        }, 
+                        {
+                            "answer" : "Pape Station"
+                        }, 
+                        {
+                            "answer" : "Dawes Station"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Click the word below that has an affix.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "chance"
+                        }, 
+                        {
+                            "answer" : "friendliest"
+                        }, 
+                        {
+                            "answer" : "grass"
+                        }, 
+                        {
+                            "answer" : "bottom"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Click the word below that has an affix.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "irrelevant"
+                        }, 
+                        {
+                            "answer" : "relevant"
+                        }, 
+                        {
+                            "answer" : "point"
+                        }, 
+                        {
+                            "answer" : "read"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Click the word below that is the root of the following example.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "pleasing"
+                        }, 
+                        {
+                            "answer" : "easy"
+                        }, 
+                        {
+                            "answer" : "please"
+                        }, 
+                        {
+                            "answer" : "sing"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Click the word below that is the root of the following example.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "intre"
+                        }, 
+                        {
+                            "answer" : "trepidly"
+                        }, 
+                        {
+                            "answer" : "trep"
+                        }, 
+                        {
+                            "answer" : "trepid"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Which of the following strategies is an example of using context clues?",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Predicting the author's purpose."
+                        }, 
+                        {
+                            "answer" : "Reading the words around a confusing word."
+                        }, 
+                        {
+                            "answer" : "Using the dictionary."
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "I have to stop by the DMV to renew my driver's license.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Department of Motor Vehicles"
+                        }, 
+                        {
+                            "answer" : "District of Mount Vernon"
+                        }, 
+                        {
+                            "answer" : "Division of Multiple Vehicles"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Danielle brought a present to the party.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "in this moment"
+                        }, 
+                        {
+                            "answer" : "a gift"
+                        }, 
+                        {
+                            "answer" : "to put on show"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Many people think that the Monongahela is the most beautiful river in Pittsburgh.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "river"
+                        }, 
+                        {
+                            "answer" : "beautiful"
+                        }, 
+                        {
+                            "answer" : "people"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "Carol's son asked her, \"Can I invite my friends over when I finish my homework?\"",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "The writer is asking a question."
+                        }, 
+                        {
+                            "answer" : "The writer is making a statement."
+                        }, 
+                        {
+                            "answer" : "The writer is expressing strong emotion."
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "At her banking job Celeste is a machine, but when she gets home she crashes.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "at her banking job"
+                        }, 
+                        {
+                            "answer" : "Celeste is a machine"
+                        }, 
+                        {
+                            "answer" : "when she gets home she crashes"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "While fixing her deck, Dominque learns that the beams she is using must be able to bear up to 200 lbs.",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "What is the purpose of the text?"
+                        }, 
+                        {
+                            "answer" : "Is there a comparison being made?"
+                        }, 
+                        {
+                            "answer" : "What are the two or more definitions for this word?"
+                        }
+                    ]
+                }, 
+                {
+                    "type" : "multiChoice",
+                    "prompt" : "After a cold afternoon building a snowman, Maurice's hands were like icicles",
+                    "value" : 0,
+                    "feedback" : "",
+                    "answers" : [ 
+                        {
+                            "answer" : "Maurice and snowman"
+                        }, 
+                        {
+                            "answer" : "hands and icicles"
+                        }, 
+                        {
+                            "answer" : "hands and cold"
+                        }
+                    ]
+                }
+            ],
+            "header" : "ARC Review 1",
+            "subheader" : "Introduction"
+        }
+    ],
+    "public" : false,
+    "owner" : "DurzHWk27yTGcMxs8",
+    "orgOwnedBy" : "ZrPoovwSF3JDSQS74",
+    "fallbackRoute" : "nextPage",
+    "pageFlowVars" : {
+        "score" : 0
+    },
+    "enableScoring" : true,
+    "randomChoice" : true,
+    "skipInterstitials" : true,
+    "showScoring" : true,
+    "enableAdaptivePages" : true,
+    "enableFeedback" : true,
+    "feedbackTimeout" : "3"
+}

@@ -6,17 +6,20 @@
                 <p>You have completed this module!</p>
                 <button class="btn btn-primary" id="goBack">Return to My Profile</button>    
             {{else}}
-                <h3><b>{{page.header}}</b></h3>
-                <h4><b>{{page.subheader}}</b></h4>
-                {{#if module.showScoring}}
-                    Score: {{trialData.score}}
-                {{/if}}
+                <h3><b>{{page.header}}: {{page.subheader}}</b></h3>
                 {{#if page.typeText}}
                     {{#if module.enableAutoTutor}}
-                    <div class="row">
-                        <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
-                        <div class="speaker col-xs-4" style="width: 50; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px; margin-bottom: 20px;" id="script" hidden></div>
-                        <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
+                    <div class="autoTutorTemplate" hidden>
+                        <div id="ATTemplate0" class="row attemplate row" hidden>
+                            <div class="speaker avatar col-xs-1" style="text-align: right;" id="avatar"></div>
+                            <div class="speaker script col-xs-11" style="text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px;  margin-bottom: 20px;"></div>
+                        </div>
+                        <div id="ATTemplate1" class="row attemplate row" hidden>
+                            <div class="speaker script col-xs-11" style="text-align: left; background: rgb(120, 206, 143);font-size: large;color: white; border-radius: 3px; min-height:50px;  margin-bottom: 20px;"></div>
+                            <div class="speaker avatar col-xs-1" style="text-align: left;" id="avatar"></div>
+                        </div>
+                    </div>
+                    <div class="autoTutorHistory">
                     </div>
                     <br>
                     {{/if}}
@@ -33,81 +36,61 @@
                     <button id="contine" class="btn btn-primary continue">Save and Continue</button>
                 {{/if}}
                 {{#if page.typeEmbed}}
-                {{#if module.enableAutoTutor}}
-                <div class="row">
-                    <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
-                    <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                    <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
-                </div>
-                <br>
-                {{/if}}
-                {{#if page.imageAbove}}
-                    <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
-                    <br>
-                {{/if}}
-                <div id="embedContainer">{{{page.embeddedHTML}}}</div>
-                <br>
-                {{#if page.imageBelow}}
-                    <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
-                    <br>
-                {{/if}}
                 <button id="contine" class="btn btn-primary continue">Save and Continue</button>
             {{/if}}
                 {{#if this.questionId}}
                     <h5>Activity {{questionid}}</h5>
                     {{#if module.enableAutoTutor}}
-                    <div class="row">
-                        <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
-                        <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                        <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
+                    <div class="autoTutorTemplate" hidden>
+                        <div id="ATTemplate0" class="row attemplate row" hidden>
+                            <div class="speaker avatar col-xs-1" style="text-align: right;" id="avatar"></div>
+                            <div class="speaker script col-xs-11" style="text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px;  margin-bottom: 20px;"></div>
+                        </div>
+                        <div id="ATTemplate1" class="row attemplate row" hidden>
+                            <div class="speaker script col-xs-11" style="text-align: left; background: rgb(120, 206, 143);font-size: large;color: white; border-radius: 3px; min-height:50px;  margin-bottom: 20px;"></div>
+                            <div class="speaker avatar col-xs-1" style="text-align: left;" id="avatar"></div>
+                        </div>
                     </div>
+                    <div class="autoTutorHistory">
+                        
+                    </div>
+                    <br>
+                    {{/if}}
+                    {{#if page.image}}
+                    <img class="img-responsive center-block module-img" src="{{page.image}}" alt="Your Alt Text">
+                    <br>
+                    {{/if}}
+                    {{#if page.text}}
+                    <div id="pageText" class="col-md 4col-xs-12 scrollbar" style="overflow-y: scroll; font-size: large; max-height: 200px; max-width: 100%;">{{{page.text}}}</div>
                     <br>
                     {{/if}}
                     {{#if question.promptImg}}
                         <img src="{{question.promptImg}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
                     {{/if}}
-                    {{#if question.typeATScript}}
-                        {{#if module.enableAutoTutor}}
-                        <div class="row">
-                            <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
-                            <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                            <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
-                        </div>
-                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
+                    {{#if question.typeATScript}}      
+                        {{#if question.image}}
+                        <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
                         <br>
                         {{/if}}
+                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
                     {{/if}}
                         {{#if question.typeVideo}}
-                        {{#if module.enableAutoTutor}}
-                        <div class="row">
-                            <div class="speaker col-xs-1 col-md-4" style="width: 25%;" id="currentAvatar"></div>
-                            <div class="speaker col-xs-10 col-md-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                            <div class="speaker col-xs-1 col-md-4" style="width: 25%;" id="secondAvatar"></div>
-                        </div>
-                        {{/if}}
-                        <div class="row">
-                            <div class="col-md-4 col-xs-1"></div>
-                            <div class="col-md-4 col-xs-10"><video id="videoPrompt" autoplay style="width:100%" onended="$('.continue').prop('disabled',false); $('.continue').click()"><source src="{{question.prompt}}"></video></div>
-                            <div class="col-md-4 col-xs-1"></div>
-                        </div>
+                        <div class="col-md-6 col-xs-1"></div>
+                        <div class="col-md-6 col-xs-10"><video id="videoPrompt" autoplay style="width:100%" onended="$('.continue').prop('disabled',false); $('.continue').click()"><source src="{{question.prompt}}"></video></div>
+                        <div class="col-md-6 col-xs-1"></div>
                         <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
                     {{/if}}
                     {{#if question.typeHTML}}
-                    {{#if module.enableAutoTutor}}
-                    <div class="row">
-                        <div class="speaker col-xs-4" style="width: 25%;" id="currentAvatar"></div>
-                        <div class="speaker col-xs-4" style="width: 75%; text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px; padding: 10px;  margin-bottom: 20px;" id="script" hidden></div>
-                        <div class="speaker col-xs-4" style="width: 25%;" id="secondAvatar"></div>
-                    </div>
                     {{{question.prompt}}}
                     <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
-                    <br>
-                    {{/if}}
                 {{/if}}
                     {{#if question.typeBlank}}
                         {{#if module.autoTutorReadsPrompt}}
                         {{else}}
                         <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                        {{/if}}
+                        {{#if question.image}}
+                            <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
                         {{/if}}
                         {{#if question.audioRecording}}
                         <p id="audioRecordingNoticeContainer">
@@ -131,6 +114,9 @@
                         {{#if module.autoTutorReadsPrompt}}
                         {{else}}
                         <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                        {{/if}}
+                        {{#if question.image}}
+                        <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
                         {{/if}}
                         {{#if question.audioRecording}}
                         <p id="audioRecordingNoticeContainer">
@@ -156,14 +142,18 @@
                     {{else}}
                     <h3 id="prompt">{{{question.prompt}}}</h3><br>
                     {{/if}}
+                    {{#if question.image}}
+                    <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                    {{/if}}
+
                     <form>
                         {{#each question.answers}}
                             {{#if this.image}}
-                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
+                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
                                     <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
                                 </button>
                             {{else}}
-                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.answer}}</button>
+                            <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.answer}}</button>
                             {{/if}}
                         {{/each}}
                     </form>
@@ -172,39 +162,53 @@
                     </div>
                     <br>
                     {{/if}}
-                    {{#if question.typeCombo}}
-                    <h3>{{{question.prompt}}}</h3><br>
-                        <form>
-                        {{#each question.fields}}
-                            {{#if this.typeBlank}}
-                                <h3>{{this.text}}</h3>
-                                    <input class="combo" type="text">
-                            {{/if}}
-                            {{#if this.typeLongText}}
-                            <h3>{{this.text}}</h3><br>
-                            <form>
-                                <textarea style="height:100px; width:100%;" class="combo"></textarea>
-                            </form>
-                            <br>
-                          {{/if}}
-                          {{#if this.typeMultiChoice}}
-                                <h3>{{this.text}}</h3>
-                                {{#each this.answers}}
-                                    {{#if this.image}}
-                                    <button  class="btn btn-primary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">
-                                        <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
-                                    </button>
-                                    {{else}}
-                                    <button  class="btn btn-primary  text-nowrap btn-lg btn-block multichoice combo" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{@index}}" name="">{{this.answer}}</button>
-                                    {{/if}}
-                                {{/each}}
-                            {{/if}}
-                            <br>
+                    {{#if question.typeQuestionSelectBoard}}
+                    {{#if module.autoTutorReadsPrompt}}
+                    {{else}}
+                    <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                    {{/if}}
+                    <div class="row text-left">
+                        Score: {{question.currentScore}} / {{question.goalScore}}
+                    </div>
+                    <div class="row scorebarcontainer">
+                        <div class="scorebar">
+                        </div>
+                    </div>
+                    <br>
+                    {{#if question.image}}
+                    <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                    {{/if}}
+                    <form>
+                        {{#each question.availableQuestions}}
+                        <button  class="btn btn-primary text-nowrap selectionboard" data-index="{{this.index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.value}}</button>
                         {{/each}}
-                        </form> 
-                        <br>
-                        <button  class="btn btn-primary continue" id="continue" name="">Save and Continue</button>
-                        <br>
+                    </form>
+                    <br>
+                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                    {{/if}}
+                    {{#if question.typeWordBank}}
+                    {{#if module.autoTutorReadsPrompt}}
+                    {{else}}
+                    <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                    {{/if}}
+                    {{#if question.image}}
+                    <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                    {{/if}}
+                    <br>
+                    <input type="text" class="textBank" style="text-align:center; font-size:x-large; width:100%" id="transcription" value="{{transcript}}" disabled>
+                    <br>
+                    <br>
+                    <form>
+                        {{#each question.answers}}
+                                <button  class="btn btn-primary text-nowrap btn-lg btn-block btn-wordbank-add" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.answer}}</button>
+                        {{/each}}
+                    </form>
+                    <button  class="btn btn-warning text-nowrap btn-lg btn-block btn-wordbank-clear">Clear Selection</button>
+                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                    <div class="alert" id="refutation" role="alert" hidden>
+                    Message: {{feedback.message}}
+                    </div>
+                    <br>
                     {{/if}}
                     {{#if question.typeScroll}}
                         <div class="row" style="padding:20px;">
@@ -216,11 +220,27 @@
                         <br>
                         <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
                     {{/if}}
+                    {{#if question.typeReading}}
+                    {{#if question.image}}
+                    <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                    <br>
+                    {{/if}}
+                    <div class="row" style="padding:20px;">
+                        <div class="col-md-4 col-xs-1"></div>
+                        <div id="scrollArea" class="col-md 4col-xs-12" style="overflow-y: scroll; font-size: large; max-height: 200px; max-width: 100%;">{{{this.prompt}}}</div>
+                        <div class="col-md-4 col-xs-1"></div>
+                    </div>
+                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                     {{/if}}
                     {{#if question.typeLink}}
-                    <div id="linkArea" style="overflow-y: scroll; font-size: large; max-height: 300px;">{{{question.prompt}}}</div>
+                    <div id="linkArea" style="overflow-y: scroll; font-size: large; max-height: 300px;">
+                        {{{question.prompt}}}</div>
                     <br>
                     <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
                 {{/if}}
+                <br>
+                {{#if page.text}}{{#if module.enableAutoTutor}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text</button>{{/if}}{{/if}}
+                {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation</button>{{/if}}
                 {{else}}
                      {{#if page.typeActivity}}
                          <h3><b>Activity: {{page.header}}</b></h3>
@@ -235,4 +255,5 @@
                 <button class="btn btn-caution" id="goBack">I'm not ready.</button>
             {{/if}}
     </div>
+    
 </template>
