@@ -20,14 +20,14 @@ const defaultIgnoreChars = ['\'','!','.',',','!','?',';',':'];
 
 Meteor.startup(async function() {
     if (Meteor.isServer) {
+        insertSeedData();
         Meteor.publish('files.images.all', function () {
           return FileStore.find().cursor;
         });
     }
-
     //load default JSON assessment/modules into mongo collection
     insertDefaultAssignments().then(function(){
-        if(Meteor.isDevelopment) insertSeedData();
+
     });  
 });
 
@@ -64,7 +64,6 @@ Meteor.methods({
                             assigned: organization.newUserAssignments || [],
                             nextModule: 0,
                             persistantAnswerTags: {},
-                            author: author
                         }
                     });
                 if(linkId != ""){

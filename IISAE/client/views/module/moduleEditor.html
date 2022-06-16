@@ -386,6 +386,7 @@
                         {{/if}}
                         {{/if}}
                         {{#if this.isMultiChoice}}
+                        <b>Value: </b>{{this.value}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
                         <b>Correct Answer:</b>
                         <select id="type" class="combo-save" data-field="pages[{{this.parent}}].questions[{{@index}}].correctAnswer">
                             <option>{{this.correctAnswer}}</option>

@@ -1,16 +1,16 @@
 module.exports = {
   servers: {
     one: {
-      host: '141.225.42.232',
-      username: 'rusty',
-      pem: '~/.ssh/id_rsa'
+      host: '3.88.57.206',
+      username: 'ubuntu',
+      pem: '~/issae/scripts/staging-key-final.pem'
     }
   },
   app: {
     name: 'IISae',
     path: '../',
     docker: {
-      image: 'zodern/meteor:root',
+      image: 'zodern/meteor:root'
     },
     servers: {
       one: {}
@@ -19,13 +19,12 @@ module.exports = {
       serverOnly: true
     },
     env: {
-      ROOT_URL: 'http://iis-desk05.uom.memphis.edu',
-      MONGO_URL: 'mongodb://localhost:27017/issae',
-      PORT: 80
+      ROOT_URL: 'http://3.88.57.206',
+      MONGO_URL: 'mongodb://localhost/meteor'
     }
   },
   mongo: {
-    version: '4.2.0',
+    version: '3.4.1',
     servers: {
       one: {}
     }
