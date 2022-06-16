@@ -208,6 +208,24 @@ Meteor.methods({
         }
         Modules.insert(newModule);
     },
+    uploadModule: function(path,user){
+        const fs = Npm.require('fs');
+        const bound = Meteor.bindEnvironment((callback) => {callback();});
+        fs.readFile(path,'utf8', (err,data) => {
+            bound(() => {
+                if(err){
+                    console.log(err)
+                } else {
+                    console.log(data);
+                    var newModule =  JSON.parse(data);
+                    newModule.owner = user;
+                    newModule.orgOwnedBy = Meteor.users.find({_id: user}).organization;
+                    delete newModule._id;
+                    Modules.insert(newModule);
+                }
+            });
+        });
+    },
     changeModule(input){
         moduleId = input.moduleId;
         field = input.field;
@@ -753,7 +771,7 @@ Meteor.methods({
     },
     changeClassName(classId, name){
         Classes.update({"_id":classId}, {$set:{name: name}});
-    }
+    },
 });
 
 //Server Methods
@@ -860,4 +878,8 @@ async function makeHTTPSrequest(options, request){
         req.write(request)
         req.end()
     });
+}
+
+function insertModule(data){
+    Modules.insert(data);
 }
