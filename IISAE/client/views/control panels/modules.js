@@ -236,10 +236,19 @@ Template.modulesAdmin.events({
               alert(`Error during upload: ${error}`);
             } else {
               alert(`File "${fileObj.name}" successfully uploaded`);
-              link = Images.link(fileObj);
+              link = FileStore.link(fileObj);
               fileName = fileObj.name;
               type = fileObj.type;
               Meteor.call('addFileToOrg',  link, fileName, type);
+              if(fileObj.ext == "json"){
+                Meteor.call('uploadModule',fileObj.path,Meteor.userId(),function(err,res){
+                    if(err){
+                        alert("package failed");
+                    } else {
+                        console.log(res);
+                    }
+                });
+            }
             }
             template.currentUpload.set(false);
           });
