@@ -16,13 +16,13 @@
 
 <template name="DefaultLayout">
   <div>
-    {{#if currentUser }}
   <nav class="navbar navbar-light bg-light navbar-fixed-top">
     <div class="container">
       <ul class="nav nav-pills nav-fill justify-content-right">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/profile">IIS<i>ae</i>{{#if organization}} | <span class="orgLogo">{{organization.orgNameTruncated}}</span> {{/if}}</a>
+          <a class="nav-link active" aria-current="page" href="/">IIS<i>ae</i>{{#if organization}} | <span class="orgLogo">{{organization.orgNameTruncated}}</span> {{/if}}</a>
         </li>
+        {{#if currentUser }}
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/profile"><span class="glyphicon glyphicon-home"></span></a>
         </li>
@@ -37,16 +37,15 @@
         <li class="nav-item">
           <a class="nav-link active" id="logoutButton" href="/logout" aria-current="page"><span class=" glyphicon glyphicon-log-out"></span></a>
         </li>
+        {{/if}}
+      <li class="nav-item">
+        <a class="nav-link active" id="helpButton" href="/help" aria-current="page"><span class="glyphicon glyphicon-question-sign"></span></a>
+      </li>
       </ul>
     </div>
   </nav>
-  {{/if}}
   <div class="container" id="container-yield">
     {{> yield}}
   </div>
-  </div>
-  <div id="footer">
-    <p>{{footer.copyright}}</p>
-    <p>{{footer.message}}</p>
   </div>
   </template>  
