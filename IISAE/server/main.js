@@ -375,7 +375,7 @@ Meteor.methods({
     initiateNewResponse: function (moduleData){
         ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
     },
-    saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue){
+    saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue,charResponses){
         response = response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
@@ -415,6 +415,11 @@ Meteor.methods({
             skipFeedback = curModule.pages[pageId].questions[questionId].noRefutation;
             enableWeightedQuestions = curModule.enableWeightedQuestions;
             questionWeight = 1;
+            answerCheck = false;
+            feedback = {
+                isCorrect: false,
+                characterRefutation: []
+            };
             if(!moduleData.score){
                 moduleData.score = 0;
             }
@@ -422,9 +427,19 @@ Meteor.methods({
                 questionWeight = curModule.pages[pageId].questions[0].weight
             }
             if(enableFeedback && !skipFeedback){
-                feedback = answerAssess(correctAnswer, response).isCorrect;
+                answerCheck = answerAssess(correctAnswer, response).isCorrect;
+                feedback.isCorrect = answerCheck;
+                for(let charResponse of charResponses){
+                    console.log(charResponse);
+                    charAnswerCheck = answerAssess(correctAnswer, charResponse.response).isCorrect;
+                    data = {
+                        character: charResponse.name,
+                        isCorrect: charAnswerCheck
+                    }
+                    feedback.characterRefutation.push(data);
+                }
             }
-            if(feedback == true){
+            if(answerCheck == true){
                 moduleData.score += parseInt(answerValue) * parseFloat(questionWeight);
             } else {
                 moduleData.score = parseInt(moduleData.score);

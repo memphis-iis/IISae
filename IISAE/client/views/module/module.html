@@ -33,10 +33,10 @@
                         <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
                         <br>
                     {{/if}}
-                    <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+                    <button id="contine" class="btn btn-primary continue">Continue <span class="glyphicon glyphicon-play"></span></button>
                 {{/if}}
                 {{#if page.typeEmbed}}
-                <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+                <button id="contine" class="btn btn-primary continue">Continue <span class="glyphicon glyphicon-play"></span></button>
             {{/if}}
                 {{#if this.questionId}}
                     <h5>Activity {{questionid}}</h5>
@@ -72,17 +72,17 @@
                         <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
                         <br>
                         {{/if}}
-                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
+                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Continue <span class="glyphicon glyphicon-play"></span></button>
                     {{/if}}
                         {{#if question.typeVideo}}
                         <div class="col-md-6 col-xs-1"></div>
                         <div class="col-md-6 col-xs-10"><video id="videoPrompt" autoplay style="width:100%" onended="$('.continue').prop('disabled',false); $('.continue').click()"><source src="{{question.prompt}}"></video></div>
                         <div class="col-md-6 col-xs-1"></div>
-                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
+                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Continue <span class="glyphicon glyphicon-play"></span></button>
                     {{/if}}
                     {{#if question.typeHTML}}
                     {{{question.prompt}}}
-                    <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Save and Continue</button>
+                    <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Continue <span class="glyphicon glyphicon-play"></span></button>
                 {{/if}}
                     {{#if question.typeBlank}}
                         {{#if module.autoTutorReadsPrompt}}
@@ -105,7 +105,7 @@
                         </form>
                         {{/if}}
                         <br>
-                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="{{question.value}}">Save and Continue</button>
+                        <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="{{question.value}}">Continue <span class="glyphicon glyphicon-play"></span></button>
                         <div class="alert" id="refutation" role="alert" hidden>
                             Message: {{feedback.message}}
                         </div>
@@ -128,13 +128,13 @@
                             </form>
                         </p>
                         <br>
-                        <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+                        <button id="contine" class="btn btn-primary continue">Continue <span class="glyphicon glyphicon-play"></span></button>
                         {{else}}
                         <form>
                             <textarea style="height:100px; width:100%;" class="textareaInput"></textarea>
                         </form>
                         <br>
-                        <button id="contine" class="btn btn-primary continue">Save and Continue</button>
+                        <button id="contine" class="btn btn-primary continue">Continue <span class="glyphicon glyphicon-play"></span></button>
                         {{/if}}
                     {{/if}}
                     {{#if question.typeMultiChoice}}
@@ -184,7 +184,7 @@
                         {{/each}}
                     </form>
                     <br>
-                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                    <button id="continue" class="btn btn-primary continue" disabled>Continue <span class="glyphicon glyphicon-play"></span></button>
                     {{/if}}
                     {{#if question.typeWordBank}}
                     {{#if module.autoTutorReadsPrompt}}
@@ -204,7 +204,7 @@
                         {{/each}}
                     </form>
                     <button  class="btn btn-warning text-nowrap btn-lg btn-block btn-wordbank-clear">Clear Selection</button>
-                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                    <button id="continue" class="btn btn-primary continue" disabled>Continue <span class="glyphicon glyphicon-play"></span></button>
                     <div class="alert" id="refutation" role="alert" hidden>
                     Message: {{feedback.message}}
                     </div>
@@ -218,7 +218,7 @@
                         </div>
                         <br>
                         <br>
-                        <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                        <button id="continue" class="btn btn-primary continue" disabled>Continue <span class="glyphicon glyphicon-play"></span></button>
                     {{/if}}
                     {{#if question.typeReading}}
                     {{#if question.image}}
@@ -230,17 +230,17 @@
                         <div id="scrollArea" class="col-md 4col-xs-12" style="overflow-y: scroll; font-size: large; max-height: 200px; max-width: 100%;">{{{this.prompt}}}</div>
                         <div class="col-md-4 col-xs-1"></div>
                     </div>
-                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                    <button id="continue" class="btn btn-primary continue" disabled>Continue <span class="glyphicon glyphicon-play"></span></button>
                      {{/if}}
                     {{#if question.typeLink}}
                     <div id="linkArea" style="overflow-y: scroll; font-size: large; max-height: 300px;">
                         {{{question.prompt}}}</div>
                     <br>
-                    <button id="continue" class="btn btn-primary continue" disabled>Save and Continue</button>
+                    <button id="continue" class="btn btn-primary continue" disabled>Continue <span class="glyphicon glyphicon-play"></span></button>
                 {{/if}}
                 <br>
-                {{#if page.text}}{{#if module.enableAutoTutor}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text</button>{{/if}}{{/if}}
-                {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation</button>{{/if}}
+                {{#if page.text}}{{#if module.enableAutoTutor}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
+                {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
                 {{else}}
                      {{#if page.typeActivity}}
                          <h3><b>Activity: {{page.header}}</b></h3>
