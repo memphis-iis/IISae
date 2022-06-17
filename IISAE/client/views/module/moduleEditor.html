@@ -450,7 +450,9 @@
                           {{/each}}
                       </select>
                   </td>
-                    <td><b>Speech: </b>{{this.script}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].autoTutorScript[{{@index}}].script" data-value="{{this.script}}"> Edit</a><br></td>
+                    <td><b>Speech: </b>{{this.script}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].autoTutorScript[{{@index}}].script" data-value="{{this.script}}"> Edit</a><br>
+                        <b>Alternate Speech: </b>{{this.scriptAlt}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].autoTutorScript[{{@index}}].scriptAlt" data-value="{{this.scriptAlt}}"> Edit</a>
+                    </td>
                     <td>
                         <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].autoTutorScript[{{@index}}]">Delete Line</a><br>
                         <a id="add-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].autoTutorScript">Add Line</a>
