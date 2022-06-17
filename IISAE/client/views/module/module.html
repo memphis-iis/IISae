@@ -1,12 +1,12 @@
 <template name="module">
     <div class="px-4 py-5 my-5 text-center">
-        <h3>{{module.title}}</h3>
         {{#if this.pageId}}
             {{#if completed}}
+                <h4>{{module.title}} : Completed</h4>
                 <p>You have completed this module!</p>
                 <button class="btn btn-primary" id="goBack">Return to My Profile</button>    
             {{else}}
-                <h3><b>{{page.header}}: {{page.subheader}}</b></h3>
+                <h4>{{page.header}} : {{page.subheader}}</h4>
                 {{#if page.typeText}}
                     {{#if module.enableAutoTutor}}
                     <div class="autoTutorTemplate" hidden>
@@ -39,7 +39,6 @@
                 <button id="contine" class="btn btn-primary continue">Continue <span class="glyphicon glyphicon-play"></span></button>
             {{/if}}
                 {{#if this.questionId}}
-                    <h5>Activity {{questionid}}</h5>
                     {{#if module.enableAutoTutor}}
                     <div class="autoTutorTemplate" hidden>
                         <div id="ATTemplate0" class="row attemplate row" hidden>
@@ -250,6 +249,7 @@
                 {{/if}}
             {{/if}}
         {{else}}
+                <h3>{{module.title}}</h3>
                 <p>{{module.description}}</p>
                 <button class="btn btn-primary" id="startModule">Lets Begin!</button>
                 <button class="btn btn-caution" id="goBack">I'm not ready.</button>

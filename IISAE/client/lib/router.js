@@ -20,7 +20,8 @@ const defaultBehaviorRoutes = [
   'login',
   'signup',
   'restricted',
-  'code'
+  'code',
+  'help'
 ];
 
 //Set Up Logged In Restricted Routes 
