@@ -203,6 +203,8 @@
             <option>{{this.name}}</option>
             {{/each}}
         </select>
+        <br>
+        Script Display Timeout (Fade, 0 for no fade): {{module.scriptFadeTimeout}}<a id="open-editor" data-value={{module.scriptFadeTimeout}} data-field="identifier"> Edit</a><br>
           <table class="table" id="autoTutorCharacters">
             <thead>
                 <th scope="col" width="25%">Name</th>
@@ -367,6 +369,7 @@
                                 <option>link</option>
                                 <option>html</option>
                                 <option>video</option>
+                                <option>reading</option>
                                 <option>autotutorscript</option>
                             </select>
                         </div>
