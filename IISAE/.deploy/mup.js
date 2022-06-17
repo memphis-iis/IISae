@@ -3,7 +3,7 @@ module.exports = {
     one: {
       host: '3.88.57.206',
       username: 'ubuntu',
-      pem: '~/issae/scripts/staging-key-final.pem'
+      pem: '~/issae/staging-key-final.pem'
     }
   },
   app: {

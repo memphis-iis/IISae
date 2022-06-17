@@ -31,7 +31,7 @@ Template.module.onRendered(function (){
     console.log(moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId], Meteor.user().curModule.pageId,Meteor.user().curModule.questionId);
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
-    if(autoTutorReadsScript && scriptsToRead.length > 0){
+    if(autoTutorReadsScript && scriptsToRead.length > 0 && (moduleResults.questionBoardAnswered.length == 0 || !moduleResults.questionBoardAnswered)){
         for(let scriptIndex in scriptsToRead){
             script = scriptsToRead[scriptIndex];
             scriptToAdd = ""
