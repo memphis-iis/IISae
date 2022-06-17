@@ -69,8 +69,8 @@ Template.module.onRendered(function (){
                 promptToRead = questionPrompt.replace(regex,moduleResults.answerTags[keys]);
             }
         }
-     }
-    if(autoTutorReadsPrompt && promptToRead){
+    }
+    if(autoTutorReadsPrompt && promptToRead){   
         readTTS(t, promptToRead, autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
     } 
     if(moduleData.audioRecording && !moduleData.enableAutoTutor){
@@ -601,10 +601,13 @@ Template.module.events({
                                 } else {
                                     target = "/module/" + curModule._id + "/" + nextPage; 
                                 }
+                                moduleData.nextPage = nextPage;
+                                moduleData.nextQuestion = 0;
                             } else {
                                 target = "/module/" + curModule._id + "/completed"; 
                             }
                         }
+                        Meteor.call("overrideUserDataRoutes",moduleData); 
                     } else {
                         conditions = curModule.pages[thisPage].nextFlow;
                         routePicked = false;

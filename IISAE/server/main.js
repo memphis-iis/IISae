@@ -63,7 +63,7 @@ Meteor.methods({
                             gender: gender,
                             assigned: organization.newUserAssignments || [],
                             nextModule: 0,
-                            persistantAnswerTags: {},
+                            persistantAnswerTags: [],
                         }
                     });
                 if(linkId != ""){
