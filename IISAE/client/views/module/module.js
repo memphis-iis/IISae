@@ -31,7 +31,7 @@ Template.module.onRendered(function (){
     console.log(moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId], Meteor.user().curModule.pageId,Meteor.user().curModule.questionId);
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
-    if(autoTutorReadsScript && scriptsToRead.length > 0 && (moduleResults.questionBoardAnswered.length == 0 || !moduleResults.questionBoardAnswered)){
+    if(autoTutorReadsScript && scriptsToRead.length > 0 && typeof moduleResults.questionBoardAnswered == 'undefined'){
         for(let scriptIndex in scriptsToRead){
             script = scriptsToRead[scriptIndex];
             scriptToAdd = ""
@@ -727,6 +727,7 @@ async function playAudio(template){
     $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art + "' style='max-width:100%; padding=20px;'><br>");
     $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
     $(clone).fadeIn();
+    $(clone).attr("id","ATTemplateFinished");
     console.log(TTSTracPlaying, "of" , audioObjs.length) - 1;
     template.TTSTracPlaying.set(TTSTracPlaying + 1);
     window.currentAudioObj = audioObj;
@@ -736,9 +737,13 @@ async function playAudio(template){
         if(audioObjs.length > TTSTracPlaying){
             sleep(1000).then(function(){
                 playAudio(template);
-                sleep(3000).then(function(){
-                    $(clone).fadeOut();
-                });
+                curModule = Modules.findOne();
+                if(curModule.scriptFadeTime || curModule.scriptFadeTime == "" || curModule.scriptFadeTime == 0){
+                    fadeTime = curModule.scriptFadeTimeout * 1000;
+                    sleep(300).then(function(){
+                        $(clone).fadeOut(fadeTime);
+                    });
+                }
             });
         }
         else{
