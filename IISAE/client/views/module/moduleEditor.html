@@ -208,8 +208,9 @@
           <table class="table" id="autoTutorCharacters">
             <thead>
                 <th scope="col" width="25%">Name</th>
-                <th scope="col" width="25%">Voice</th>
-                <th scope="col" width="25%">Art URL</th>
+                <th scope="col" width="15%">Voice</th>
+                <th scope="col" width="20%">Options</th>
+                <th scope="col" width="15%">Art URL</th>
                 <th scope="col" width="25%">Actions</th>
             </thead>
             <tbody>
@@ -226,6 +227,14 @@
                             <option value="en-US-Standard-C">Female 1</option>
                             <option value="en-US-Standard-E">Female 2</option>
                         </select>
+                    </td>
+                    <td>
+                        Character Answers Questions:
+                        {{#if this.answersQuestions}}
+                        <input class="markCorrect"  data-field="autoTutorCharacter[{{@index}}].answersQuestions" data-value="false" type="checkbox"  checked>
+                        {{else}}
+                        <input class="markCorrect"  data-field="autoTutorCharacter[{{@index}}].answersQuestions" data-value="false" type="checkbox">
+                        {{/if}}        
                     </td>
                     <td>
                         <img src="{{this.art}}" style="max-width: 100px;" /><a id="open-editor" data-field="autoTutorCharacter[{{@index}}].art"  data-value="{{this.art}}"> Edit</a><br>

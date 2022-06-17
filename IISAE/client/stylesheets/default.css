@@ -51,8 +51,8 @@ input, option, textarea {
     background-color: rgba(0, 0, 0, 0.5);
 }
 .login input, .code input{
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50px;
+    color:black;
+
     margin-top: 0px;
 }
 #footer{
