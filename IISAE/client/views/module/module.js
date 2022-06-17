@@ -34,6 +34,7 @@ Template.module.onRendered(function (){
     if(autoTutorReadsScript && scriptsToRead.length > 0 && typeof moduleResults.questionBoardAnswered == 'undefined'){
         for(let scriptIndex in scriptsToRead){
             script = scriptsToRead[scriptIndex];
+            if(script.scriptAlt)
             scriptToAdd = ""
             character = script.character;
             voice = moduleData.autoTutorCharacter.find(o => o.name == script.character).voice;
@@ -45,12 +46,17 @@ Template.module.onRendered(function (){
                         regex = new RegExp(pattern)
                         scriptToAdd = script.script.replace(regex,moduleResults.answerTags[keys]);
                     }
-                    readTTS(t,scriptToAdd,voice,character, art);
+                    for(let keys of Object.keys(moduleResults.answerTags)){
+                        pattern = "<(" + keys + ")>"
+                        regex = new RegExp(pattern)
+                        scriptToAdd = script.scriptAlt.replace(regex,moduleResults.answerTags[keys]);
+                    }
+                    readTTS(t,scriptToAdd,voice,character, art, script.scriptAlt);
                 } else {
-                    readTTS(t,script.script,voice,character, art);
+                    readTTS(t,script.script,voice,character, art, script.scriptAlt);
                 }
             } else {
-                readTTS(t,script.script,voice,character, art);
+                readTTS(t,script.script,voice,character, art, script.scriptAlt);
             }
         }
     }
@@ -682,7 +688,7 @@ Template.module.onCreated(function(){
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-function readTTS(template, message, voice, character,characterArt){
+function readTTS(template, message, voice, character,characterArt,scriptAlt){
     let curModule = Modules.findOne();
     let moduleId =  curModule._id;
     let audioActive = template.audioActive.get();
@@ -695,6 +701,9 @@ function readTTS(template, message, voice, character,characterArt){
     audioObjects.push({obj:audioObj, art:characterArt, character:character, displayMessage:displayMessage, characterIndex:characterIndex});
     let order = audioObjects.length;
     template.audioObjects.set(audioObjects);
+    if(scriptAlt){
+        message = scriptAlt;
+    }
     Meteor.call('makeGoogleTTSApiCall', message, moduleId, voice, function(err, res) {
         if(err){
             console.log("Something went wrong with TTS, ", err)
