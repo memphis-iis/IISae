@@ -205,7 +205,7 @@ Template.module.helpers({
             question.typeReading = true;
             question.curPassageNumber = t.curReadingPage.get();
             question.curPassage = question.passages[question.curPassageNumber].text;
-            if(page.questions.length == question.curPassageNumber){
+            if(page.questions.length - 1 == question.curPassageNumber){
                 $('.readingLastPage').prop("disabled",true);
                 $('.readingNextPage').prop("disabled",true);
                 $('.readingPrevPage').prop("disabled",false);
