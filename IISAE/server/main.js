@@ -260,6 +260,7 @@ Meteor.methods({
     addModuleItem(input){
         moduleId = input.moduleId;
         field = input.field;
+        console.log(field);
         curModule = Modules.findOne({_id: moduleId});
         text = "curModule." + field;
         newField = eval(text);
@@ -350,6 +351,13 @@ Meteor.methods({
             if(addedField == "answers"){
                 data = {
                     answer:"New",
+                }
+                text = "curModule." + field + "=[data]";
+                eval(text);
+            }
+            if(addedField == "passages"){
+                data = {
+                    text:"New",
                 }
                 text = "curModule." + field + "=[data]";
                 eval(text);

@@ -195,6 +195,20 @@ Template.module.helpers({
         };
         if(question.type == "reading"){
             question.typeReading = true;
+            question.curPassageNumber = t.curReadingPage.get();
+            question.curPassage = question.passages[question.curPassageNumber].text;
+            if(page.questions.length == question.curPassageNumber){
+                $('.readingLastPage').prop("disabled",true);
+                $('.readingNextPage').prop("disabled",true);
+                $('.readingPrevPage').prop("disabled",false);
+                $('.contine').prop("disabled",false);
+            } 
+            if(question.curPassageNumber == 0){
+                $('.readingLastPage').prop("disabled",false);
+                $('.readingNextPage').prop("disabled",false);
+                $('.readingPrevPage').prop("disabled",true);
+            } 
+
         };
         if(question.type == "wordbank"){
             question.typeWordBank = true;
@@ -295,6 +309,25 @@ Template.module.events({
             autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
             readTTS(t, response, autoTutorPromptCharacterVoice);
          }
+    },
+    'click .readingNextPage': function(event){
+        const t = Template.instance();
+        curPage = t.curReadingPage.get();
+        nextPage = curPage + 1;
+        t.curReadingPage.set(nextPage);
+    },
+    'click .readingPrevPage': function(event){
+        const t = Template.instance();
+        curPage = t.curReadingPage.get();
+        nextPage = curPage - 1;
+        t.curReadingPage.set(nextPage);
+    },
+    'click .readingLastPage': function(event){
+        const t = Template.instance();
+        page = Modules.findOne().pages[parseInt(this.pageId)];
+        curPage = t.curReadingPage.get();
+        nextPage = page.questions.length;
+        t.curReadingPage.set(nextPage);
     },
     'click .btn-wordbank-add': function(event){
         event.preventDefault();
@@ -719,6 +752,7 @@ Template.module.onCreated(function(){
     this.questionType = new ReactiveVar("");
     this.pageType = new ReactiveVar("");
     this.feedback = new ReactiveVar(false);
+    this.curReadingPage = new ReactiveVar(0);
     this.statsData = new ReactiveVar({});
     this.audioActive = new ReactiveVar(false);
     this.audioObjects = new ReactiveVar([]);

@@ -423,6 +423,9 @@
                     <td>
                         <a id="delete-item" data-field="pages[{{this.parent}}].questions[{{@index}}]">Delete</a><br>
                         <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].autoTutorScript">Add AutoTutor</a>
+                        {{#if this.isReading}}
+                        <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].passages">Add Passage</a>
+                        {{/if}}
                         {{#if this.isMultiChoice}}
                         <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answers">Add Choice</a>
                         {{/if}}
@@ -445,6 +448,17 @@
                     <td></td>
                     <td>
                         <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].answerCorpera[{{@index}}]">Delete Answer</a><br>
+                    </td>
+                </tr>
+                {{/each}}
+                {{#each this.passages}}
+                <tr>
+                    <td>Passage-></td>
+                    <td><b>Text: </b>{{this.text}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].passages[{{@index}}].text" data-value="{{this.text}}"> Edit</a><br>
+                  </td>
+                    <td></td>
+                    <td>
+                        <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].passages[{{@index}}]">Delete Passage</a><br>
                     </td>
                 </tr>
                 {{/each}}
