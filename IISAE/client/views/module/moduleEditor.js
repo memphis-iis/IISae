@@ -28,6 +28,7 @@ Template.moduleEditor.helpers({
                         questions[j].isMultiChoice = false;
                         questions[j].isQuestionSelectBoard = false;
                         questions[j].isWordBank = false;
+                        questions[j].isReading = false;
                         questions[j].enableLSA = curModule.enableLSA;
                         if(questions[j].autoTutorScript){
                             autoTutorScripts = pages[i].questions[j].autoTutorScript;
@@ -37,31 +38,16 @@ Template.moduleEditor.helpers({
                                 pages[i].questions[j].autoTutorScript[k].characterChoices = curModule.autoTutorCharacter;
                             }
                         }
-                        if(questions[j].type == "combo"){ 
-                            questions[j].isCombo = true;
-                            questions[j].showTextOptions = false;
-                            if(typeof questions[j].fields !== "undefined"){
-                                fields = questions[j].fields;
-                                for(k=0;k < fields.length;k++){
-                                    fields[k].showTextOptions = true;
-                                    fields[k].page = i;
-                                    fields[k].parent = j;
-                                    fields[k].isMultiChoice = false;
-                                    if(fields[k].type == "multiChoice"){
-                                        fields[k].isMultiChoice = true;
-                                        fields[k].showTextOptions = false;
-                                        if(typeof fields[k].answers !== "undefined"){
-                                            answers = fields[k].answers;
-                                            for(l=0;l < answers.length; l++){
-                                                answers[l].page = i;
-                                                answers[l].question = j;
-                                                answers[l].parent = k;
-                                            }
-                                        }
-                                    }
+                        if(questions[j].type == "reading"){ 
+                            questions[j].isReading = true;
+                            passages = questions[j].passages;
+                            if(typeof passages !== "undefined"){
+                                for(k = 0; k < passages.length; k++){
+                                    passages[k].parent = j;
+                                    passages[k].page = i;
                                 }
                             }
-                        } 
+                        }
                         if(questions[j].type == "questionSelectionBoard"){
                             questions[j].isQuestionSelectBoard = true;
                         }
