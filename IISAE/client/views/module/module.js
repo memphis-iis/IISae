@@ -154,21 +154,29 @@ Template.module.helpers({
             }
             console.log(moduleData.questionBoardAnswered);
             if(moduleData.questionBoardAnswered){
-                console.log("questions already answered");
                 for(questionIndex of moduleData.questionBoardAnswered){
-                    console.log("Question answered",questionIndex, typeof questionIndex);
                     questionIndex = parseInt(questionIndex);
                     let findIndex = questionsAvailable.map(e => e.index).indexOf(questionIndex);
-                    console.log("Found Index ", findIndex);
                     questionsAvailable.splice(findIndex, 1);
                 }
             }
-            questionsAvailable.shift()
-            let shuffled = questionsAvailable
-                .map(value => ({ value, sort: Math.random() }))
-                .sort((a, b) => a.sort - b.sort)
-                .map(({ value }) => value)
-            question.availableQuestions = shuffled;
+            question.availableQuestions = [];
+            for(questionIndex in questionsAvailable){
+                category = questionsAvailable[questionIndex].category;
+                console.log(category);
+                if(category){
+                    if(!question.availableQuestions.categories){
+                        question.availableQuestions.categories  = [{category: category, questions: []}];
+                    }
+                    if(question.availableQuestions.categories.map(e => e.category).indexOf(category) == - 1){
+                        question.availableQuestions.categories.push({category: category, questions: []})
+                    }
+                    categoryIndex = question.availableQuestions.categories.map(e => e.category).indexOf(category);
+                    console.log("Rusty",question.availableQuestions);
+                    question.availableQuestions.categories[categoryIndex].questions.push(questionsAvailable[questionIndex]);
+                }
+            }
+            console.log(question.availableQuestions);
         };
         if(question.type == "scrollbar"){
             question.typeScroll = true;

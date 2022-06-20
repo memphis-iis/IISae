@@ -178,9 +178,16 @@
                     <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
                     {{/if}}
                     <form>
-                        {{#each question.availableQuestions}}
-                        <button  class="btn btn-primary text-nowrap selectionboard" data-index="{{this.index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.value}}</button>
-                        {{/each}}
+                        <div class="row">
+                           {{#each question.availableQuestions.categories}}
+                                <div class="col-xs-2 text-center">
+                                    <h4>{{this.category}}</h4>
+                                    {{#each this.questions}}
+                                        <button  class="btn btn-primary text-nowrap selectionboard" data-index="{{this.index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.value}}</button><br>
+                                    {{/each}}
+                                </div>
+                            {{/each}}
+                        </div>
                     </form>
                     <br>
                     <button id="continue" class="btn btn-primary continue" disabled>Continue <span class="glyphicon glyphicon-play"></span></button>

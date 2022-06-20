@@ -398,6 +398,7 @@
                         {{/if}}
                         {{/if}}
                         {{#if this.isMultiChoice}}
+                        <b>Category: </b>{{this.category}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].category" data-value="{{this.category}}"> Edit</a><br>
                         <b>Value: </b>{{this.value}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
                         <b>Correct Answer:</b>
                         <select id="type" class="combo-save" data-field="pages[{{this.parent}}].questions[{{@index}}].correctAnswer">
@@ -454,7 +455,7 @@
                 {{#each this.passages}}
                 <tr>
                     <td>Passage-></td>
-                    <td><b>Text: </b>{{this.text}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].passages[{{@index}}].text" data-value="{{this.text}}"> Edit</a><br>
+                    <td><b>Text: </b>{{this.text}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].passage[{{@index}}].text" data-value="{{this.text}}"> Edit</a><br>
                   </td>
                     <td></td>
                     <td>
