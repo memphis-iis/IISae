@@ -161,6 +161,25 @@
                     </div>
                     <br>
                     {{/if}}
+                    {{#if question.typeImageClick}}
+                    {{#if module.autoTutorReadsPrompt}}
+                    {{else}}
+                    <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                    {{/if}}
+                    {{#if question.image}}
+                    <img class="img-responsive center-block module-img" id="imageClickOver" src="{{question.image}}" alt="Your Alt Text">
+                    {{/if}}
+
+                    <form>
+                        {{#each question.answers}}
+                            <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue overlay" data-group="{{this.group}}" style="white-space: normal; position: absolute; top: {{this.yCoord}}px; left:{{this.xCoord}}px; width: {{this.width}}px; height: {{this.height}}px" id="{{@index}}" value="{{this.value}}" name=""></button>
+                        {{/each}}
+                    </form>
+                    <div class="alert" id="refutation" role="alert" hidden>
+                    Message: {{feedback.message}}
+                    </div>
+                    <br>
+                    {{/if}}
                     {{#if question.typeQuestionSelectBoard}}
                     {{#if module.autoTutorReadsPrompt}}
                     {{else}}

@@ -379,6 +379,7 @@
                                 <option>html</option>
                                 <option>video</option>
                                 <option>reading</option>
+                                <option>imageClick</option>
                                 <option>autotutorscript</option>
                             </select>
                         </div>
@@ -398,6 +399,17 @@
                         {{/if}}
                         {{/if}}
                         {{#if this.isMultiChoice}}
+                        <b>Category: </b>{{this.category}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].category" data-value="{{this.category}}"> Edit</a><br>
+                        <b>Value: </b>{{this.value}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
+                        <b>Correct Answer:</b>
+                        <select id="type" class="combo-save" data-field="pages[{{this.parent}}].questions[{{@index}}].correctAnswer">
+                            <option>{{this.correctAnswer}}</option>
+                            {{#each this.answers}}
+                            <option>{{this.answer}}</option>
+                            {{/each}}
+                        </select><br>
+                        {{/if}}
+                        {{#if this.isImageClick}}
                         <b>Category: </b>{{this.category}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].category" data-value="{{this.category}}"> Edit</a><br>
                         <b>Value: </b>{{this.value}}<a id="open-editor" data-field="pages[{{this.parent}}].questions[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
                         <b>Correct Answer:</b>
@@ -429,6 +441,9 @@
                         {{/if}}
                         {{#if this.isMultiChoice}}
                         <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answers">Add Choice</a>
+                        {{/if}}
+                        {{#if this.isImageClick}}
+                        <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answers">Add Button</a>
                         {{/if}}
                         {{#if this.isWordBank}}
                         <br> <a id="add-item" data-field="pages[{{this.parent}}].questions[{{@index}}].answers">Add Word or Phrase</a>
@@ -520,6 +535,31 @@
                     </tr>
                     {{/each}}
                 {{/if}}
+                {{#if this.isImageClick}}
+                {{#each this.answers}}
+                <tr>
+                    <td>
+                        Answer -->
+                    </td>
+                    <td>
+                        {{this.answer}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].answer" data-value="{{this.answer}}"> Edit</a><br>
+                    </td>
+                    <td>
+                        <b>Value:</b>{{this.value}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].value" data-value="{{this.value}}"> Edit</a><br>
+                        <b>Feedback:</b>{{this.feedback}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].feedback" data-value="{{this.feedback}}"> Edit</a><br>
+                        <b>Button Coordinate X:</b>{{this.xCoord}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].xCoord" data-value="{{this.xCoord}}"> Edit</a><br>
+                        <b>Button Coordinate Y:</b>{{this.yCoord}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].yCoord" data-value="{{this.yCoord}}"> Edit</a><br>
+                        <b>Button Width in Pixels:</b>{{this.width}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].width" data-value="{{this.width}}"> Edit</a><br>
+                        <b>Button Height in Pixels:</b>{{this.height}}<a id="open-editor" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}].height" data-value="{{this.height}}"> Edit</a><br>
+
+
+                    </td>
+                    <td>
+                        <a id="delete-item" data-field="pages[{{this.page}}].questions[{{this.parent}}].answers[{{@index}}]">Delete</a>
+                    </td>
+                </tr>
+                {{/each}}
+            {{/if}}
             </tbody>
         </table>
         </div>
