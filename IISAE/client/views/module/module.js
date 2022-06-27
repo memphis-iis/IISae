@@ -534,6 +534,7 @@ Template.module.events({
             data.questionId = thisQuestion;
             data.response =  response;
             data.responseTimeStamp = Date.now().toString();
+            data.result = ""
             if(curModule.autoTutorReadsResponse && response){
                 autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
                 autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;

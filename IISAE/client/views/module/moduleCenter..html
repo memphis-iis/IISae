@@ -10,7 +10,11 @@
                 {{#if this.hasModules}}
                     {{#each this.flow}}
                         <div class="module" style="margin-top:5px;">
-                            <button id="{{this.moduleId}}" class="startModule btn btn-primary startAssessment">{{this.title}}</button>
+                            <button id="{{this.moduleId}}" class="startModule btn btn-primary startAssessment">{{this.title}} 
+                                {{#if this.isPractice}}
+                                    <i>(practice)</i>
+                                {{/if}}
+                            </button>
                         </div>
                     {{/each}}
                 {{else}}

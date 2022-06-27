@@ -99,7 +99,11 @@
                 <tbody>
                 {{#each selectedClass.flow}}
                     <tr>
-                        <td>{{this.title}}</td>
+                        <td>{{this.title}}
+                            {{#if this.isPractice}}
+                                <i>(practice)</i>
+                            {{/if}}
+                        </td>
                         <td>
                             {{#if this.first}}
                             {{else}}
@@ -128,7 +132,8 @@
                 {{#each module}}
                     <tr>
                         <td>{{this.title}}</td>
-                        <td><a id="assign-module" data-module-id="{{this._id}}">Add to Class Flow</a><br>
+                        <td><a id="assign-module" data-module-id="{{this._id}}">Add to Class Flow as Trial</a><br>
+                        <a id="assign-module-practice" data-module-id="{{this._id}}">Add to Class Flow as Practice</a><br>
                         <a id="assign-module-to-all" data-module-id="{{this._id}}">Assign to All Students</a></td>
                     </tr>
                 {{/each}}

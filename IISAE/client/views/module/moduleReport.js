@@ -12,29 +12,19 @@ Template.moduleReport.helpers({
         return data;
     },
 
-    'pages': function(){
+    'responses': function(){
         resultsData = ModuleResults.findOne();
         modData = Modules.findOne({_id: resultsData.moduleId})
-        responses = [];
-        for(i = 0; i < resultsData.responses.length; i++){
-            if(modData.pages[resultsData.responses[i].pageId].questions[resultsData.responses[i].questionId].type != "combo"){
-                data = {
-                    question: modData.pages[resultsData.responses[i].pageId].questions[resultsData.responses[i].questionId].prompt,
-                    response: resultsData.responses[i].response[0]
-                }
-                responses.push(data)
-            } else {
-                comboQuestions = modData.pages[resultsData.responses[i].pageId].questions[resultsData.responses[i].questionId].fields;
-                for(j = 0; j < comboQuestions.length; j++){
-                    data = {
-                        question: comboQuestions[j].text,
-                        response: resultsData.responses[i].response[j]
-                    }
-                    responses.push(data);
-                }
+        for(result of resultsData.responses){
+            pageId = result.pageId;
+            questionId = result.questionId;
+            if(typeof pageId != "undefined" && typeof questionId != "undefined"){
+                console.log("here");
+                result.correctanswer = modData.pages[result.pageId].questions[result.questionId].correctAnswer || "N/A";
+                result.prompt = modData.pages[result.pageId].questions[result.questionId].prompt || "N/A";
             }
         }
-        return responses;
+        return resultsData.responses;
     },
 })
 

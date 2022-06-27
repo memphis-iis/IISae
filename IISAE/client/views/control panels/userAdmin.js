@@ -70,30 +70,29 @@ Template.usersAdmin.helpers({
         const t = Template.instance();
         userId = t.selectedUser.get();
         data = ModuleResults.find({userId: userId}).fetch();
-        results = [];
-        for(i = 0; i < data.length; i++){
-            moduleInfo = Modules.findOne({_id: data[i].moduleId})
-            dateAccessed = new Date(0);
-            dateAccessed.setUTCSeconds(parseInt(data[i].lastAccessed))
-            completed = false;
-            if(data[i].nextPage == "completed"){
-                completed = true;
+        for(trial of data){
+            console.log(trial, userId);
+            if(trial.moduleId){
+                moduleInfo = Modules.findOne({_id: trial.moduleId});
+                if(moduleInfo){
+                    completed = false;
+                    if(trial.nextPage == "completed"){
+                        completed = true;
+                    }
+                    console.log(trial);
+                    dateAccessed = new Date(0);
+                    dateAccessed.setUTCSeconds(parseInt(trial.lastAccessed));
+                    trial.id = trial._id;
+                    trial.title = moduleInfo.title;
+                    trial.dateAccessed = dateAccessed;
+                    trial.lastPage = trial.nextPage;
+                    trial.completed = completed;
+                    trial.totalPages = moduleInfo.pages.length;
+                    trial.percentDone = (trial.nextPage / moduleInfo.pages.length * 100).toFixed(0);
+                }
             }
-            dataToPush = {
-                id: data[i]._id,
-                lastAccessed: dateAccessed,
-                title: moduleInfo.title,
-                lastPage: data[i].nextPage,
-                totalPages : moduleInfo.pages.length,
-                percentDone: (data[i].nextPage / moduleInfo.pages.length * 100).toFixed(0),
-                completed: completed
-            };
-            results.push(dataToPush);
         }
-        if(results.length == 0){
-            results = false;
-        }
-        return results;
+        return data;
 },
     'modulesAvailable': function() {
         data = Modules.find().fetch();
