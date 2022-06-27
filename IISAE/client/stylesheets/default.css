@@ -118,3 +118,12 @@ img #logo-color{
     width:2%;
     background-color: #74c3f0;
 }
+.overlay{
+    background-color: rgba(0,0, 0, 0);
+    color:white;
+    border-width: 3px;
+    border-color: white;
+}
+.overlay:hover{
+    background-color: rgba(0,0, 0, .5);
+}

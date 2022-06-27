@@ -201,6 +201,18 @@ Template.module.helpers({
                 question.answers = shuffled;
             }
         };
+        if(question.type == "imageClick"){
+            question.typeImageClick = true;
+            imagePos = $('#imageClickOver').offset();
+            answers = question.answers;
+            if(imagePos){
+                for(answer of answers){
+                    answer.xCoord = imagePos.left + parseInt(answer.xCoord);
+                    answer.yCoord = imagePos.top + parseInt(answer.yCoord);
+                }
+            }
+            question.answers = answers
+        };
         if(question.type == "reading"){
             question.typeReading = true;
             question.curPassageNumber = t.curReadingPage.get();
@@ -246,25 +258,6 @@ Template.module.helpers({
         };
         if(question.type == "dropdown"){
             question.typeDropDown = true;
-        };
-        if(question.type == "combo"){
-            question.typeCombo= true;
-            fields = question.fields;
-            for(i = 0; i < fields.length; i++){
-                if(fields[i].type == "blank"){
-                    fields[i].typeBlank = true;
-                };
-                if(fields[i].type == "longtext"){
-                    fields[i].typeLongText = true;
-                };
-                if(fields[i].type == "multiChoice"){
-                    fields[i].typeMultiChoice = true;
-                    for(j = 0; j < fields[i].answers.length; j++){
-                        fields[i].answers[j].group = i;
-                    }
-                };
-                
-            }
         };
         t.questionType.set(question.type);
         question.length = question.length;
@@ -509,6 +502,15 @@ Template.module.events({
                         refutation = thisQuestionData.answers[index].feedback;
                     }
                 }
+                if(questionData.type == "imageClick"){
+                    response = $(event.target).html();
+                    answerValue = parseInt($(event.target).val());
+                    index = event.target.getAttribute('id');
+                    console.log(thisQuestion, index)
+                    if(thisQuestionData.answers[index].feedback != "" || typeof thisQuestionData.answers[index].feedback != "undefined"){
+                        refutation = thisQuestionData.answers[index].feedback;
+                    }
+                }
                 if(questionData.type == "longtext"){
                     response = $('.textareaInput').val();
                 }
@@ -558,6 +560,24 @@ Template.module.events({
                         }
                     }
                 }
+                if(question.type == "imageClick"){
+                    for(character of curModule.autoTutorCharacter){
+                            if(character.answersQuestions){
+                                characterResponse = questionData.answers[Math.floor(Math.random()*questionData.answers.length)];
+                                characterAnswer = characterResponse.answer
+                                characterSpeech = "I think it is " + characterAnswer
+                                characterRepsonseData = {
+                                    name: character.name,
+                                    response: characterAnswer,
+                                    voice: character.voice,
+                                    value: characterResponse.value,
+                                    speech: characterSpeech,
+                                    art: character.art
+                                }
+                                characterResponses.push(characterRepsonseData);
+                            }
+                        }
+                    }
             moduleData.responses[moduleData.responses.length - 1]=data;
             moduleData.characterResponses[moduleData.responses.length - 1] = characterResponses;
             moduleData.nextPage = thisPage;
