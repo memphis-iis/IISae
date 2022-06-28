@@ -63,7 +63,6 @@ Template.modulesAdmin.helpers({
                 data[i].owned = true;
             }
             if(data[i].public == false && data[i].owner != Meteor.userId() ){
-                data[i].status += "Don't Look up. That's what they want."
                 data.slice(i,1);
             }
             if(data[i].public == true){
