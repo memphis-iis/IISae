@@ -5,13 +5,13 @@
         Last Accessed: {{generalinfo.lastAccessed}}<br>
        </p>
        <div class="d-grid gap-2 d-sm-flex">
+        <h3>Answer Sheet</h3>
         <table class="table" id="moduleList">
             <thead>
                 <th scope="col" width="20%">Activity</th>
                 <th scope="col" width="20%">Question</th>
                 <th scope="col" width="20%">Correct Answer</th>
                 <th scope="col" width="20%">Response</th>
-                <th scope="col" width="20%">Result</th>
             </thead>
             <tbody>
                 {{#each responses}}
@@ -20,7 +20,27 @@
                         <td>{{this.prompt}}</td>
                         <td>{{this.correctanswer}}</td>
                         <td>{{this.response}}</td>
-                        <td>{{this.result}}</td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <h3>Timeline</h3>
+        <table class="table" id="moduleList">
+            <thead>
+                <th scope="col" width="20%">Location</th>
+                <th scope="col" width="20%">Time Elapsed (seconds)</th>
+                <th scope="col" width="15%">Actor</th>
+                <th scope="col" width="20%">Verb</th>
+                <th scope="col" width="25%">Data</th>
+            </thead>
+            <tbody>
+                {{#each timeline}}
+                    <tr>
+                        <td>Page: {{this.pageId}} / Activity: {{this.questionId}}</td>
+                        <td>{{this.time}}</td>
+                        <td>{{this.actor}}</td>
+                        <td>{{this.verb}}</td>
+                        <td>{{this.data}}</td>
                     </tr>
                 {{/each}}
             </tbody>
