@@ -84,6 +84,13 @@ Template.classAdmin.events({
         addedModule = $(event.target).data("module-id");
         Meteor.call('assignModuleToClass',selectedClass,addedModule);
     },
+    'click #assign-module-practice': function(event){
+        const t = Template.instance();
+        selectedClass = t.classSelected.get();
+        addedModule = $(event.target).data("module-id");
+        isPractice = true;
+        Meteor.call('assignModuleToClass',selectedClass,addedModule,isPractice);
+    },
     'click #remove-module': function(event){
         const t = Template.instance();
         selectedClass = t.classSelected.get();

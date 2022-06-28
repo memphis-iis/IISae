@@ -27,8 +27,6 @@ Router.route('/api',{
                     lastname: 0,
                     emails: 0,
                     username: 0,
-                    role: 0,
-                    supervisorInviteCode: 0,
                     services: 0,
                     organization: 0,
                     api: 0
@@ -36,7 +34,7 @@ Router.route('/api',{
             }).fetch();
             userListResponse = []
             for(i = 0; i < userlist.length; i++){
-                userModules = Modules.find({userId: userlist[i]._id}).fetch();
+                userModules = ModuleResults.find({userId: userlist[i]._id}).fetch();
                 curUser = userlist[i];
                 curUser.modules = JSON.parse(JSON.stringify(userModules));
                 userListResponse.push(curUser);

@@ -158,19 +158,19 @@
             <table class="table" id="moduleList">
                 <thead>
                     <th scope="col" width="40%">Date Last Accessed</th>
-                    <th scope="col" width="40%">Module</th>
-                    <th scope="col" width="15%">Progress</th>
+                    <th scope="col" width="30%">Module</th>
+                    <th scope="col" width="25%">Progress</th>
                     <th scope="col" width="5%">Results</th>
                 </thead>
                 <tbody>
                     {{#each modules}}
                         <tr>
-                            <td>{{this.lastAccessed}}</td>
+                            <td>{{this.dateAccessed}}</td>
                             <td>{{this.title}}</td>
                             {{#if this.completed}}
                             <td>Completed</td>
                             {{else}}
-                            <td>Page {{this.lastPage}} of {{this.totalPages}} / {{this.percentDone}}% </td>
+                            <td>Page {{this.lastPage}} of {{this.totalPages}} / {{this.percentDone}}%, Score: {{this.score}}</td>
                             {{/if}}
                             <td><a href="/moduleReport/{{this.id}}">Report</a></td>
                         </tr>
