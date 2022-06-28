@@ -380,13 +380,10 @@ Meteor.methods({
             });
         return results;
     },
-    initiateNewResponse: function (moduleData){
-        moduleData.lastAccessed = Date.now();
-        moduleData.nextPage = 0;
-        moduleData.score = 0;
+    updateModuleData: function (moduleData){
         ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
     },
-    saveModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue,charResponses){
+    evaluateModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue,charResponses){
         response = response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
@@ -439,7 +436,6 @@ Meteor.methods({
             }
             if(enableFeedback && !skipFeedback){
                 answerCheck = answerAssess(correctAnswer, response).isCorrect;
-                moduleData.responses[moduleData.responses.length -1 ].result = answerCheck || "N/A";
                 feedback.isCorrect = answerCheck;
                 for(let charResponse of charResponses){
                     console.log(charResponse);
@@ -776,14 +772,13 @@ Meteor.methods({
         } 
         Classes.insert(dataNew);
     },
-    assignModuleToClass(classId,moduleId, isPractice=false){
+    assignModuleToClass(classId,moduleId){
         moduleName = Modules.findOne({"_id":moduleId}).title;
         prevFlow = Classes.findOne({"_id":classId}).flow;
         newFlow = prevFlow;
         data = {
             moduleId: moduleId,
-            title: moduleName,
-            isPractice: isPractice
+            title: moduleName
         }
         newFlow.push(data);
         Classes.update({"_id":classId}, {$set:{flow: newFlow}});

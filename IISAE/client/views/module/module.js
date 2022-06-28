@@ -16,13 +16,14 @@ Template.module.onRendered(function (){
     $('#visualizer').hide();
     moduleData = Modules.findOne();
     let moduleId = Meteor.user().curModule.moduleId;
+    const t = Template.instance();
     moduleResults = ModuleResults.findOne({_id: moduleId});
     data = {
-        pageRendered: Date.now()
+        events: [],
+        responses: []
     }
     moduleResults.responses.push(data);
-    Meteor.call('initiateNewResponse',moduleResults);
-    const t = Template.instance();
+    Meteor.call('updateModuleData',moduleResults);
     autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
     autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
     autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
@@ -294,6 +295,8 @@ Template.module.events({
     'keypress #response' : function(event){
         event.preventDefault();
         if (event.keyCode === 13) {
+            const t = Template.instance();
+            recordEvent(t,"keyboardEnterkey");
             $(".continue").click();
         } else {
             value = $('#response').val();
@@ -305,6 +308,7 @@ Template.module.events({
         response = $(event.target).html();
         curModule = Modules.findOne();
         const t = Template.instance();
+        recordEvent(t,"multiChoiceMouseOver",Meteor.userId(),{response: response});
         if(curModule.autoTutorReadsResponse && response){
             autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
             autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
@@ -313,18 +317,21 @@ Template.module.events({
     },
     'click .readingNextPage': function(event){
         const t = Template.instance();
+        recordEvent(t,"readNextPage");
         curPage = t.curReadingPage.get();
         nextPage = curPage + 1;
         t.curReadingPage.set(nextPage);
     },
     'click .readingPrevPage': function(event){
         const t = Template.instance();
+        recordEvent(t,"readPrevPage");
         curPage = t.curReadingPage.get();
         nextPage = curPage - 1;
         t.curReadingPage.set(nextPage);
     },
     'click .readingLastPage': function(event){
         const t = Template.instance();
+        recordEvent(t,"readLastPage");
         page = Modules.findOne().pages[parseInt(this.pageId)];
         curPage = t.curReadingPage.get();
         nextPage = page.questions.length;
@@ -340,18 +347,22 @@ Template.module.events({
         } else {
             array = array + "," +  addToArray;
         }
+        const t = Template.instance();
+        recordEvent(t,"addWordBankItemToResponse",Meteor.userId(),{response: addToArray});
         $(".textBank").val(array);
     },
     'click .btn-wordbank-clear': function(event){
+        const t = Template.instance();
         event.preventDefault();
+        recordEvent(t,"clearWordBankResponse");
         $(".textBank").val("");
     },
     'click .btn-read': function (event){
-        console.log('reading prompt text')
+        const t = Template.instance();
+        recordEvent(t,"clickReadPromptButton");
         moduleData = Modules.findOne();
         let moduleId = Meteor.user().curModule.moduleId;
         moduleResults = ModuleResults.findOne({_id: moduleId});
-        const t = Template.instance();
         autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
         autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
         autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
@@ -362,10 +373,11 @@ Template.module.events({
         readTTS(t, textToReadStripped, autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
     },
     'click .btn-repeat': function (event){
+        const t = Template.instance();
+        recordEvent(t,"clickRepeatConversationButton");
         moduleData = Modules.findOne();
         let moduleId = Meteor.user().curModule.moduleId;
         moduleResults = ModuleResults.findOne({_id: moduleId});
-        const t = Template.instance();
         autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
         autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
         autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
@@ -424,6 +436,8 @@ Template.module.events({
         event.preventDefault();
         moduleData = ModuleResults.findOne({_id: moduleId});
         nextQuestion =  event.target.getAttribute("data-index");
+        const t = Template.instance();
+        recordEvent(t,"clickSelectionBoardButton",Meteor.userId(),{nextQuestion: nextQuestion});
         moduleId = Modules.findOne()._id;
         thisPage = Meteor.user().curModule.pageId;
         moduleData.nextQuestion = nextQuestion;
@@ -434,14 +448,16 @@ Template.module.events({
         window.location.href = target;
     },
     'click .continue': async function(event) {
-        $(':button').prop('disabled', true); 
         const t = Template.instance();
+        recordEvent(t,"clickContinue");
+        $(':button').prop('disabled', true); 
         event.preventDefault();
         curModule = Modules.findOne()
         command = t.command.get();
         target = "";
         moduleId = Meteor.user().curModule.moduleId;
         moduleData = ModuleResults.findOne({_id: moduleId});
+        data = moduleData.responses[moduleData.responses.length - 1];
         moduleData.lastAccessed = Date.now().toString();
         thisPage = Meteor.user().curModule.pageId;
         thisQuestion = parseInt(Meteor.user().curModule.questionId);
@@ -530,13 +546,13 @@ Template.module.events({
                 response = transcript;
                 answerValue = 1;
             }
-            data = moduleData.responses[moduleData.responses.length - 1];
             data.questionType = t.questionType.get();
             data.pageId =  thisPage;
             data.questionId = thisQuestion;
             data.response =  response;
             data.responseTimeStamp = Date.now().toString();
             data.result = ""
+            recordEvent(t,"responseSelect", Meteor.userId(), data.response);
             if(curModule.autoTutorReadsResponse && response){
                 autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
                 autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
@@ -584,10 +600,11 @@ Template.module.events({
             moduleData.nextPage = thisPage;
             moduleData.nextQuestion = thisQuestion + 1;
             console.log(response);
-            Meteor.call("saveModuleData", moduleData, curModule._id , thisPage, thisQuestion, response, answerValue, characterResponses, function(err, res){
+            Meteor.call("evaluateModuleData", moduleData, curModule._id , thisPage, thisQuestion, response, answerValue, characterResponses, function(err, res){
                 feedback = t.feedback.get();
                 type = "danger"
                 message = refutation || question.incorrectFeedback || "you are not correct."
+                
                 if(res != "disabled"){
                     if(res.isCorrect == true){ 
                         type = "success";
@@ -601,11 +618,12 @@ Template.module.events({
                             message = "No, " + charResponse.character + " you are incorrect." + message;
                         }
                     }
-                    if(res)
+                    recordEvent(t,"evaluate", "system", {result: res});
                     addedClass = 'alert-' + type;
                     $('#refutation').addClass(addedClass);
                     $('#refutation').text(message);
                     $('#refutation').show();
+                    recordEvent(t,"showRefutation","system",{refutation:message});
                     if(curModule.autoTutorReadsRefutation){
                         autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
                         autoTutorCharacter = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts);
@@ -615,6 +633,8 @@ Template.module.events({
                         readTTS(t, message, autoTutorCharacter.voice, autoTutorCharacter.name, autoTutorCharacter.art);
                     }
                 }
+                moduleData.responses[moduleData.responses.length - 1].result = res.isCorrect || "disabled";
+                
             });
             Meteor.setInterval(async function(){
                 audioActive = t.audioActive.get();
@@ -729,6 +749,10 @@ Template.module.events({
                             Meteor.call("overrideUserDataRoutes",moduleData); 
                         }
                     }
+                    recordEvent(t,"routeToNext", "system", {target:target});
+                    events = t.events.get();
+                    moduleData.responses[moduleData.responses.length - 1].events = events;
+                    Meteor.call("overrideUserDataRoutes",moduleData); 
                     console.log("ROUTE:", target);
                     window.location.href = target;
                 }
@@ -788,11 +812,14 @@ Template.module.onCreated(function(){
     this.audioToSave = new ReactiveVar("");
     this.transcript = new ReactiveVar("");
     this.TTSTracPlaying = new ReactiveVar(0);
+    this.events = new ReactiveVar([]);
+    
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function readTTS(template, message, voice, character,characterArt,scriptAlt){
+    recordEvent(template,"addAutoTutorScriptToTTSQueue","system",{character:character, text:message});
     let curModule = Modules.findOne();
     let moduleId =  curModule._id;
     let audioActive = template.audioActive.get();
@@ -846,6 +873,7 @@ async function playAudio(template){
     window.currentAudioObj = audioObj;
     window.currentAudioObj.addEventListener('ended', function(){
         TTSTracPlaying++;
+        recordEvent(template,"autoTutorScriptLineEnd", "system");
         template.TTSTracPlaying.set(TTSTracPlaying);
         if(audioObjs.length > TTSTracPlaying){
             sleep(1000).then(function(){
@@ -861,6 +889,7 @@ async function playAudio(template){
         }
         else{
             sleep(1000).then(function(){
+                recordEvent(template,"autoTutorScriptQueueEnd", "system");
                 questionType = template.questionType.get();
                 console.log(questionType);
                 template.audioActive.set(false);
@@ -889,9 +918,11 @@ async function playAudio(template){
             );
         }
     });
+    recordEvent(template,"autoTutorScriptAudioStart", "system");
     window.currentAudioObj.play();
 }
 function setupRecording(template){
+    recordEvent(template,"initializeVoiceRecognition", "system");
     console.log("Setting up audio");
     /// Setup Audio Recording
     template = template;
@@ -918,6 +949,7 @@ function setupRecording(template){
         }
 
         async function processAudio(chunks) {
+            recordEvent(template,"processVoiceRecognition", "system");
             $('#audiovis').hide();
             var blob = new Blob(chunks, {
               type: "audio/webm"
@@ -938,6 +970,7 @@ function setupRecording(template){
             } else {
                 recorder.stop();
                 transcript = results.responses[results.responses.length - 1].transcription[0].alternatives[0].transcript;
+                recordEvent(template,"voiceRecognitionTranscript", "system", {transcript:transcript});
                 if(transcript != "" || typeof transcript !== "undefined"){
                     stream.getTracks() // get all tracks from the MediaStream
                     forEach( track => track.stop() ); // stop each of them
@@ -999,4 +1032,15 @@ function visualize(stream){
         canvasCtx.stroke();
 
     }
+}
+function recordEvent(template,verb,actor,data){
+    let events = template.events.get();
+    eventToPass = {
+        actor: actor || Meteor.userId(),
+        verb: verb,
+        data: data || "none",
+        time: Date.now(),
+    }
+    events.push(eventToPass)
+    template.events.set(events);
 }
