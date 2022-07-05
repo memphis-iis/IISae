@@ -216,19 +216,27 @@ Template.module.helpers({
         };
         if(question.type == "reading"){
             question.typeReading = true;
-            question.curPassageNumber = t.curReadingPage.get();
-            question.curPassage = question.passages[question.curPassageNumber].text;
-            if(page.questions.length - 1 == question.curPassageNumber){
-                $('.readingLastPage').prop("disabled",true);
-                $('.readingNextPage').prop("disabled",true);
-                $('.readingPrevPage').prop("disabled",false);
-                $('.contine').prop("disabled",false);
-            } 
-            if(question.curPassageNumber == 0){
-                $('.readingLastPage').prop("disabled",false);
-                $('.readingNextPage').prop("disabled",false);
-                $('.readingPrevPage').prop("disabled",true);
-            } 
+            if(!question.readingIsPagePrompt){
+                question.curPassageNumber = t.curReadingPage.get();
+                question.curPassage = question.passages[question.curPassageNumber].text;
+                question.curPage = page.prompt;
+                if(page.questions.length - 1 == question.curPassageNumber){
+                    $('.readingLastPage').prop("disabled",true);
+                    $('.readingNextPage').prop("disabled",true);
+                    $('.readingPrevPage').prop("disabled",false);
+                    $('.contine').prop("disabled",false);
+                } 
+                if(question.curPassageNumber == 0){
+                    $('.readingLastPage').prop("disabled",false);
+                    $('.readingNextPage').prop("disabled",false);
+                    $('.readingPrevPage').prop("disabled",true);
+                } 
+            } else {
+                $('.readingLastPage').hide();
+                $('.readingNextPage').hide();
+                $('.readingPrevPage').hide();
+                question.curPassage = page.text;
+            }
 
         };
         if(question.type == "wordbank"){
