@@ -169,7 +169,7 @@
             </div>
             {{#if module.autoTutorReadsScript}}
             <div class="form-check">
-            AutoTutor allowed to repeat itself:
+            AutoTutor allowed to repeat the conversation:
             {{#if module.autoTutorRepeat}}
             <input class="markCorrect"  data-field="autoTutorRepeat" data-value="false" type="checkbox"  checked>
             {{else}}
@@ -177,6 +177,14 @@
             {{/if}}        
             </div>
             {{/if}}
+            <div class="form-check">
+            AutoTutor allowed to read passages:
+            {{#if module.autoTutorRepeat}}
+            <input class="markCorrect"  data-field="autoTutorCanReadPassage" data-value="false" type="checkbox"  checked>
+            {{else}}
+            <input class="markCorrect"  data-field="autoTutorCanReadPassage" data-value="true" type="checkbox" >
+            {{/if}}        
+            </div>
             <div class="form-check">
             AutoTutor reads user response:
             {{#if module.autoTutorReadsResponse}}
@@ -419,6 +427,15 @@
                             <option>{{this.answer}}</option>
                             {{/each}}
                         </select><br>
+                        {{/if}}
+                        {{#if this.isReading}}
+                        <b>Page Text is Prompt</b>
+                        {{#if this.readingIsPagePrompt}}
+                        <input class="markCorrect"  data-field="pages[{{this.parent}}].questions[{{@index}}].readingIsPagePrompt" data-value="false" type="checkbox"  checked>
+                        {{else}}
+                        <input class="markCorrect"  data-field="pages[{{this.parent}}].questions[{{@index}}].readingIsPagePrompt" data-value="true" type="checkbox" >
+                        {{/if}}
+                        <br>  
                         {{/if}}
                         <b>Skip refutation</b>
                         {{#if this.noRefutation}}

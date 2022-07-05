@@ -250,12 +250,15 @@
                     <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
                     <br>
                     {{/if}}
+                    {{#if question.readingIsPagePrompt}}
+                    {{else}}
                     <div class="row" style="padding:20px;">
                         <h3>{{question.prompt}}</h3>
                         <div class="col-md-1 col-xs-1"></div>
                         <div id="scrollArea" class="col-md 4 col-xs-12 text-left" style="overflow-y: scroll; font-size: large; max-height: 500px; max-width: 100%;">{{{question.curPassage}}}</div>
                         <div class="col-md-4 col-xs-1"></div>
                     </div>
+                    {{/if}}
                     <button id="continue" class="btn btn-success readingPrevPage" >Previous Page <span class="glyphicon glyphicon-step-backward"></span></button>
                     <button id="continue" class="btn btn-success readingNextPage" >Next Page <span class="glyphicon glyphicon-step-forward"></span></button>
                     <button id="continue" class="btn btn-success readingLastPage" >Last Page <span class="glyphicon glyphicon-fast-forward"></span></button><br>
@@ -268,7 +271,7 @@
                     <button id="continue" class="btn btn-primary continue" disabled>Continue <span class="glyphicon glyphicon-play"></span></button>
                 {{/if}}
                 <br>
-                {{#if page.text}}{{#if module.enableAutoTutor}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
+                {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
                 {{else}}
                      {{#if page.typeActivity}}
