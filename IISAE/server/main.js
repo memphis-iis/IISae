@@ -7,6 +7,7 @@ import { FilesCollection } from 'meteor/ostrio:files';
 import { insertSeedData } from './seedData'
 import { LSA } from './macineLearning/LSA'
 import { answerAssess } from './answerAssess'
+import { Console } from 'console';
 
 export { addUserToRoles }
 
@@ -384,15 +385,14 @@ Meteor.methods({
         ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
     },
     evaluateModuleData: function (moduleData, moduleId, pageId, questionId, response, answerValue,charResponses){
-        response = response;
         questionType = moduleData.questionType;
         curModule = Modules.findOne({_id: moduleId});
+        console.log(curModule);
         answerTags = moduleData.answerTags  || {};
         if(curModule.enableAnswerTags){
             answerTagKey = curModule.pages[pageId].questions[questionId].answerTag;
             answerTags[answerTagKey] = response;
         }
-        console.log(curModule.pages[pageId].questions[questionId].persistantAnswerTag);
         if(curModule.pages[pageId].questions[questionId].persistantAnswerTag){
             answerTagKey = curModule.pages[pageId].questions[questionId].answerTag;
             curAnswerTags = Meteor.user().persistantAnswerTags || {};
@@ -434,11 +434,12 @@ Meteor.methods({
             if(enableWeightedQuestions){
                 questionWeight = curModule.pages[pageId].questions[0].weight
             }
+            console.log(enableFeedback , skipFeedback);
             if(enableFeedback && !skipFeedback){
+                console.log("Answer Assess ======================", correctAnswer, response);
                 answerCheck = answerAssess(correctAnswer, response).isCorrect;
                 feedback.isCorrect = answerCheck;
                 for(let charResponse of charResponses){
-                    console.log(charResponse);
                     charAnswerCheck = answerAssess(correctAnswer, charResponse.response).isCorrect;
                     data = {
                         character: charResponse.name,
@@ -447,11 +448,70 @@ Meteor.methods({
                     feedback.characterRefutation.push(data);
                 }
             }
+
             if(answerCheck == true){
                 moduleData.score += parseInt(answerValue) * parseFloat(questionWeight);
             } else {
                 moduleData.score = parseInt(moduleData.score);
             }
+
+            //Define Stats Values
+            //Calculate Stats 
+            if(curModule.pages[pageId].type == "activity" && !skipFeedback){
+                console.log("Calculating Stats");
+                console.log(feedback);
+                if(!moduleData.stats || moduleData.stats == undefined || !moduleData.stats.attemptCount || moduleData.stats.attemptCount == "NaN"){
+                    var stats = moduleData.stats || {
+                        numCorrect: 0,
+                        numIncorrect: 0,
+                        averageCorrect: 0,
+                        attemptCount: 0,
+                        avatarSpeakingTotalDuration: 0,
+                        userResponseTotalDuration: 0,
+                        totalDuration: 0,
+                        lastDuration: 0,
+                        totalChoiceCount: 0,
+                    };
+                } else {
+                    var stats = moduleData.stats;
+                }
+                if(feedback.isCorrect){
+                    stats.numCorrect += 1 || 0;
+                    stats.attemptCount += 1 || 0;
+                } 
+                if(!feedback.isCorrect && !skipFeedback){
+                    stats.numIncorrect += 1 || 0;
+                    stats.attemptCount += 1 || 0;
+                }
+            
+                stats.averageCorrect = stats.numCorrect / (stats.numCorrect + stats.numIncorrect);
+                stats.lastDuration = moduleData.responseTime - moduleData.renderTime;
+                stats.totalDuration = stats.totalDuration + stats.lastDuration;
+                stats.userResponseTotalDuration = stats.userResponseTotalDuration + (moduleData.responseTime - moduleData.renderTime - moduleData.speakingTime);
+                stats.avatarSpeakingTotalDuration = stats.avatarSpeakingTotalDuration + moduleData.speakingTime;
+                stats.avatarAverageQuestionSpeakingDuration = stats.avatarSpeakingTotalDuration / stats.attemptCount;
+                stats.averageUserResponseDuration = stats.userResponseTotalDuration / stats.attemptCount;
+                stats.choiceCount = curModule.pages[pageId].questions[questionId].answers.length;
+                stats.totalChoiceCount = stats.totalChoiceCount + stats.choiceCount;
+                
+                //Send stats to trial Data
+                moduleData.stats = stats;
+                feedback.stats = stats;
+
+                //Print Stats
+                console.log(stats);
+
+
+
+                //Define Complex Score If Applicable
+                if(curModule.complexScoreFunction){
+                    complexScore = new Function("stats", curModule.complexScoreFunction);
+                    moduleData.complexScore = complexScore(stats);
+                } else {
+                    moduleData.complexScore = "undefined";
+                }
+            }
+
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
             Meteor.users.upsert(Meteor.userId(), {
                 $set: {
@@ -462,7 +522,6 @@ Meteor.methods({
                     },
                 }
             });
-            console.log(feedback);
             return feedback;
         } else {
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
@@ -553,21 +612,18 @@ Meteor.methods({
         Orgs.update({_id: Meteor.user().organization}, {$set: {files: orgFiles} })
     },
     makeGoogleTTSApiCall: async function(message, moduleId=false, voice) {
-        console.log(message,moduleId);
         if(moduleId !== false){
             curModule = Modules.findOne({_id: moduleId});
             if(curModule.googleAPIKey){
                 ttsAPIKey = curModule.googleAPIKey;
             } 
         }
-        console.log(ttsAPIKey);
         voiceOptions = {languageCode:"en-US", name:voice, ssmlGender:"FEMALE"};
         const request = JSON.stringify({
             input: {text: message},
             voice: voiceOptions,
             audioConfig: {audioEncoding: 'MP3', speakingRate: 1, volumeGainDb: .5},
         });
-        console.log(request);
         const options = {
             hostname: 'texttospeech.googleapis.com',
             path: '/v1/text:synthesize?key=' + ttsAPIKey,
