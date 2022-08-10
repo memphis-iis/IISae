@@ -1,5 +1,8 @@
 {
-    "public":{
-        "authors":["testAdmin@memphis.edu","jrhaner@memphis.edu","rawhite2@memphis.edu"]
+    "public":{,
+        "authors":["testAdmin@memphis.edu","jrhaner@memphis.edu","rawhite2@memphis.edu"],
+        "projectName":"ARC",
+        "useDefaultModules":false,
+        "description":"ARC is a web application using the IISAE framwork."
     }
 }

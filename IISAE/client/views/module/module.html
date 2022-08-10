@@ -273,6 +273,16 @@
                 <br>
                 {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
+                {{#if isInRole 'supervisor,admin'}}
+                    <br>
+                    <h3>Debug Panel:</h3><br>
+                    <b>Score:</b> {{question.currentScore}}<br>
+                    <b>ComplexScore:</b> {{trialData.complexScore}}<br>
+                    <b>Stats: {{#each trialData.statsDisplay}}{{this.stat}}: {{this.value}}<br>{{/each}}</b>
+                    {{/if}}
+                    {{#if question.correctAnswer}}
+                        <br><b>CorrectAnswer</b>: {{question.correctAnswer}}<br>
+                {{/if}}
                 {{else}}
                      {{#if page.typeActivity}}
                          <h3><b>Activity: {{page.header}}</b></h3>
@@ -284,8 +294,8 @@
         {{else}}
                 <h3>{{module.title}}</h3>
                 <p>{{module.description}}</p>
-                <button class="btn btn-primary" id="startModule">Lets Begin!</button>
-                <button class="btn btn-caution" id="goBack">I'm not ready.</button>
+                <button class="btn btn-primary" id="startModule"><span class="glyphicon glyphicon-play"></span> Lets Begin!</button>
+                <button class="btn btn-caution" id="goBack"><span class="glyphicon glyphicon-repeat"></span>I'm not ready.</button>
             {{/if}}
     </div>
     

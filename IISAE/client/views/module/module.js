@@ -1,6 +1,7 @@
 import hark from 'hark';
 import { FilesCollection } from 'meteor/ostrio:files';
 import FileReader from 'filereader';
+import { Script } from 'vm';
 
 
 var chunks = [];
@@ -52,12 +53,15 @@ Template.module.onRendered(function (){
                         regex = new RegExp(pattern)
                         scriptToAdd = script.scriptAlt.replace(regex,moduleResults.answerTags[keys]);
                     }
+                    scriptToAdd = scriptToAdd.replace('_user_', Meteor.user().firstname);
                     readTTS(t,scriptToAdd,voice,character, art, script.scriptAlt);
                 } else {
-                    readTTS(t,script.script,voice,character, art, script.scriptAlt);
+                    scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
+                    readTTS(t,scriptToAdd,voice,character, art, script.scriptAlt);
                 }
             } else {
-                readTTS(t,script.script,voice,character, art, script.scriptAlt);
+                scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
+                readTTS(t,scriptToAdd,voice,character, art, script.scriptAlt);
             }
         }
     }
@@ -84,6 +88,14 @@ Template.module.helpers({
     'trialData': function(){
         let moduleId = Meteor.user().curModule.moduleId;
         let moduleData = ModuleResults.findOne({_id: moduleId});
+        moduleData.statsDisplay = [];
+        for(stat in Object.keys(moduleData.stats)){
+            moduleData.statsDisplay.push({
+                stat: Object.keys(moduleData.stats)[stat],
+                value: moduleData.stats[Object.keys(moduleData.stats)[stat]]
+            });
+        }
+        console.log(moduleData.statsDisplay);
         return moduleData;
     },
     'pageid': function() {return parseInt(this.pageId);},
@@ -184,6 +196,8 @@ Template.module.helpers({
         };
         if(question.type == "autotutorscript"){
             question.typeATScript = true;
+            autoAdvance = question.autoAdvance || false;
+            t.autoAdvance.set(autoAdvance);
         }
         if(question.type == "link"){
             question.typeLink = true;
@@ -465,12 +479,17 @@ Template.module.events({
         target = "";
         moduleId = Meteor.user().curModule.moduleId;
         moduleData = ModuleResults.findOne({_id: moduleId});
+        timeStamp = new Date();
+        moduleData.responseTime = timeStamp.getTime();
+        moduleData.renderTime = t.renderTime.get();
+        moduleData.speakingTime = t.speakingTime.get();
         data = moduleData.responses[moduleData.responses.length - 1];
         moduleData.lastAccessed = Date.now().toString();
         thisPage = Meteor.user().curModule.pageId;
         thisQuestion = parseInt(Meteor.user().curModule.questionId);
         thisQuestionData = curModule.pages[thisPage].questions[thisQuestion]
         answerValue = 0;
+        userResponse = "";
         transcript = t.transcript.get() || "";
         $('#audioRecordingNotice').html("Waiting for AutoTutor to finish.");
         if(t.pageType.get() == "activity"){
@@ -482,31 +501,31 @@ Template.module.events({
 
                 }
                 if(questionData.type == "blank"){
-                    response = $(".textInput").val();
+                    userResponse = $(".textInput").val();
                     answerValue = parseInt($(event.target).val());
                 }
                 if(questionData.type == "questionSelectionBoard"){
-                    response = "continue"
+                    userResponse = "continue"
                     answerValue = moduleData.questionBoardScore;
                 }
                 if(questionData.type == "wordbank"){
-                    response = $(".textBank").val();
+                    userResponse = $(".textBank").val();
                     answerValue = 0;
                 }
                 if(questionData.type == "autotutorscript"){
-                    response = "continue";
+                    userResponse = "continue";
                     answerValue = 0;
                 }
                 if(questionData.type == "video"){
-                    response = "continue";
+                    userResponse = "continue";
                     answerValue = 0;
                 }
                 if(questionData.type == "html"){
-                    response = "continue";
+                    userResponse = "continue";
                     answerValue = 0;
                 }
                 if(questionData.type == "scrollbar"){
-                    response = thisQuestion.correctAnswer || true;
+                    userResponse = thisQuestion.correctAnswer || true;
                     answerValue = answerValue;
                 }
                 if(questionData.type == "reading"){
@@ -518,16 +537,17 @@ Template.module.events({
                     answerValue = answerValue;
                 }
                 if(questionData.type == "multiChoice"){
-                    response = $(event.target).html();
-                    answerValue = parseInt($(event.target).val());
+                    var target = event.target || event.srcElement;
+                    userResponse = target.textContent;
+                    answerValue = parseInt($(event.target).val()) || 0;
                     index = event.target.getAttribute('id');
-                    console.log(thisQuestion, index)
                     if(thisQuestionData.answers[index].feedback != "" || typeof thisQuestionData.answers[index].feedback != "undefined"){
                         refutation = thisQuestionData.answers[index].feedback;
                     }
                 }
                 if(questionData.type == "imageClick"){
-                    response = $(event.target).html();
+                    var target = event.target || event.srcElement;
+                    userResponse = target.innerHTML;
                     answerValue = parseInt($(event.target).val());
                     index = event.target.getAttribute('id');
                     console.log(thisQuestion, index)
@@ -536,19 +556,7 @@ Template.module.events({
                     }
                 }
                 if(questionData.type == "longtext"){
-                    response = $('.textareaInput').val();
-                }
-                if(questionData.type == "combo"){
-                    allInput = document.getElementsByClassName('combo');
-                    response = [];
-                    for(i = 0; i < allInput.length; i++){
-                        if ($(allInput[i]).prop('nodeName') == "INPUT" || $(allInput[i]).prop('nodeName') == "TEXTAREA"){
-                            response.push($(allInput[i]).val());
-                        }
-                        if ($(allInput[i]).hasClass('btn-info')){
-                            response.push($(allInput[i]).html());
-                        }
-                    }
+                    userResponse = $('.textareaInput').val();
                 }
             } else {
                 response = transcript;
@@ -557,7 +565,7 @@ Template.module.events({
             data.questionType = t.questionType.get();
             data.pageId =  thisPage;
             data.questionId = thisQuestion;
-            data.response =  response;
+            data.response =  userResponse;
             data.responseTimeStamp = Date.now().toString();
             data.result = ""
             recordEvent(t,"responseSelect", Meteor.userId(), data.response);
@@ -607,8 +615,7 @@ Template.module.events({
             moduleData.characterResponses[moduleData.responses.length - 1] = characterResponses;
             moduleData.nextPage = thisPage;
             moduleData.nextQuestion = thisQuestion + 1;
-            console.log(response);
-            Meteor.call("evaluateModuleData", moduleData, curModule._id , thisPage, thisQuestion, response, answerValue, characterResponses, function(err, res){
+            Meteor.call("evaluateModuleData", moduleData, curModule._id , thisPage, thisQuestion, data.response, answerValue, characterResponses, function(err, res){
                 feedback = t.feedback.get();
                 type = "danger"
                 message = refutation || question.incorrectFeedback || "you are not correct."
@@ -616,14 +623,14 @@ Template.module.events({
                 if(res != "disabled"){
                     if(res.isCorrect == true){ 
                         type = "success";
-                        message = refutation || "you are correct!";
+                        message = refutation || "you are correct! ";
                     } 
                     message = Meteor.user().firstname + ", " + message;
                     for(charResponse of res.characterRefutation){
                         if(charResponse.isCorrect){
-                            message = "Yes, " + charResponse.character + " you are correct." + message;
+                            message += "Yes, " + charResponse.character + " you are correct.";
                         } else {
-                            message = "No, " + charResponse.character + " you are incorrect." + message;
+                            message += "No, " + charResponse.character + " you are incorrect.";
                         }
                     }
                     recordEvent(t,"evaluate", "system", {result: res});
@@ -774,7 +781,7 @@ Template.module.events({
     'click .multichoice': function(event){
         event.preventDefault();
         const t = Template.instance();
-        transcript.transcript.get();
+        transcript = t.transcript.get() || ""; 
         if(transcript = "" || !transcript){
             const collection = document.getElementsByClassName("multichoice");
             for (let i = 0; i < collection.length; i++){
@@ -811,6 +818,11 @@ Template.module.onCreated(function(){
     Meteor.subscribe('curModule', params._id);
     this.command = new ReactiveVar(params._command);
     this.questionType = new ReactiveVar("");
+    this.autoAdvance = new ReactiveVar(false);
+    var currentTimeStamp = new Date().getTime();
+    this.renderTime = new ReactiveVar(currentTimeStamp);
+    this.speakingTime = new ReactiveVar(0);
+    this.startAudioTime = new ReactiveVar(0);
     this.pageType = new ReactiveVar("");
     this.feedback = new ReactiveVar(false);
     this.curReadingPage = new ReactiveVar(0);
@@ -834,6 +846,7 @@ function readTTS(template, message, voice, character,characterArt,scriptAlt){
     template.audioActive.set(true);
     let displayMessage = character + ": " + message;
     const characterSearch = (element) => element.name == character;
+    console.log("Rusty",characterSearch);
     let characterIndex = curModule.autoTutorCharacter.findIndex(characterSearch);
     let audioObj = new Audio();
     let audioObjects = template.audioObjects.get();
@@ -896,10 +909,15 @@ async function playAudio(template){
             });
         }
         else{
+            var curTime = new Date().getTime();
+            var audioTime = curTime - template.startAudioTime.get();
+            var speakingTime = template.speakingTime.get();
+            speakingTime = speakingTime + audioTime;
+            template.speakingTime.set(speakingTime);
             sleep(1000).then(function(){
                 recordEvent(template,"autoTutorScriptQueueEnd", "system");
                 questionType = template.questionType.get();
-                console.log(questionType);
+                autoAdvance = template.autoAdvance.get();
                 template.audioActive.set(false);
                 $('#audioRecordingNotice').html("I am listening.");
                 
@@ -910,14 +928,15 @@ async function playAudio(template){
                 }
                 questionType = template.questionType.get();
                 if(questionType == "video" || questionType == "link" || questionType == "scrollbar"){
-                    console.log("test");
                     $(':button').prop('disabled', true); 
                     $(':button').prop('hidden', true); 
                 } else {
                     $(':button').prop('disabled', false); 
                     $(':button').prop('hidden', false); 
+                    $('.continue').prop('disabled', false);
+                    $('.continue').prop('hidden', false);
                 }
-                if(questionType == "autotutorscript"){
+                if(autoAdvance == true){
                     sleep(3000).then(function(){
                         $('.continue').click();
                     })
@@ -928,6 +947,7 @@ async function playAudio(template){
     });
     recordEvent(template,"autoTutorScriptAudioStart", "system");
     window.currentAudioObj.play();
+    template.startAudioTime.set(new Date().getTime());
 }
 function setupRecording(template){
     recordEvent(template,"initializeVoiceRecognition", "system");

@@ -183,6 +183,11 @@ Template.modulesAdmin.events({
             module: newModule
         });
     },
+    'click #test-module': function (event){
+        testModule = $(event.target).data("module-id");
+        target = "/module/" + testModule;
+        window.location.href = target;
+    },
     'click #edit-module': function (event){
         moduleId = $(event.target).data("module-id");
         Router.go('/moduleEditor/' + moduleId);
