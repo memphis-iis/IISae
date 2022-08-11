@@ -426,11 +426,14 @@ Template.module.events({
                             regex = new RegExp(pattern)
                             scriptToAdd = scriptToAdd.replace(regex,Meteor.user().persistantAnswerTags[keys]);
                         }
+                        scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
                         readTTS(t,scriptToAdd,voice,character, art);
                     } else {
+                        scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
                         readTTS(t,script.script,voice,character, art);
                     }
                 } else {
+                    scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
                     readTTS(t,script.script,voice,character, art);
                 }
             }
