@@ -708,25 +708,39 @@ Template.module.events({
                     } else {
                         conditions = curModule.pages[thisPage].nextFlow;
                         routePicked = false;
-                        for(i = 0; i < conditions.length; i++){
-                            if(!routePicked){
-                                conditionStatement = "moduleData." + conditions[i].condition + conditions[i].operand + conditions[i].threshold;
-                                conditionState = eval(conditionStatement);
-                                if(conditionState){
-                                    if(curModule.pages[conditions[i].route].type="activity" && curModule.skipInterstitials){
-                                        target = "/module/" + curModule._id + "/" + conditions[i].route + "/0"; 
-                                    } else {
-                                        target = "/module/" + curModule._id + "/" + conditions[i].route; 
+                        if(conditions.length > 0){
+                            for(i = 0; i < conditions.length; i++){
+                                if(!routePicked){
+                                    conditionStatement = "moduleData." + conditions[i].condition + conditions[i].operand + conditions[i].threshold;
+                                    conditionState = eval(conditionStatement);
+                                    if(conditionState){
+                                        if(curModule.pages[conditions[i].route].type="activity" && curModule.skipInterstitials){
+                                            target = "/module/" + curModule._id + "/" + conditions[i].route + "/0"; 
+                                        } else {
+                                            target = "/module/" + curModule._id + "/" + conditions[i].route; 
+                                        }
+                                        routePicked = true;
+                                        moduleData.nextPage = conditions[i].route;
+                                        moduleData.nextQuestion = 0;
+                                        console.log(conditions[i].clearScoring);
+                                        if(conditions[i].clearScoring){
+                                            moduleData.score = 0;
+                                        }
+                                        Meteor.call("overrideUserDataRoutes",moduleData); 
                                     }
-                                    routePicked = true;
-                                    moduleData.nextPage = conditions[i].route;
-                                    moduleData.nextQuestion = 0;
-                                    console.log(conditions[i].clearScoring);
-                                    if(conditions[i].clearScoring){
-                                        moduleData.score = 0;
-                                    }
-                                    Meteor.call("overrideUserDataRoutes",moduleData); 
                                 }
+                            }
+                        }
+                        if(curModule.customConditionScript && !routePicked){
+                            script = new Function("stats", curModule.customConditionScript);
+                            stats = moduleData.stats;
+                            [nextPage, nextQuestion, customVariable, customValue] = script(stats);
+                            if(moduleData.customCondition){
+                                moduleData.nextPage = nextPage;
+                                moduleData.nextQuestion = nextQuestion;
+                                moduleData.stats[customVariable] = customValue;
+                                target = "/module/" + curModule._id + "/" + nextPage + "/" + nextQuestion;
+                                routePicked = true;
                             }
                         }
                         if(!routePicked){

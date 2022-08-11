@@ -131,13 +131,20 @@
           <option value="error">Throw Error</option>
       </select>
         <div class="form-check">
-            Override With Javascript Snippet
-            {{#if module.adaptivePageFlowOverride}}
-            <input class="markCorrect"  data-field="adaptivePageFlowOverride" data-value="false" type="checkbox"  checked>
+           Complex Scoring Mechanism. Must use return statement in snippet to return a score.
+            {{#if module.complexScoreFunction}}
+            <input class="markCorrect"  data-field="complexScoreFunction" data-value="false" type="checkbox"  checked>
             {{else}}
-            <input class="markCorrect"  data-field="adaptivePageFlowOverride" data-value="true" type="checkbox" >
+            <input class="markCorrect"  data-field="complexScoreFunction" data-value="true" type="checkbox" >
             {{/if}}        
           </div>
+          Complex Roting Mechanism. Must use return [nextPage, nextQuestion, customVariable, customValue] statement in snippet to return a score. customVariable will be stored in trial data and can be used in the complex scoring snippet.
+          {{#if module.customConditionScript}}
+          <input class="markCorrect"  data-field="customConditionScript" data-value="false" type="checkbox"  checked>
+          {{else}}
+          <input class="markCorrect"  data-field="customConditionScript" data-value="true" type="checkbox" >
+          {{/if}}        
+        </div>
           {{#if module.adaptivePageFlowOverride}}
             Available Variables: 
             {{#each module.pageFlowVarNames}}
