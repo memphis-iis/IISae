@@ -130,31 +130,28 @@
           <option value="completed">Completed</option>
           <option value="error">Throw Error</option>
       </select>
+      <br>
+      <br>
         <div class="form-check">
-           Complex Scoring Mechanism. Must use return statement in snippet to return a score.
-            {{#if module.complexScoreFunction}}
-            <input class="markCorrect"  data-field="complexScoreFunction" data-value="false" type="checkbox"  checked>
-            {{else}}
-            <input class="markCorrect"  data-field="complexScoreFunction" data-value="true" type="checkbox" >
-            {{/if}}        
+           Complex Scoring Mechanism. Must use return statement in snippet to return a score.<br>
+           <textarea disabled>{{module.complexScoringFunction}}</textarea>
+           <a id="open-editor" data-value={{module.complexScoreFunction}} data-field="complexScoreFunction"> Edit</a>
           </div>
+          <br>
           <div class="form-check">
-          Complex Roting Mechanism. Must use return [nextPage, nextQuestion, customVariable, customValue] statement in snippet to return a score. customVariable will be stored in trial data and can be used in the complex scoring snippet.
-          {{#if module.customConditionScript}}
-          <input class="markCorrect"  data-field="customConditionScript" data-value="false" type="checkbox"  checked>
-          {{else}}
-          <input class="markCorrect"  data-field="customConditionScript" data-value="true" type="checkbox" >
-          {{/if}}        
+          Complex Routing Mechanism. Must use return [nextPage, nextQuestion, customVariable, customValue] statement in snippet to return a score. customVariable will be stored in trial data and can be used in the complex scoring snippet.<br>
+          <textarea disabled>{{module.customConditionScript}}</textarea>
+           <a id="open-editor" data-value={{module.customConditionScript}} data-field="complexScoreFunction"> Edit</a>
         </div>
-          {{#if module.adaptivePageFlowOverride}}
-            Available Variables: 
-            {{#each module.pageFlowVarNames}}
-            moduleData.{{this}}
-            {{/each}}<br>
-            <h4>Javascript Snippet:</h4>
-            {{module.adaptivePageFlowOverrideScript}}<a id="open-editor" data-field="adaptivePageFlowOverrideScript"  data-value="{{this.adaptivePageFlowOverrideScript}}"> Edit</a><br>
-          {{/if}}
+        {{#if module.adaptivePageFlowOverride}}
+        Available Variables: 
+        {{#each module.pageFlowVarNames}}
+        moduleData.{{this}}
+        {{/each}}<br>
+        <h4>Javascript Snippet:</h4>
+        {{module.adaptivePageFlowOverrideScript}}<a id="open-editor" data-field="adaptivePageFlowOverrideScript"  data-value="{{this.adaptivePageFlowOverrideScript}}"> Edit</a><br>
         {{/if}}
+      {{/if}}
         {{#if module.enableAutoTutor}}
         <h3>AutoTutor Options</h3>
         <p>The AutoTutor Conversational Engine allows for a simulation of a classroom setting with a virtual instructor and multiple virtual students.</p>
@@ -187,7 +184,7 @@
             {{/if}}
             <div class="form-check">
             AutoTutor allowed to read passages:
-            {{#if module.autoTutorRepeat}}
+            {{#if module.autoTutorCanReadPassage}}
             <input class="markCorrect"  data-field="autoTutorCanReadPassage" data-value="false" type="checkbox"  checked>
             {{else}}
             <input class="markCorrect"  data-field="autoTutorCanReadPassage" data-value="true" type="checkbox" >
@@ -226,7 +223,8 @@
                 <th scope="col" width="25%">Name</th>
                 <th scope="col" width="15%">Voice</th>
                 <th scope="col" width="20%">Options</th>
-                <th scope="col" width="15%">Art URL</th>
+                <th scope="col" width="10%">Art URL</th>
+                <th scope="col" width="10%">Chat Color (hex)</th>
                 <th scope="col" width="25%">Actions</th>
             </thead>
             <tbody>
@@ -254,6 +252,11 @@
                     </td>
                     <td>
                         <img src="{{this.art}}" style="max-width: 100px;" /><a id="open-editor" data-field="autoTutorCharacter[{{@index}}].art"  data-value="{{this.art}}"> Edit</a><br>
+                    </td>
+                    <td>
+                        Background:<br> <input type="color" class="combo-save" data-field="autoTutorCharacter[{{@index}}].chatColor" data-value="{{this.chatColor}}" value="{{this.chatColor}}"><br>
+
+                        Text: <br><input type="color" class="combo-save" data-field="autoTutorCharacter[{{@index}}].chatTextColor" data-value="{{this.chatTextColor}}" value="{{this.chatTextColor}}">
                     </td>
                     <td>
                         <a id="delete-item" data-field="autoTutorCharacter[{{@index}}]">Delete Character</a><br>

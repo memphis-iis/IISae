@@ -6,17 +6,17 @@
                 <p>You have completed this module!</p>
                 <button class="btn btn-primary" id="goBack">Return to My Profile</button>    
             {{else}}
-                <h4>{{page.header}} : {{page.subheader}}</h4>
+                <br>
                 {{#if page.typeText}}
                     {{#if module.enableAutoTutor}}
                     <div class="autoTutorTemplate" hidden>
                         <div id="ATTemplate0" class="row attemplate row" hidden>
-                            <div class="speaker avatar col-xs-1" style="text-align: right;" id="avatar"></div>
-                            <div class="speaker script col-xs-11" style="text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px;  margin-bottom: 20px;"></div>
+                            <div class="speaker avatar col-md-1 col-xs-3" style="text-align: right;" id="avatar"></div>
+                            <div class="speaker script col-md-11 col-xs-9" style="text-align: left; background: rgb(30, 142, 216);font-size: large;color: white; border-radius: 3px; min-height:50px;  margin-bottom: 20px;"></div>
                         </div>
                         <div id="ATTemplate1" class="row attemplate row" hidden>
-                            <div class="speaker script col-xs-11" style="text-align: left; background: rgb(120, 206, 143);font-size: large;color: white; border-radius: 3px; min-height:50px;  margin-bottom: 20px;"></div>
-                            <div class="speaker avatar col-xs-1" style="text-align: left;" id="avatar"></div>
+                            <div class="speaker script col-md-1 col-xs-3" style="text-align: left; background: rgb(120, 206, 143);font-size: large;color: white; border-radius: 3px; min-height:50px;  margin-bottom: 20px;"></div>
+                            <div class="speaker avatar col-md-11 col-xs-9" style="text-align: left;" id="avatar"></div>
                         </div>
                     </div>
                     <div class="autoTutorHistory">
@@ -142,18 +142,35 @@
                     <h3 id="prompt">{{{question.prompt}}}</h3><br>
                     {{/if}}
                     {{#if question.image}}
-                    <img class="img-responsive center-block module-img" src="{{question.image}}" alt="Your Alt Text">
+                    <div class="col-md-4 col-xs-hidden"></div>
+                    <dic class="col-md-4 col-xs-12" style="margin-bottom: 20px;">
+                        <div style="background-image:url('{{question.image}}'); background-position:center; background-size: 100% 100%; background-repeat: no-repeat; height:440px; width:320px; margin:auto;">
+                            {{#if question.imageObscurus}}
+                            {{#each question.imageObscurus}}
+                                    <div style="position:absolute; line-height: {{this.height}}; top:{{this.y}}; left:{{this.x}}; width:{{this.width}}; height:{{this.height}}; background-color:{{this.bgColor}};">
+                                        {{this.text}}
+                                    </div>
+                            {{/each}}
+                            {{/if}}
+                        </div>
+                    </dic>
+                    <div class="col-md-4 col-xs-hidden"></div>
+
                     {{/if}}
 
                     <form>
                         {{#each question.answers}}
+                            <div class="row">
                             {{#if this.image}}
-                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
+                                <div class="col-md-3 col-xs-6">
+                                <button  class="btn btn-lg btn-primary text-nowrap btn-block multichoice continue" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">
                                     <img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text">
                                 </button>
+                                </div>
                             {{else}}
                             <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{this.answer}}</button>
                             {{/if}}
+                        </div>
                         {{/each}}
                     </form>
                     <div class="alert" id="refutation" role="alert" hidden>
@@ -167,12 +184,12 @@
                     <h3 id="prompt">{{{question.prompt}}}</h3><br>
                     {{/if}}
                     {{#if question.image}}
-                    <img class="img-responsive center-block module-img" id="imageClickOver" src="{{question.image}}" alt="Your Alt Text">
+                    <img class="img-responsive center-block" id="imageClickOver" src="{{question.image}}" alt="Your Alt Text">
                     {{/if}}
 
                     <form>
                         {{#each question.answers}}
-                            <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue overlay" data-group="{{this.group}}" style="white-space: normal; position: absolute; top: {{this.yCoord}}px; left:{{this.xCoord}}px; width: {{this.width}}px; height: {{this.height}}px" id="{{@index}}" value="{{this.value}}" name=""></button>
+                            <button  class="btn text-nowrap continue overlay" id="{{@index}}" data-group="{{this.group}}" style="position: absolute; top: {{this.scaledCoords.yScaled}}px; left: {{this.scaledCoords.xScaled}}px; width: {{this.scaledCoords.widthScaled}}px; height: {{this.scaledCoords.heightScaled}}px; margin:0px;">{{@index}}</button>
                         {{/each}}
                     </form>
                     <div class="alert" id="refutation" role="alert" hidden>

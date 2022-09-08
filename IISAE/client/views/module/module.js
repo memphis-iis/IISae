@@ -224,8 +224,10 @@ Template.module.helpers({
                 for(answer of answers){
                     answer.xCoord = imagePos.left + parseInt(answer.xCoord);
                     answer.yCoord = imagePos.top + parseInt(answer.yCoord);
+                    answer.scaledCoords = imageScaleValues(question.image,answer.xCoord,answer.yCoord, answer.width,answer.height);
                 }
             }
+            console.log(answers);
             question.answers = answers
         };
         if(question.type == "reading"){
@@ -550,10 +552,9 @@ Template.module.events({
                 }
                 if(questionData.type == "imageClick"){
                     var target = event.target || event.srcElement;
-                    userResponse = target.innerHTML;
-                    answerValue = parseInt($(event.target).val());
+                    response = parseInt(target.innerHTML);
                     index = event.target.getAttribute('id');
-                    console.log(thisQuestion, index)
+                    userResponse = thisQuestionData.answers[response].answer;
                     if(thisQuestionData.answers[index].feedback != "" || typeof thisQuestionData.answers[index].feedback != "undefined"){
                         refutation = thisQuestionData.answers[index].feedback;
                     }
@@ -902,7 +903,7 @@ async function playAudio(template){
     $('.autoTutorHistory').show();
     let scriptHandle = atTemplate + " .script";
     let avatarHandle = atTemplate + " .avatar";
-    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art + "' style='max-width:100%; padding=20px;'><br>");
+    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art + "' style='max-width:100%;'><br>");
     $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
     $(clone).fadeIn();
     $(clone).attr("id","ATTemplateFinished");
@@ -1088,4 +1089,27 @@ function recordEvent(template,verb,actor,data){
     }
     events.push(eventToPass)
     template.events.set(events);
+}
+
+function imageScaleValues(imgUrl, x, y, width, height){
+    source = $('#imageClickOver')
+    sourceWidth = source.width();
+    sourceHeight = source.height();
+    sourceX = source.offset().left;
+    sourceY = source.offset().top;
+    console.log("sourceWidth: " + sourceWidth);
+    console.log("sourceHeight: " + sourceHeight);
+    console.log("sourceX: " + sourceX);
+    console.log("sourceY: " + sourceY);
+    var xPercent = (x / sourceWidth) 
+    var yPercent = (y / sourceHeight) 
+    var widthPercent = (width / sourceWidth);
+    var heightPercent = (height / sourceHeight);
+    var parentXPosition = $('#imageClickOver').offset().left;
+    var parentYPosition = $('#imageClickOver').offset().top;
+    var xScaled =  (xPercent * sourceWidth)
+    var yScaled =  (yPercent * sourceHeight);
+    var widthScaled = (widthPercent * sourceWidth);
+    var heightScaled = (heightPercent* sourceHeight);
+    return {xPercent:xPercent, yPercent:yPercent, widthPercent:widthPercent, heightPercent:heightPercent, xScaled:xScaled, yScaled:yScaled, widthScaled:widthScaled, heightScaled:heightScaled, parentXPosition:parentXPosition, parentYPosition:parentYPosition};
 }
