@@ -459,8 +459,6 @@ Meteor.methods({
             //Define Stats Values
             //Calculate Stats 
             if(curModule.pages[pageId].type == "activity" && !skipFeedback){
-                console.log("Calculating Stats");
-                console.log(feedback);
                 if(!moduleData.stats || moduleData.stats == undefined || !moduleData.stats.attemptCount || moduleData.stats.attemptCount == "NaN"){
                     var stats = moduleData.stats || {
                         numCorrect: 0,
@@ -476,13 +474,14 @@ Meteor.methods({
                 } else {
                     var stats = moduleData.stats;
                 }
+                console.log("Correct: " + stats.numCorrect + " Incorrect: " + stats.numIncorrect + " Average Correct: " + stats.averageCorrect + " Attempt Count: " + stats.attemptCount);
                 if(feedback.isCorrect){
-                    stats.numCorrect += 1 || 0;
-                    stats.attemptCount += 1 || 0;
+                    stats.numCorrect += 1;
+                    stats.attemptCount += 1;
                 } 
                 if(!feedback.isCorrect && !skipFeedback){
-                    stats.numIncorrect += 1 || 0;
-                    stats.attemptCount += 1 || 0;
+                    stats.numIncorrect += 1;
+                    stats.attemptCount += 1; 
                 }
             
                 stats.averageCorrect = stats.numCorrect / (stats.numCorrect + stats.numIncorrect);
@@ -496,13 +495,7 @@ Meteor.methods({
                 stats.totalChoiceCount = stats.totalChoiceCount + stats.choiceCount;
                 
                 //Send stats to trial Data
-                moduleData.stats = stats;
-                feedback.stats = stats;
-
-                //Print Stats
-                console.log(stats);
-
-
+                Object.assign(moduleData, {stats: stats});
 
                 //Define Complex Score If Applicable
                 if(curModule.complexScoreFunction){
@@ -511,9 +504,11 @@ Meteor.methods({
                 } else {
                     moduleData.complexScore = "undefined";
                 }
-            }
 
-            ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+                //Update User Stats
+                console.log("Correct: " + stats.numCorrect + " Incorrect: " + stats.numIncorrect + " Average Correct: " + stats.averageCorrect + " Attempt Count: " + stats.attemptCount);
+                ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
+            }
             Meteor.users.upsert(Meteor.userId(), {
                 $set: {
                     curModule: {
@@ -526,6 +521,7 @@ Meteor.methods({
             feedback.moduleData = moduleData;
             return feedback;
         } else {
+            serverConsole("attempts: " + moduleData.attempts);
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
             Meteor.users.update(Meteor.userId(), {
                 $set: {
@@ -542,7 +538,6 @@ Meteor.methods({
     },
     overrideUserDataRoutes: function (moduleData){
         console.log('overriding user progress', moduleData.nextPage, moduleData.nextQuestion)
-        ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
         Meteor.users.update(Meteor.userId(), {
             $set: {
                 curModule: {

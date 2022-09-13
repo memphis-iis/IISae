@@ -627,8 +627,7 @@ Template.module.events({
             moduleData.characterResponses[moduleData.responses.length - 1] = characterResponses;
             moduleData.nextPage = thisPage;
             moduleData.nextQuestion = thisQuestion + 1;
-            Meteor.call("evaluateModuleData", moduleData, curModule._id , thisPage, thisQuestion, data.response, answerValue, characterResponses, function(err, res){
-                feedback = t.feedback.get();
+            await Meteor.call("evaluateModuleData", moduleData, curModule._id , thisPage, thisQuestion, data.response, answerValue, characterResponses, function(err, res){                feedback = t.feedback.get();
                 moduleData = res.moduleData;
                 type = "danger";
                 username = Meteor.user().firstname;
@@ -654,9 +653,7 @@ Template.module.events({
                     }
                 }
                 moduleData.responses[moduleData.responses.length - 1].result = res.isCorrect || "disabled";
-                
             });
-            moduleData = ModuleResults.findOne({_id: moduleId});
             if(!curModule.enableAdaptivePages || curModule.pages[thisPage].questions.length > thisQuestion + 1 || command == "return"){
                 if(command == "return"){
                     nextQuestion = 0;
@@ -676,13 +673,11 @@ Template.module.events({
                     }
                     moduleData.nextQuestion = 0;
                     moduleData.nextPage = thisPage;
-                    Meteor.call("overrideUserDataRoutes",moduleData); 
                 } else {
                     nextQuestion = thisQuestion + 1;
                     nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
-                    moduleData.nextQuestion = nextQuestion;
-                    moduleData.nextPage = thisPage;
-                    Meteor.call("overrideUserDataRoutes",moduleData);
+                    nextQuestion = nextQuestion;
+                    nextPage = thisPage;
                 }
                 if(typeof nextQuestionData !== "undefined"){
                     target = "/module/" + curModule._id + "/" + thisPage + "/" + nextQuestion; 
@@ -696,7 +691,6 @@ Template.module.events({
                         }
                         moduleData.nextPage = nextPage;
                         moduleData.nextQuestion = 0;
-                        Meteor.call("overrideUserDataRoutes",moduleData);
                     } else {
                         target = "/module/" + curModule._id + "/completed"; 
                     }
@@ -718,7 +712,6 @@ Template.module.events({
                                 routePicked = true;
                                 moduleData.nextPage = conditions[i].route;
                                 moduleData.nextQuestion = 0;
-                                Meteor.call("overrideUserDataRoutes",moduleData);
                                 console.log(conditions[i].clearScoring);
                                 if(conditions[i].clearScoring){
                                     moduleData.score = 0;
@@ -737,7 +730,6 @@ Template.module.events({
                         moduleData.stats[customVariable] = customValue;
                         target = "/module/" + curModule._id + "/" + nextPage + "/" + nextQuestion;
                         routePicked = true;
-                        Meteor.call("overrideUserDataRoutes",moduleData);
                     }
                 }
                 if(!routePicked){
@@ -751,14 +743,12 @@ Template.module.events({
                         } else {
                             target = "/module/" + curModule._id + "/completed";
                         }
-                        Meteor.call("overrideUserDataRoutes",moduleData);
                     } 
                     if(routing == 'currentPage'){
                         moduleData.nextPage = thisPage;
                         moduleData.nextQuestion = 0;
                         routePicked = true;
                         target = "/module/" + curModule._id + "/" + thisPage;
-                        Meteor.call("overrideUserDataRoutes",moduleData);
                     }
                   
                     if(routing == 'completed'){
@@ -766,7 +756,6 @@ Template.module.events({
                         moduleData.nextQuestion =  "completed";
                         routePicked = true;
                         target = "/module/" + curModule._id + "/completed";
-                        Meteor.call("overrideUserDataRoutes",moduleData);
                     }
                     if(routing == 'error'){
                         alert("Something went wrong. No routing found.");
@@ -774,10 +763,10 @@ Template.module.events({
                         moduleData.nextQuestion =  "error";
                         routePicked = true;
                         target = "/moduleCenter";
-                        Meteor.call("overrideUserDataRoutes",moduleData);
                     }
                 }
             }
+            Meteor.call("overrideUserDataRoutes",moduleData);
             timeOut = 0;
             if(curModule.feedbackTimeout){
                 timeOut = curModule.feedbackTimeout * 1000;
