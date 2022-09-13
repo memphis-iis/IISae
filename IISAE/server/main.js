@@ -443,6 +443,7 @@ Meteor.methods({
                     charAnswerCheck = answerAssess(correctAnswer, charResponse.response).isCorrect;
                     data = {
                         character: charResponse.name,
+                        choiceIndex: charResponse.choiceIndex,
                         isCorrect: charAnswerCheck
                     }
                     feedback.characterRefutation.push(data);
@@ -522,6 +523,7 @@ Meteor.methods({
                     },
                 }
             });
+            feedback.moduleData = moduleData;
             return feedback;
         } else {
             ModuleResults.upsert({_id: moduleData._id}, {$set: moduleData});
@@ -534,6 +536,7 @@ Meteor.methods({
                     },
                 }
             });
+            feedback = {results: false, moduleData: moduleData};
             return false;
         }
     },

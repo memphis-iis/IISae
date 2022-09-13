@@ -2,6 +2,7 @@ import hark from 'hark';
 import { FilesCollection } from 'meteor/ostrio:files';
 import FileReader from 'filereader';
 import { Script } from 'vm';
+import { read } from 'fs';
 
 
 var chunks = [];
@@ -147,7 +148,6 @@ Template.module.helpers({
         question = page.questions[parseInt(this.questionId)];
         const t = Template.instance();
         question.audioRecording = curModule.audioRecording;
-        console.log(question.type);
         if(question.type == "blank"){
             question.typeBlank = true;
         };
@@ -582,14 +582,18 @@ Template.module.events({
              if(question.type == "multiChoice"){
                 for(character of curModule.autoTutorCharacter){
                         if(character.answersQuestions){
-                            characterResponse = questionData.answers[Math.floor(Math.random()*questionData.answers.length)];
-                            characterAnswer = characterResponse.answer
-                            characterSpeech = "I think it is " + characterAnswer
+                            selectedAnswer = Math.floor(Math.random() * question.answers.length);
+                            characterResponse = questionData.answers[selectedAnswer];
+                            characterAnswer = characterResponse.answer;
+                            message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, selectedAnswer, 0, 0);
+                            readTTS(t, message, character.voice, character.name, character.art);
+                            characterSpeech = message;
                             characterRepsonseData = {
                                 name: character.name,
                                 response: characterAnswer,
                                 voice: character.voice,
                                 value: characterResponse.value,
+                                choiceIndex: selectedAnswer,
                                 speech: characterSpeech,
                                 art: character.art
                             }
@@ -600,15 +604,19 @@ Template.module.events({
                 if(question.type == "imageClick"){
                     for(character of curModule.autoTutorCharacter){
                             if(character.answersQuestions){
+                                characterResponseIndex = Math.floor(Math.random()*questionData.answers.length - 1)
                                 characterResponse = questionData.answers[Math.floor(Math.random()*questionData.answers.length)];
                                 characterAnswer = characterResponse.answer
-                                characterSpeech = "I think it is " + characterAnswer
+                                message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, characterResponseIndex, 0, 0);
+                                readTTS(t, message, character.voice, character.name, character.art);
+                                characterSpeech = message;
                                 characterRepsonseData = {
                                     name: character.name,
                                     response: characterAnswer,
                                     voice: character.voice,
                                     value: characterResponse.value,
                                     speech: characterSpeech,
+                                    choiceIndex: characterResponseIndex,
                                     art: character.art
                                 }
                                 characterResponses.push(characterRepsonseData);
@@ -621,21 +629,17 @@ Template.module.events({
             moduleData.nextQuestion = thisQuestion + 1;
             Meteor.call("evaluateModuleData", moduleData, curModule._id , thisPage, thisQuestion, data.response, answerValue, characterResponses, function(err, res){
                 feedback = t.feedback.get();
-                type = "danger"
+                moduleData = res.moduleData;
+                type = "danger";
+                username = Meteor.user().firstname;
                 message = refutation || question.incorrectFeedback || "you are not correct."
-                
                 if(res != "disabled"){
                     if(res.isCorrect == true){ 
                         type = "success";
-                        message = refutation || "you are correct! ";
                     } 
-                    message = Meteor.user().firstname + ", " + message;
+                    message = getAgentSpeech(username, curModule, "feedback", thisPage, thisQuestion, answerValue, 0, res.isCorrect);
                     for(charResponse of res.characterRefutation){
-                        if(charResponse.isCorrect){
-                            message += "Yes, " + charResponse.character + " you are correct.";
-                        } else {
-                            message += "No, " + charResponse.character + " you are incorrect.";
-                        }
+                        message += " "+ getAgentSpeech(charResponse.character, curModule, "feedback", thisPage, thisQuestion, charResponse.choiceIndex, 0, charResponse.isCorrect);
                     }
                     recordEvent(t,"evaluate", "system", {result: res});
                     addedClass = 'alert-' + type;
@@ -646,150 +650,158 @@ Template.module.events({
                     if(curModule.autoTutorReadsRefutation){
                         autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
                         autoTutorCharacter = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts);
-                        for(response of characterResponses){
-                            readTTS(t, response.speech, response.voice, response.name, response.art);
-                        }
                         readTTS(t, message, autoTutorCharacter.voice, autoTutorCharacter.name, autoTutorCharacter.art);
                     }
                 }
                 moduleData.responses[moduleData.responses.length - 1].result = res.isCorrect || "disabled";
                 
             });
-            Meteor.setInterval(async function(){
+            moduleData = ModuleResults.findOne({_id: moduleId});
+            if(!curModule.enableAdaptivePages || curModule.pages[thisPage].questions.length > thisQuestion + 1 || command == "return"){
+                if(command == "return"){
+                    nextQuestion = 0;
+                    nextPage = thisPage;
+                    nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
+                    if(nextQuestionData.type == "questionSelectionBoard"){
+                        if(moduleData.questionBoardScore){
+                            moduleData.questionBoardScore += answerValue;
+                        } else {
+                            moduleData.questionBoardScore = answerValue;
+                        }
+                        if(moduleData.questionBoardAnswered){
+                            moduleData.questionBoardAnswered.push(thisQuestion);
+                        }else{
+                            moduleData.questionBoardAnswered = [thisQuestion];
+                        }
+                    }
+                    moduleData.nextQuestion = 0;
+                    moduleData.nextPage = thisPage;
+                    Meteor.call("overrideUserDataRoutes",moduleData); 
+                } else {
+                    nextQuestion = thisQuestion + 1;
+                    nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
+                    moduleData.nextQuestion = nextQuestion;
+                    moduleData.nextPage = thisPage;
+                    Meteor.call("overrideUserDataRoutes",moduleData);
+                }
+                if(typeof nextQuestionData !== "undefined"){
+                    target = "/module/" + curModule._id + "/" + thisPage + "/" + nextQuestion; 
+                } else {   
+                    nextPage = thisPage + 1;
+                    if(typeof curModule.pages[nextPage] !== "undefined"){
+                        if(curModule.pages[nextPage].type="activity" && curModule.skipInterstitials){
+                            target = "/module/" + curModule._id + "/" + nextPage + "/0"; 
+                        } else {
+                            target = "/module/" + curModule._id + "/" + nextPage; 
+                        }
+                        moduleData.nextPage = nextPage;
+                        moduleData.nextQuestion = 0;
+                        Meteor.call("overrideUserDataRoutes",moduleData);
+                    } else {
+                        target = "/module/" + curModule._id + "/completed"; 
+                    }
+                }
+            } else {
+                conditions = curModule.pages[thisPage].nextFlow;
+                routePicked = false;
+                if(conditions.length > 0){
+                    for(i = 0; i < conditions.length; i++){
+                        if(!routePicked){
+                            conditionStatement = "moduleData." + conditions[i].condition + conditions[i].operand + conditions[i].threshold;
+                            conditionState = eval(conditionStatement);
+                            if(conditionState){
+                                if(curModule.pages[conditions[i].route].type="activity" && curModule.skipInterstitials){
+                                    target = "/module/" + curModule._id + "/" + conditions[i].route + "/0"; 
+                                } else {
+                                    target = "/module/" + curModule._id + "/" + conditions[i].route; 
+                                }
+                                routePicked = true;
+                                moduleData.nextPage = conditions[i].route;
+                                moduleData.nextQuestion = 0;
+                                Meteor.call("overrideUserDataRoutes",moduleData);
+                                console.log(conditions[i].clearScoring);
+                                if(conditions[i].clearScoring){
+                                    moduleData.score = 0;
+                                } 
+                            }
+                        }
+                    }
+                }
+                if(curModule.customConditionScript && !routePicked){
+                    script = new Function("stats", curModule.customConditionScript);
+                    stats = moduleData.stats;
+                    [nextPage, nextQuestion, customVariable, customValue] = script(stats);
+                    if(moduleData.customCondition){
+                        moduleData.nextPage = nextPage;
+                        moduleData.nextQuestion = nextQuestion;
+                        moduleData.stats[customVariable] = customValue;
+                        target = "/module/" + curModule._id + "/" + nextPage + "/" + nextQuestion;
+                        routePicked = true;
+                        Meteor.call("overrideUserDataRoutes",moduleData);
+                    }
+                }
+                if(!routePicked){
+                    routing = curModule.fallbackRoute
+                    if(routing == 'nextPage'){
+                        moduleData.nextPage = thisPage + 1;
+                        if(typeof curModule.pages[thisPage + 1] !== "undefined"){
+                            moduleData.nextQuestion = 0;
+                            routePicked = true;
+                            target = "/module/" + curModule._id + "/" + moduleData.nextPage;
+                        } else {
+                            target = "/module/" + curModule._id + "/completed";
+                        }
+                        Meteor.call("overrideUserDataRoutes",moduleData);
+                    } 
+                    if(routing == 'currentPage'){
+                        moduleData.nextPage = thisPage;
+                        moduleData.nextQuestion = 0;
+                        routePicked = true;
+                        target = "/module/" + curModule._id + "/" + thisPage;
+                        Meteor.call("overrideUserDataRoutes",moduleData);
+                    }
+                  
+                    if(routing == 'completed'){
+                        moduleData.nextPage = "completed";
+                        moduleData.nextQuestion =  "completed";
+                        routePicked = true;
+                        target = "/module/" + curModule._id + "/completed";
+                        Meteor.call("overrideUserDataRoutes",moduleData);
+                    }
+                    if(routing == 'error'){
+                        alert("Something went wrong. No routing found.");
+                        moduleData.nextPage = "error";
+                        moduleData.nextQuestion =  "error";
+                        routePicked = true;
+                        target = "/moduleCenter";
+                        Meteor.call("overrideUserDataRoutes",moduleData);
+                    }
+                }
+            }
+            timeOut = 0;
+            if(curModule.feedbackTimeout){
+                timeOut = curModule.feedbackTimeout * 1000;
+            }
+            setInterval(checkAvatarsFinished, 1000,  timeOut, target, finishQuestion);
+            function checkAvatarsFinished( timeOut, target, finishQuestion){
                 audioActive = t.audioActive.get();
-                console.log(audioActive);
                 if(!audioActive){
-                    timeOut = curModule.feedbackTimeout * 1000 || 5000;
-                    await sleep(timeOut);
                     $('#refutation').removeClass('alert-success');
                     $('#refutation').removeClass('alert-danger');
                     $('#refutation').text("");
                     $('#refutation').hide();
                     $(':button').prop('disabled', false); 
                     $(':button').removeClass('btn-info');
-                    moduleData = ModuleResults.findOne({_id: moduleId});
-                    if(!curModule.enableAdaptivePages || curModule.pages[thisPage].questions.length > thisQuestion + 1 || command == "return"){
-                        if(command == "return"){
-                            nextQuestion = 0;
-                            nextPage = thisPage;
-                            nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
-                            if(nextQuestionData.type == "questionSelectionBoard"){
-                                if(moduleData.questionBoardScore){
-                                    moduleData.questionBoardScore += answerValue;
-                                } else {
-                                    moduleData.questionBoardScore = answerValue;
-                                }
-                                if(moduleData.questionBoardAnswered){
-                                    moduleData.questionBoardAnswered.push(thisQuestion);
-                                }else{
-                                    moduleData.questionBoardAnswered = [thisQuestion];
-                                }
-                            }
-                            moduleData.nextQuestion = 0;
-                            moduleData.nextPage = thisPage;
-                            Meteor.call("overrideUserDataRoutes",moduleData); 
-                        } else {
-                            nextQuestion = thisQuestion + 1;
-                            nextQuestionData = curModule.pages[thisPage].questions[nextQuestion];
-                        }
-                        if(typeof nextQuestionData !== "undefined"){
-                            target = "/module/" + curModule._id + "/" + thisPage + "/" + nextQuestion; 
-                        } else {   
-                            nextPage = thisPage + 1;
-                            if(typeof curModule.pages[nextPage] !== "undefined"){
-                                if(curModule.pages[nextPage].type="activity" && curModule.skipInterstitials){
-                                    target = "/module/" + curModule._id + "/" + nextPage + "/0"; 
-                                } else {
-                                    target = "/module/" + curModule._id + "/" + nextPage; 
-                                }
-                                moduleData.nextPage = nextPage;
-                                moduleData.nextQuestion = 0;
-                            } else {
-                                target = "/module/" + curModule._id + "/completed"; 
-                            }
-                        }
-                        Meteor.call("overrideUserDataRoutes",moduleData); 
-                    } else {
-                        conditions = curModule.pages[thisPage].nextFlow;
-                        routePicked = false;
-                        if(conditions.length > 0){
-                            for(i = 0; i < conditions.length; i++){
-                                if(!routePicked){
-                                    conditionStatement = "moduleData." + conditions[i].condition + conditions[i].operand + conditions[i].threshold;
-                                    conditionState = eval(conditionStatement);
-                                    if(conditionState){
-                                        if(curModule.pages[conditions[i].route].type="activity" && curModule.skipInterstitials){
-                                            target = "/module/" + curModule._id + "/" + conditions[i].route + "/0"; 
-                                        } else {
-                                            target = "/module/" + curModule._id + "/" + conditions[i].route; 
-                                        }
-                                        routePicked = true;
-                                        moduleData.nextPage = conditions[i].route;
-                                        moduleData.nextQuestion = 0;
-                                        console.log(conditions[i].clearScoring);
-                                        if(conditions[i].clearScoring){
-                                            moduleData.score = 0;
-                                        }
-                                        Meteor.call("overrideUserDataRoutes",moduleData); 
-                                    }
-                                }
-                            }
-                        }
-                        if(curModule.customConditionScript && !routePicked){
-                            script = new Function("stats", curModule.customConditionScript);
-                            stats = moduleData.stats;
-                            [nextPage, nextQuestion, customVariable, customValue] = script(stats);
-                            if(moduleData.customCondition){
-                                moduleData.nextPage = nextPage;
-                                moduleData.nextQuestion = nextQuestion;
-                                moduleData.stats[customVariable] = customValue;
-                                target = "/module/" + curModule._id + "/" + nextPage + "/" + nextQuestion;
-                                routePicked = true;
-                            }
-                        }
-                        if(!routePicked){
-                            routing = curModule.fallbackRoute
-                            if(routing == 'nextPage'){
-                                moduleData.nextPage = thisPage + 1;
-                                if(typeof curModule.pages[thisPage + 1] !== "undefined"){
-                                    moduleData.nextQuestion = 0;
-                                    routePicked = true;
-                                    target = "/module/" + curModule._id + "/" + moduleData.nextPage;
-                                } else {
-                                    target = "/module/" + curModule._id + "/completed";
-                                }
-                            } 
-                            if(routing == 'currentPage'){
-                                moduleData.nextPage = thisPage;
-                                moduleData.nextQuestion = 0;
-                                routePicked = true;
-                                target = "/module/" + curModule._id + "/" + thisPage;
-                            }
-                          
-                            if(routing == 'completed'){
-                                moduleData.nextPage = "completed";
-                                moduleData.nextQuestion =  "completed";
-                                routePicked = true;
-                                target = "/module/" + curModule._id + "/completed";
-                            }
-                            if(routing == 'error'){
-                                alert("Something went wrong. No routing found.");
-                                moduleData.nextPage = "error";
-                                moduleData.nextQuestion =  "error";
-                                routePicked = true;
-                                target = "/moduleCenter";
-                            }
-                            Meteor.call("overrideUserDataRoutes",moduleData); 
-                        }
-                    }
-                    recordEvent(t,"routeToNext", "system", {target:target});
-                    events = t.events.get();
-                    moduleData.responses[moduleData.responses.length - 1].events = events;
-                    Meteor.call("overrideUserDataRoutes",moduleData); 
-                    console.log("ROUTE:", target);
-                    window.location.href = target;
+                    setTimeout(finishQuestion, timeOut, target);
                 }
-            }, 100)
+            }
+            function finishQuestion(target){
+                
+                recordEvent(t,"routeToNext", "system", {target:target});
+                curModuleData = Meteor.user().curModule.nextPage;
+                console.log(curModuleData);
+                window.location.href = target;                
+            }
         }
     },
     'click #startActivity': function(event){
@@ -1112,4 +1124,66 @@ function imageScaleValues(imgUrl, x, y, width, height){
     var widthScaled = (widthPercent * sourceWidth);
     var heightScaled = (heightPercent* sourceHeight);
     return {xPercent:xPercent, yPercent:yPercent, widthPercent:widthPercent, heightPercent:heightPercent, xScaled:xScaled, yScaled:yScaled, widthScaled:widthScaled, heightScaled:heightScaled, parentXPosition:parentXPosition, parentYPosition:parentYPosition};
+}
+
+function getAgentSpeech(speakingTo, module, type, page, question, answerId, response, isCorrect){
+    console.log("getAgentSpeech", speakingTo, module, type, page, question, answerId, response, isCorrect);
+    simpleFeedbackBag = module.simpleFeedbackBag || {correct: ["Good job {{speakingTo}}!", "Well done, {{speakingTo}}!"], incorrect: ["Not Quite, {{speakingTo}}.", "No, {{speakingTo}}."]};
+    if(typeof module.pages[page].questions[question].answers[answerId].feedback !== "undefined"){
+        elaboratedFeedback = module.pages[page].questions[question].answers[answerId].feedback;
+    } else {
+        elaboratedFeedback = "";
+    }   
+    elaboratedTrigger = Math.floor(Math.random() * 100);
+    if(type == "feedback"){
+        threshold = 50;
+        feedback = "No feedback; Error in getAgentSpeech";
+        if(module.feedbackThresholdCalculation){
+            getThreshold = new Function(module.feedbackThresholdCalculation);
+            threshold = getThreshold();
+        } 
+        if(module.feedbackThreshold){
+            threshold = module.feedbackThreshold || threshold;
+        }
+        if(elaboratedTrigger < threshold){
+            if(isCorrect){
+                simpleFeedback = simpleFeedbackBag.correct[Math.floor(Math.random() * simpleFeedbackBag.correct.length)] || "{{speakingTo}} is correct.";
+                combinedFeedback = simpleFeedback + " " + elaboratedFeedback || "Correct";
+                feedback = combinedFeedback;
+            } else {
+                simpleFeedback = simpleFeedbackBag.incorrect[Math.floor(Math.random() * simpleFeedbackBag.incorrect.length)] || "{{speakingTo}} is incorrect.";
+                combinedFeedback = simpleFeedback + " " + elaboratedFeedback || "Incorrect";
+                feedback = combinedFeedback;
+            }
+        } else {
+            if(isCorrect){
+                feedback = simpleFeedbackBag.correct[Math.floor(Math.random() * simpleFeedbackBag.correct.length)] || "{{speakingTo}} is correct.";
+            } else {
+                feedback = simpleFeedbackBag.incorrect[Math.floor(Math.random() * simpleFeedbackBag.incorrect.length)] || "{{speakingTo}} is incorrect.";
+            }
+        }
+        feedback = feedback.replace("{{speakingTo}}", speakingTo);
+        feedback = feedback.replace("{{response}}", response);
+        feedback = feedback.replace("{{user}}", Meteor.user().firstname);
+        console.log("feedback", feedback);
+        return feedback;
+    }
+    if(type == "response"){
+        textResponse = module.pages[page].questions[question].answers[response].answer || "No response; Error in getAgentSpeech";
+        bag1 = module.responseBag || ["I  think it is {{response}}","{{response}} is my guess", "{{response}}? I think so."];
+        responseSpeech = bag1[Math.floor(Math.random() * bag1.length)];
+        responseSpeech = responseSpeech.replace("{{response}}", textResponse);
+        responseSpeech = responseSpeech.replace("{{speakingTo}}", speakingTo);
+        responseSpeech = responseSpeech.replace("{{user}}", Meteor.user().firstname);
+        return responseSpeech;
+    }
+    if(type == "timeOut"){
+        bag1 = module.timeOutBag || ["Are you having trouble?","Are you still there?","Are you still with me?"];
+        timeOutSpeech = bag1[Math.floor(Math.random() * bag1.length)];
+        timeOutSpeech = timeOutSpeech.replace("{{response}}", response);
+        timeOutSpeech = timeOutSpeech.replace("{{speakingTo}}", speakingTo);
+        timeOutSpeech = timeOutSpeech.replace("{{user}}", Meteor.user().firstname);
+        return timeOutSpeech;
+    }
+    return("Error in getAgentSpeech, type not found");
 }
