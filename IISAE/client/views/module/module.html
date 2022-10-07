@@ -231,20 +231,17 @@
                         {{/if}}
                     {{/if}}
                     {{#if question.typeMultiChoice}}
-                    {{#if module.autoTutorReadsPrompt}}
-                    {{else}}
-                    <h3 id="prompt">{{{question.prompt}}}</h3><br>
-                    {{/if}}
                     {{#if question.image}}
                     <div class="row questionImage" style="h-50">
-                        <div class="col-md-1 col-xs-4"></div>
-                        <div class="col-md-4 col-xs-4" style="margin-bottom: 20px; text-center" id="elements">
-                            <img src="{{question.image}}" class="img-responsive text-left" id="imageClickOver">
-                                {{#each question.imageObscurus}}
-                                {{/each}}
+                        <div class="col-md-1 col-sm-2 col-xs-hidden"></div>
+                        <div class="col-md-4 col-sm-8 col-xs-12" style="margin-bottom: 20px; text-center">
+                            <div id="elements">
+                                <img src="{{question.image}}" class="img-responsive text-left" id="imageClickOver">
+                            </div>
                         </div>
-                        <div class="col-md-1 col-xs-4"></div>
-                        <div class="col-md-6 col-xs-12 align-middle">
+                        <div class="col-md-1 col-sm-2 col-xs-hidden"></div>
+                        <div class="col-md-6 col-sm-12 col-xs-12 align-middle answerbox">
+                            <h3 id="prompt">{{{question.prompt}}}</h3><br>
                             <form>
                                 <div class="row justify-content-center">
                                 {{#each question.answers}}
@@ -270,6 +267,7 @@
                                 </div>
                             {{/if}}
                         </div>
+                        <div class="col-md-hidden col-sm-12 col-xs-12"><br></div>
                     </div>
 
                     {{/if}}

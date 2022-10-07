@@ -88,7 +88,23 @@ Template.module.onRendered(function (){
 
 Template.module.helpers({
     'windowSize': function(){
-
+        size = Session.get('windowSize');
+        page = Modules.findOne().pages[parseInt(this.pageId)];
+        question = page.questions[parseInt(this.questionId)];
+        obscuri = question.imageObscurus;
+        answers = question.answers;
+        answersWithXCoords = answers.filter(function(answer){
+            return answer.xCoord;
+        });
+        console.log(obscuri);
+        if(obscuri.length > 0){
+            image = $('#imageClickOver').attr('src');
+            displayObscuri(image,obscuri);
+        }
+        if(answersWithXCoords.length > 0){
+            image = $('#imageClickOver').attr('src');
+            displayClickOverOptions(image,answersWithXCoords);
+        }
         return "";
     },
     'module': () => Modules.findOne(),
@@ -368,9 +384,6 @@ Template.module.events({
                     } else {
                         readTTS(t, response, autoTutorPromptCharacterVoice, autoTutorPromptCaracterArt, autoTutorReadsPrompt);
                     }
-                    //append speaker icon
-                    speakerIcon = "<div class='temp-icon'><br><i class='fa fa-volume-up'></i></div>";
-                    $(event.target).append(speakerIcon);
                 }
             }
         }, 2000);
@@ -1249,13 +1262,15 @@ function displayObscuri(imageSrc, obscuri){
     //create dummy image of imageSrc
     var img = new Image();
     img.src = imageSrc;
+    // delete old obscuri
+    $('.obscuri').remove();
     img.onload = function(){
         //get image dimensions
         var width = img.width;
         var height = img.height;
         //get display image
         var dispImage = $('#imageClickOver');
-        //get dispImage dimensions
+        //get dispImage rendered dimensions
         var dispWidth = dispImage.width();
         var dispHeight = dispImage.height();
         //get ratio of image to display image
@@ -1285,28 +1300,33 @@ function displayObscuri(imageSrc, obscuri){
             //get elements div size
             var divWidth = $('#elements').width();
             var divHeight = $('#elements').height();
+            //get div padding
+            var divPadding = $('#elements').css('padding-left');
             //get the difference between the div size and the display image size
             var diffWidth = divWidth - dispWidth;
             var diffHeight = divHeight - dispHeight;
             //subtract the difference from the obscuri dimensions and position
-            dispObscuriX = dispObscuriX - diffWidth/2;
-            dispObscuriY = dispObscuriY - diffHeight/2;
+            dispObscuriX = dispObscuriX + diffWidth/2 + parseInt(divPadding);
+            dispObscuriY = dispObscuriY + diffHeight/2 + parseInt(divPadding);
             dispObscuriWidth = dispObscuriWidth + diffWidth;
             dispObscuriHeight = dispObscuriHeight + diffHeight;
-            //convert to percentage
-            var dispObscuriXPercent = dispObscuriX/dispWidth * 100;
-            var dispObscuriYPercent = dispObscuriY/dispHeight * 100;
-            var dispObscuriWidthPercent = dispObscuriWidth/dispWidth * 100;
-            var dispObscuriHeightPercent = dispObscuriHeight/dispHeight * 100;
-            //get 5 percent of the screen width
-            var fivePercent = $(window).width() * 0.05;
+            //check if the screen size is less than or equal to 768px
+            divX = 0;
+            divY = 0;
+            if($(window).width() <= 768){ 
+                //get the position of the div and subtract it from the obscuri position and add the padding
+                divX = $('#elements').offset().left;
+                divY = $('#elements').offset().top;
+                dispObscuriX = dispObscuriX - divX + 40;
+            }
+
             //create obscuri div
             var obscuriDiv = $('<div class="obscuri"></div>').css({
                 'position': 'absolute',
-                'top': dispObscuriYPercent + '%',
-                'left': dispObscuriXPercent + '%',
-                'width': dispObscuriWidthPercent  - 10 + '%',
-                'height': dispObscuriHeightPercent + '%',
+                'top': dispObscuriY + 'px',
+                'left': dispObscuriX + divX + 'px',
+                'width': dispObscuriWidth + 'px',
+                'height': dispObscuriHeight + 'px',
                 'background-color': bgColor,
                 'color': textColor,
                 'font-size': fontSize,
@@ -1486,8 +1506,8 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
         }
         bag1 = module.responseBag || ["I  think it is {{response}}.","{{response}} is my guess.", "{{response}}? I think so."];
         responseSpeech = bag1[Math.floor(Math.random() * bag1.length)];
-        //remove trailing punctuation
-        textResponse = textResponse.replace(/[\.,-\/#!%\^&\*;:{}=\-_`~()]/g,"");
+        //remove periods, question marks, and exclamation points at the end of the response
+        textResponse = textResponse.replace(/\.+$/, "");
         //remove trailing spaces
         textResponse = textResponse.replace(/\s{2,}/g," ");
         //add quotes to text response

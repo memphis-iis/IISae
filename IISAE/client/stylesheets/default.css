@@ -35,7 +35,6 @@ body{
 }
 .btn{
     margin-bottom:20px;
-    white-space: normal;
 }
 .calendar-today {
     background-color: #74c3f0;
@@ -62,6 +61,14 @@ input, option, textarea {
 #footer p{
     text-align: center;
 }
+.btn-block{
+    width: 90%;
+    margin-bottom: 30px;
+    margin: auto;
+}
+.answerbox{
+    margin-bottom: 50px;
+}
 #mark{
     vertical-align: bottom;
     display: inline;
@@ -86,7 +93,12 @@ img #logo-color{
     height: 50px;
     margin:5px;
 }
-
+#elements{
+    border-radius: 10px;
+    border: #74c3f0 1px solid;
+    padding: 10px;
+    display: inline-block;
+}
 .module-img{
     max-height:300px;
     margin-bottom: 20px;

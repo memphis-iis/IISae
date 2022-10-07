@@ -1,0 +1,923 @@
+{
+  "public" : true,
+  "fallbackRoute" : "nextPage",
+  "googleAPIKey" : "AIzaSyAjxoQ8qRAw88SI2H3F97TT7bPyOhxz-B0",
+  "enableScoring" : true,
+  "enableAutoTutor" : true,
+  "autoTutorReadsScript" : true,
+  "autoTutorReadsRefutation" : true,
+  "autoTutorReadsPrompt" : true,
+  "autoTutorReadsResponse" : false,
+  "autoTutorReadsChoices" : true,
+  "autoTutorRepeat" : true,
+  "autoTutorCanReadPassage" : true,
+  "scriptFadeTimeout" : 0,
+  "autoTutorCharacter" : [ 
+      {
+          "role" : "teacher",
+          "name" : "Cristina",
+          "template" : "default",
+          "voice" : "en-US-Standard-C",
+          "art" : "data:image/jpeg;base64,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",
+          "answersQuestions" : false
+      }, 
+      {
+          "role" : "student",
+          "name" : "Jordan",
+          "template" : "default",
+          "voice" : "en-US-Standard-B",
+          "art" : "https://a9p9n2x2.stackpathcdn.com/wp-content/blogs.dir/1/files/2019/10/Aaron-Follins-1024x911.jpg",
+          "answersQuestions" : true
+      }
+  ],
+  "characterReadsPrompts" : "Cristina",
+  "enableAnswerTags" : false,
+  "showScoring" : true,
+  "feedbackTimeout" : "0",
+  "enableAdaptivePages" : false,
+  "enableAdaptiveQuestions" : false,
+  "enableFeedback" : true,
+  "enableWeightedQuestions" : false,
+  "enableLSA" : false,
+  "lsaThreshold" : false,
+  "audtioRecording" : false,
+  "complexScoringFunction" : "",
+  "customConditionScript" : "",
+  "nextFlow" : [],
+  "skipInterstitials" : true,
+  "randomChoice" : false,
+  "title" : "Lesson 1: Bag of Words - Avatar Response, Feedback, and Inactivity",
+  "identfier" : "Lesson1",
+  "display" : true,
+  "description" : "This is a test lesson for ARC by the developers. This lesson has the following feedback settings: Bag of Words enabled for avatar responses, simple feedback, and user inactivity (20s to 1m).",
+  "avatarTimeOutMin" : 20000,
+  "avatarTimeOutMax" : 60000,
+  "pages" : [ 
+      {
+          "type" : "activity",
+          "header" : "Introduction",
+          "subheader" : "Introduction",
+          "text" : "",
+          "nextFlow" : [],
+          "questions" : [ 
+              {
+                  "type" : "autotutorscript",
+                  "prompt" : "",
+                  "value" : 0,
+                  "feedback" : "",
+                  "noRefutation" : true,
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/BackPain.jpg",
+                  "autoTutorScript" : [ 
+                      {
+                          "character" : "Cristina",
+                          "script" : " _user_ Hi. I'm happy you are joining us for this lesson! My name is Cristina and I will be your tutor throughout this program.",
+                          "role" : "teacher",
+                          "chatColor" : "#111111",
+                          "chatTextColor" : "#ffffff"
+                      }, 
+                      {
+                          "character" : "Jordan",
+                          "script" : " _user_, hello! I'm Jordan! I will be here learning with you! I'm happy you are here to learn with me.",
+                          "role" : "teacher",
+                          "chatColor" : "#000000",
+                          "chatTextColor" : "#ffffff"
+                      }, 
+                      {
+                          "character" : "Cristina",
+                          "script" : " In this lesson we will show you how to identify print and visual cues, titles and subtitles. Also, how to make predictions using these signals.",
+                          "role" : "teacher",
+                          "chatColor" : "#111111",
+                          "chatTextColor" : "#ffffff"
+                      }, 
+                      {
+                          "character" : "Jordan",
+                          "script" : " Cristina, Can you explain what these text signals are? ",
+                          "role" : "teacher",
+                          "chatColor" : "#000000",
+                          "chatTextColor" : "#ffffff"
+                      }, 
+                      {
+                          "character" : "Cristina",
+                          "script" : " Yes. Take a look at this book. You can see the title of the book, Ending Back Pain, in green. the visual cue of a person suffering from back pain is in yellow. and the subtitle of the book is in blue.",
+                          "role" : "teacher",
+                          "chatColor" : "#111111",
+                          "chatTextColor" : "#ffffff"
+                      }, 
+                      {
+                          "character" : "Jordan",
+                          "script" : " I got it. So the title gives us general information, the visual cue is related to the topic of the book, and the subtitle shows us more information about the topic. Can we get started?",
+                          "role" : "teacher",
+                          "chatColor" : "#000000",
+                          "chatTextColor" : "#ffffff"
+                      }, 
+                      {
+                          "character" : "Cristina",
+                          "script" : " Yes, lets start. But first, I should tell you that as we go along in the lessons, you may notice that two buttons appear at the bottom of your screen.",
+                          "role" : "teacher",
+                          "chatColor" : "#111111",
+                          "chatTextColor" : "#ffffff"
+                      }, 
+                      {
+                          "character" : "Cristina",
+                          "script" : " These are a repeat button and a video button. You can press the repeat button if you need to hear something again. You can press the video button if you would like to review the video that highlights the lessons main points.",
+                          "role" : "teacher",
+                          "chatColor" : "#111111",
+                          "chatTextColor" : "#ffffff"
+                      }, 
+                      {
+                          "character" : "Cristina",
+                          "script" : " now, I think we are ready. For this activity you will need to select the print cues or visual cues that complete the book cover or street sign.",
+                          "role" : "teacher",
+                          "chatColor" : "#111111",
+                          "chatTextColor" : "#ffffff"
+                      }, 
+                      {
+                          "character" : "Cristina",
+                          "script" : " From there you will have to make predictions about the material. Let's look over the current book cover and take note of the different text signals. When you are ready, please click on the continue button to start the activity.",
+                          "role" : "teacher",
+                          "chatColor" : "#111111",
+                          "chatTextColor" : "#ffffff"
+                      }
+                  ]
+              }
+          ]
+      }, 
+      {
+          "header" : "Medium",
+          "questions" : [ 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/ComeToMeSoftlyCover.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict the message of the book.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "A couple dealing with each other's past and loving each other",
+                  "answers" : [ 
+                      {
+                          "answer" : "A couple dealing with each other's past and loving each other"
+                      }, 
+                      {
+                          "answer" : "Finding nature and looking for love"
+                      }, 
+                      {
+                          "answer" : "Discovering how to walk gently"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/ComeToMeSoftlyCover.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Which Prediction is the best for what might happen in the book?",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "The couple will go through hardships and their love will be tested",
+                  "answers" : [ 
+                      {
+                          "answer" : "The couple will go through hardships and their love will be tested"
+                      }, 
+                      {
+                          "answer" : "The book will serve as a guide for surviving the wild"
+                      }, 
+                      {
+                          "answer" : "The book shows a couple enduring parenthood and their love life"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/medium4 pic.jpg",
+                  "imageObscurus" : [ 
+                      {
+                          "x" : "0px",
+                          "y" : "60px",
+                          "width" : "438px",
+                          "height" : "150px",
+                          "text" : "",
+                          "bgColor" : " #191007",
+                          "textColor" : " #191007"
+                      }
+                  ],
+                  "prompt" : "Click on the book title that matches the other cues on the book cover.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Lincoln's Boys",
+                  "answers" : [ 
+                      {
+                          "answer" : "Lincoln's Boys"
+                      }, 
+                      {
+                          "answer" : "Locating Inner Peace"
+                      }, 
+                      {
+                          "answer" : "History of India"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/medium4 pic.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict the message of the book.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "A look into Lincoln's presidency from the viewpoint of his close friends",
+                  "answers" : [ 
+                      {
+                          "answer" : "A look into Lincoln's presidency from the viewpoint of his close friends"
+                      }, 
+                      {
+                          "answer" : "A history lesson about George Washington"
+                      }, 
+                      {
+                          "answer" : "A review of the children of American presidents"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/street_sign.png",
+                  "imageObscurus" : [
+                    {
+                        "x" : "0px",
+                        "y" : "300px",
+                        "width" : "300px",
+                        "height" : "180px",
+                        "text" : "",
+                        "bgColor" : "#2b2b29",
+                        "textColor" : "#ffffff"
+                    }
+                  ] ,
+                  "prompt" : "What is an appropriate title for this sign?",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Pedestrian Crossing",
+                  "answers" : [ 
+                      {
+                          "answer" : "Pedestrian Crossing"
+                      }, 
+                      {
+                          "answer" : "School Zone"
+                      }, 
+                      {
+                          "answer" : "Business center ahead"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/street_sign.png",
+                  "imageObscurus" : [
+                    {
+                        "x" : "0px",
+                        "y" : "15px",
+                        "width" : "300px",
+                        "height" : "150px",
+                        "text" : "",
+                        "bgColor" : " #2b2b29",
+                        "textColor" : " #2b2b29"
+                    }
+                  ],
+                  "prompt" : "Which text cue would be appropriate for the sign?",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Slow",
+                  "answers" : [ 
+                      {
+                          "answer" : "Slow"
+                      }, 
+                      {
+                          "answer" : "Fast"
+                      }, 
+                      {
+                          "answer" : "Stop Now"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/street_sign.png",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict what the sign is telling you to do.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Drive slow pedestrian crossing",
+                  "answers" : [ 
+                      {
+                          "answer" : "Drive slow pedestrian crossing"
+                      }, 
+                      {
+                          "answer" : "Business zone keep quiet"
+                      }, 
+                      {
+                          "answer" : "No cars allowed"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/RRSign.png",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict what the sign is trying to tell us.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Use caution when driving near railroad crossing",
+                  "answers" : [ 
+                      {
+                          "answer" : "Use caution when driving near railroad crossing"
+                      }, 
+                      {
+                          "answer" : "Yield to other drivers on the road"
+                      }, 
+                      {
+                          "answer" : "You must stop at this location on the red light"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/MergeSign.png",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict where this sign will most likely be seen.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "The expressway",
+                  "answers" : [ 
+                      {
+                          "answer" : "The expressway"
+                      }, 
+                      {
+                          "answer" : "At business offices only"
+                      }, 
+                      {
+                          "answer" : "Busy intersection"
+                      }
+                  ]
+              }
+          ],
+          "type" : "activity",
+          "text" : "",
+          "nextFlow" : [],
+          "subheader" : "subheader"
+      }, 
+      {
+          "header" : "Easy",
+          "questions" : [ 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Tower%20Lord.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Click the title on the book cover.",
+                  "type" : "imageClick",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Choice 3 ",
+                  "answers" : [
+                    {
+                        "answer" : "Choice 1 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "0px",
+                        "width" : "215px",
+                        "height" : "62px"
+                    },
+                    {
+                        "answer" : "Choice 2 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "62px",
+                        "width" : "215px",
+                        "height" : "201px"
+                    },
+                    {
+                        "answer" : "Choice 3 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "265px",
+                        "width" : "215px",
+                        "height" : "109px"
+                    }
+                ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Tower Lord.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Click on the book's visual cue.",
+                  "type" : "imageClick",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Choice 2 ",
+                  "answers" : [
+                    {
+                        "answer" : "Choice 1 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "0px",
+                        "width" : "215px",
+                        "height" : "62px"
+                    },
+                    {
+                        "answer" : "Choice 2 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "62px",
+                        "width" : "215px",
+                        "height" : "201px"
+                    },
+                    {
+                        "answer" : "Choice 3 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "265px",
+                        "width" : "215px",
+                        "height" : "109px"
+                    }
+                ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/RulesOfRunningCover.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Click the title on the book cover.",
+                  "type" : "imageClick",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Choice 3 ",
+                  "answers" :[
+                    {
+                        "answer" : "Choice 1 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "333px",
+                        "width" : "250px",
+                        "height" : "51px"
+                    },
+                    {
+                        "answer" : "Choice 2 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "256px",
+                        "width" : "250px",
+                        "height" : "68px"
+                    },
+                    {
+                        "answer" : "Choice 3 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "0px",
+                        "width" : "250px",
+                        "height" : "260px"
+                    }
+                ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/RulesOfRunningCover.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Click the subtitle on the book.",
+                  "type" : "imageClick",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Choice 2 ",
+                  "answers" : [
+                    {
+                        "answer" : "Choice 1 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "333px",
+                        "width" : "250px",
+                        "height" : "51px"
+                    },
+                    {
+                        "answer" : "Choice 2 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "256px",
+                        "width" : "250px",
+                        "height" : "68px"
+                    },
+                    {
+                        "answer" : "Choice 3 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "0px",
+                        "width" : "250px",
+                        "height" : "260px"
+                    }
+                ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Juicing.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Click the visual cue on the book.",
+                  "type" : "imageClick",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Choice 2 ",
+                  "answers" :[
+                    {
+                        "answer" : "Choice 1 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "560px",
+                        "width" : "330px",
+                        "height" : "58px"
+                    },
+                    {
+                        "answer" : "Choice 2 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "320px",
+                        "width" : "330px",
+                        "height" : "230px"
+                    },
+                    {
+                        "answer" : "Choice 3 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "60px",
+                        "width" : "330px",
+                        "height" : "250px"
+                    }
+                ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Juicing.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Click the title of the book.",
+                  "type" : "imageClick",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Choice 3 ",
+                  "answers" : [
+                    {
+                        "answer" : "Choice 1 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "560px",
+                        "width" : "330px",
+                        "height" : "58px"
+                    },
+                    {
+                        "answer" : "Choice 2 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "320px",
+                        "width" : "330px",
+                        "height" : "230px"
+                    },
+                    {
+                        "answer" : "Choice 3 ",
+                        "xCoord" : "0px",
+                        "yCoord" : "60px",
+                        "width" : "330px",
+                        "height" : "250px"
+                    }
+                ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/wheelchair.png",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict what the sign is telling you.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Handicap parking only you will be fined $100-$500",
+                  "answers" : [ 
+                      {
+                          "answer" : "Handicap parking only you will be fined $100-$500",
+                          "answerAlt": "Handicap parking only you will be fined $100 to $500"
+                      }, 
+                      {
+                          "answer" : "Only park here for loading and unloading"
+                      }, 
+                      {
+                          "answer" : "\"Handicap parking, park where you'd like\""
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/buckleup.png",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict what the sign is telling you.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "You are required to wear your seat belt.",
+                  "answers" : [ 
+                      {
+                          "answer" : "You are required to wear your seat belt."
+                      }, 
+                      {
+                          "answer" : "You have a right not to wear your seat belt."
+                      }, 
+                      {
+                          "answer" : "You are not safe wearing your seat belt."
+                      }
+                  ]
+              }
+          ],
+          "type" : "activity",
+          "text" : "",
+          "nextFlow" : [],
+          "subheader" : "subheader"
+      }, 
+      {
+          "header" : "Hard",
+          "questions" : [ 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Juicing.jpg",
+                  "imageObscurus" : [
+                    {
+                        "x" : "0px",
+                        "y" : "28px",
+                        "width" : "450px",
+                        "height" : "225px",
+                        "text" : "\n\t\t\t\t\t\n\t\t\t\t\t\tThe Juice Lady's Guide to Juicing for Health\n\t\t\t\t\t\n\t\t\t\t",
+                        "bgColor" : " #ffffff",
+                        "textColor" : "red",
+                        "fontSize" : "30px",
+                        "fontFamily" : "'Times New Roman', serif;"
+                    }
+                ],
+                  "prompt" : "Does the title of the book match the visual cues on the book cover.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "The title does match the other cues on the book cover.",
+                  "answers" : [ 
+                      {
+                          "answer" : "The title does match the other cues on the book cover."
+                      }, 
+                      {
+                          "answer" : "The title does NOT match the other cues on the book cover."
+                      }, 
+                      {
+                          "answer" : "The title does not match the subtitle but does match the visual cue."
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Juicing.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict what the book is about based on the text signals on the book's cover.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "It describes how to juice with fruits and prevent disease by juicing",
+                  "answers" : [ 
+                      {
+                          "answer" : "It describes how to juice with fruits and prevent disease by juicing"
+                      }, 
+                      {
+                          "answer" : "It teaches students how to bake pies"
+                      }, 
+                      {
+                          "answer" : "It helps people learn how to cook with whole foods"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/HigherCallCover.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Does the visual cue match the text signals on the cover?",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "The visual cue matches the title and subtitle",
+                  "answers" : [ 
+                      {
+                          "answer" : "The visual cue matches the title and subtitle"
+                      }, 
+                      {
+                          "answer" : "The visual cue does not match the subtitle"
+                      }, 
+                      {
+                          "answer" : "The visual cue does not match the title or subtitle"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/HigherCallCover.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict what the book is about.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "A story about fighter planes and pilots in World War II.",
+                  "answers" : [ 
+                      {
+                          "answer" : "A story about fighter planes and pilots in World War II."
+                      }, 
+                      {
+                          "answer" : "The creation of airplanes in America."
+                      }, 
+                      {
+                          "answer" : "The history of sailors in the U.S. Navy."
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/green.jpg",
+                  "imageObscurus" : [
+                    {
+                        "x" : "0px",
+                        "y" : "455px",
+                        "width" : "440px",
+                        "height" : "165px",
+                        "text" : "Studying and Applying Physics to the Real World",
+                        "bgColor" : "#86ac25",
+                        "textColor" : " #ffffff",
+                        "fontSize" : "30px",
+                        "font" : "Lobster, Verdana, 'Times New Roman'"
+                    }
+                ],
+                  "prompt" : "Does the title match the visual cues on the book?",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "The title doesn't support the visual cues",
+                  "answers" : [ 
+                      {
+                          "answer" : "The title doesn't support the visual cues"
+                      }, 
+                      {
+                          "answer" : "The title supports only part of the visual cues"
+                      }, 
+                      {
+                          "answer" : "The title supports the visual cues shown"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/green.jpg",
+                  "imageObscurus" : [
+                    {
+                        "x" : "0px",
+                        "y" : "455px",
+                        "width" : "440px",
+                        "height" : "165px",
+                        "text" : "",
+                        "bgColor" : "#86ac25",
+                        "textColor" : " #ffffff",
+                        "fontSize" : "30px",
+                        "font" : "Lobster, Verdana, 'Times New Roman'"
+                    }
+                ],
+                  "prompt" : "Predict the title based on the visual cue .",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Aunt Dimity and the Wishing Well",
+                  "answers" : [ 
+                      {
+                          "answer" : "Aunt Dimity and the Wishing Well"
+                      }, 
+                      {
+                          "answer" : "Locating the Truth"
+                      }, 
+                      {
+                          "answer" : "Discovering the Past"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/age.jpg",
+                  "imageObscurus" : [
+                    {
+                        "x" : "0px",
+                        "y" : "165px",
+                        "width" : "420px",
+                        "height" : "40px",
+                        "text" : "A How-To for",
+                        "bgColor" : " #045781",
+                        "textColor" : "#ffffff",
+                        "fontSize" : "0px",
+                        "font" : "Lora, Verdana, 'Times New Roman'"
+                    },
+                    {
+                        "x" : "0px",
+                        "y" : "330px",
+                        "width" : "420px",
+                        "height" : "40px",
+                        "text" : "Adult Sewing",
+                        "bgColor" : " #045781",
+                        "textColor" : "#ffffff",
+                        "fontSize" : "30px",
+                        "font" : "Lora, Verdana, 'Times New Roman'"
+                    }
+                ],
+                  "prompt" : "Does the subtitle match the text signals present?",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "The subtitle does not support the text signals",
+                  "answers" : [ 
+                      {
+                          "answer" : "The subtitle does not support the text signals"
+                      }, 
+                      {
+                          "answer" : "The subtitle supports the title"
+                      }, 
+                      {
+                          "answer" : "The subtitle supports the visual cues but not the title"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/age.jpg",
+                  "imageObscurus" : [ 
+                      {
+                          "x" : "0px",
+                          "y" : "148px",
+                          "width" : "100%",
+                          "height" : "350px",
+                          "text" : "",
+                          "bgColor" : " #045781",
+                          "textColor" : "#ffffff",
+                          "fontSize" : "Lora, Verdana, 'Times New Roman'",
+                          "font" : "Lora, Verdana, 'Times New Roman'"
+                      }
+                  ],
+                  "prompt" : "Predict the subtitle of the book based on the text signals.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "Electric Light and the Invention of Modern America",
+                  "answers" : [ 
+                      {
+                          "answer" : "Electric Light and the Invention of Modern America"
+                      }, 
+                      {
+                          "answer" : "The Tesla Coil"
+                      }, 
+                      {
+                          "answer" : "The History of the Computer and the Internet"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Dragon.jpg",
+                  "imageObscurus" : [ 
+                      {
+                          "x" : "0px",
+                          "y" : "73px",
+                          "width" : "100%",
+                          "height" : "268px",
+                          "text" : "",
+                          "bgColor" : " #99CCFF",
+                          "textColor" : "  "
+                      }
+                  ],
+                  "prompt" : "Click on the visual cue that matches the other cues on the book cover.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "A",
+                  "answers" : [ 
+                      {
+                          "answer" : "B",
+                          "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Hard2-Cue0.png"
+                      }, 
+                      {
+                          "answer" : "C",
+                          "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Hard2-Cue2.png"
+                      }, 
+                      {
+                          "answer" : "A",
+                          "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Hard2-Cue1.png"
+                      }
+                  ]
+              }, 
+              {
+                  "image" : "https://csal.autotutor.org/Scripts/Lesson1/ActivityMedia/media/Dragon.jpg",
+                  "imageObscurus" : [],
+                  "prompt" : "Predict what the book is about based on the text signals on the cover.",
+                  "type" : "multiChoice",
+                  "value" : 0,
+                  "feedback" : "",
+                  "correctAnswer" : "A dragon slayer must save a princess.",
+                  "answers" : [ 
+                      {
+                          "answer" : "A dragon slayer must save a princess."
+                      }, 
+                      {
+                          "answer" : "A dragon pretends to be a goat to get into a palace."
+                      }, 
+                      {
+                          "answer" : "There is a king that leaves his throne for the love of his life."
+                      }
+                  ]
+              }
+          ],
+          "type" : "activity",
+          "text" : "",
+          "nextFlow" : [],
+          "subheader" : "subheader"
+      }
+  ],
+  "simpleFeedbackBag" : {
+      "correct" : [ 
+          "{{speakingTo}}, you got the question right!", 
+          "{{speakingTo}}, you answered right! Thanks for helping me so much!", 
+          "{{speakingTo}}, you answered correctly.", 
+          "{{speakingTo}}, I agree with your answer.", 
+          "{{speakingTo}}, you answered correctly.", 
+          "{{speakingTo}}, you answered the question correctly.", 
+          "{{speakingTo}}, great answer!", 
+          "{{speakingTo}},  you picked the right answer!"
+      ],
+      "incorrect" : [ 
+          "{{speakingTo}}, I don't think that's the right answer.", 
+          "{{speakingTo}}, I don't think that was the right answer.", 
+          "{{speakingTo}}, try again. I don't think that was the right answer.", 
+          "{{speakingTo}}, I don't think that was right!", 
+          "{{speakingTo}}, sorry! that wasn't the right answer.", 
+          "{{speakingTo}},  your answer choice was not correct.", 
+          "{{speakingTo}}, looks like you picked the wrong answer", 
+          "{{speakingTo}}, your answer was not correct."
+      ]
+  },
+  "owner" : "LBsKSynSoHMLwPFNd"
+}
