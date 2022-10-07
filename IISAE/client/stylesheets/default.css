@@ -75,38 +75,91 @@ img #logo-color{
     max-width:100px;
     border-radius: 20px;
 }
-.btn{
-    width:50%%;
-}
+
 .avatar{
     text-align: center;
 }
 .speaker img{
-    width:100%;
-    height: 100%;
-    border-radius: 100px;
+
+    border-radius: 50px;
+    width: 50px;
+    height: 50px;
+    margin:5px;
 }
 
 .module-img{
     max-height:300px;
     margin-bottom: 20px;
 }
+.imageClickOver{
+    max-height:40;
+    margin-bottom: 20px;
+    border: #286588 1px solid;
+}
+
 .scrollbar{
     text-align: left;
 }
 .attemplate{
     margin-bottom: 1px;
-    min-height:100px;
+    min-height:10px;
     
 }
 .attemplate .script{
-    min-height:100px;
+    min-height:50px;
+    padding-left: 20px;
+    padding-top:5px;
+    padding-right: 20px;
+}
+
+#ATTemplate0 .script{
+    color:white;
+    background-color: #286588;
+
+}
+#ATTemplate1 .script{
+    color:white;
+    background-color: #28883d;
 }
 .autoTutorHistory{
+    padding-right: 10px;
+    padding-top: 5px;
+    overflow-y : scroll;
+    overflow-x: hidden;
+    max-height: 20vh;
+}
+.autoTutorContainer{
+    border-radius: 10px;
+    border: #74c3f0 1px solid;
+}
+.autoTutorHistoryHidden{
+    border-radius: 10px;
+    overflow-x: hidden;
     overflow-y: scroll;
-    overflow-x:hidden;
-    min-height: 100px;
-    max-height: 200px;
+    max-height:none;
+}
+.showAutoTutorHistory span, .hideAutoTutorHistory span{
+    border: #74c3f0 2px solid;
+    background-color: antiquewhite;
+    border-radius: 25px;
+    padding: 5px;
+    margin: 5px;
+}
+@media screen and (max-width: 768px) {
+    .autoTutorHistory{
+        max-height: 30vh;
+    }
+    .autoTutorHistoryHidden{
+        
+    }
+}
+.Messages{
+    background-color: #74c3f0;
+    color:white;
+    border-radius: 10px 10px 0px 0px;
+    margin-bottom: 5px;
+    text-align: left;
+    padding: 5px;
 }
 .scorebarcontainer{
     background-color:#d9eaf4;
@@ -120,9 +173,57 @@ img #logo-color{
     background-color: #74c3f0;
 }
 .overlay{
-    background-color: rgba(0,0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.2);
     color:white;
+    font-size: 30px;
+    font-weight: bold;
+    width:100%;
+    height:100%;
+    text-shadow: black 0.1em 0.1em 0.1em;
+    margin-left: 5%;
 }
 .overlay:hover{
     background-color: rgba(0,0, 0, .5);
+    color:white;
+}
+.selected{
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+.btn-wrong{
+    background-color: rgba(255, 0, 0, 1) !important;
+    color:white !important;
+}
+.btn-correct{
+    background-color: rgb(17, 184, 61) !important;
+    color:black !important;
+}
+.characterIcon{
+    border-radius: 50px;
+    width: 30px;
+    height: 30px;
+    border: #d9eaf4 3px solid;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin: 5px;
+}
+.menuBar{
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    border-top: #74c3f0 1px solid;
+    padding-top: 5px;
+    background-color: white;
+    width: 100vw;
+    box-shadow: #286588 0px 0px 10px;
+}
+.questionImage{
+    max-height: 200px;
+    max-width: 100%;
+    margin-bottom: 10px;
+}
+.menuBar .btn{
+    font-size: medium;
+    height: 60px;
+    max-width:33vw;
 }

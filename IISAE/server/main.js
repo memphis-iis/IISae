@@ -438,9 +438,13 @@ Meteor.methods({
             if(enableFeedback && !skipFeedback){
                 console.log("Answer Assess ======================", correctAnswer, response);
                 answerCheck = answerAssess(correctAnswer, response).isCorrect;
+                answersArray = curModule.pages[pageId].questions[questionId].answers;
+                correctAnswerIndex = answersArray.findIndex(obj => obj.answer === correctAnswer);
+                feedback.correctAnswerIndex = correctAnswerIndex;
                 feedback.isCorrect = answerCheck;
                 for(let charResponse of charResponses){
                     charAnswerCheck = answerAssess(correctAnswer, charResponse.response).isCorrect;
+                    console.log("Char Answer Assess ======================", correctAnswer, charResponse.response);
                     data = {
                         character: charResponse.name,
                         choiceIndex: charResponse.choiceIndex,

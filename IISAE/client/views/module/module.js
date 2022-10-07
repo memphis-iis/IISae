@@ -1,17 +1,14 @@
 import hark from 'hark';
-import { FilesCollection } from 'meteor/ostrio:files';
-import FileReader from 'filereader';
-import { Script } from 'vm';
-import { read } from 'fs';
+import { Module } from 'module';
 
 
 var chunks = [];
+var template;
 
 Template.module.onRendered(function (){
     $('#scrollArea').scroll(function(){
         element = document.getElementById('scrollArea');
         if(Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) === 0){
-            console.log('enable');
             $(".continue").prop( "disabled", false );
         }
     });
@@ -31,7 +28,6 @@ Template.module.onRendered(function (){
     autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
     art = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
     autoTutorReadsScript = moduleData.autoTutorReadsScript;
-    console.log(moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId], Meteor.user().curModule.pageId,Meteor.user().curModule.questionId);
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
     if(autoTutorReadsScript && scriptsToRead.length > 0 && typeof moduleResults.questionBoardAnswered == 'undefined'){
@@ -82,9 +78,19 @@ Template.module.onRendered(function (){
     if(moduleData.audioRecording && !moduleData.enableAutoTutor){
         setupRecording(t);
     }
+
+    //get question type
+    questionType = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].type;
+
+
+
 });
 
 Template.module.helpers({
+    'windowSize': function(){
+
+        return "";
+    },
     'module': () => Modules.findOne(),
     'trialData': function(){
         let moduleId = Meteor.user().curModule.moduleId;
@@ -96,7 +102,6 @@ Template.module.helpers({
                 value: moduleData.stats[Object.keys(moduleData.stats)[stat]]
             });
         }
-        console.log(moduleData.statsDisplay);
         return moduleData;
     },
     'pageid': function() {return parseInt(this.pageId);},
@@ -161,11 +166,9 @@ Template.module.helpers({
                 $(".continue").prop("disabled",false);
             }
             $('.scorebar').width(scoreWidth);
-            console.log(questionsAvailable);
             for(index in questionsAvailable){
                 questionsAvailable[index].index = parseInt(index);
             }
-            console.log(moduleData.questionBoardAnswered);
             if(moduleData.questionBoardAnswered){
                 for(questionIndex of moduleData.questionBoardAnswered){
                     questionIndex = parseInt(questionIndex);
@@ -176,7 +179,6 @@ Template.module.helpers({
             question.availableQuestions = [];
             for(questionIndex in questionsAvailable){
                 category = questionsAvailable[questionIndex].category;
-                console.log(category);
                 if(category){
                     if(!question.availableQuestions.categories){
                         question.availableQuestions.categories  = [{category: category, questions: []}];
@@ -185,11 +187,9 @@ Template.module.helpers({
                         question.availableQuestions.categories.push({category: category, questions: []})
                     }
                     categoryIndex = question.availableQuestions.categories.map(e => e.category).indexOf(category);
-                    console.log("Rusty",question.availableQuestions);
                     question.availableQuestions.categories[categoryIndex].questions.push(questionsAvailable[questionIndex]);
                 }
             }
-            console.log(question.availableQuestions);
         };
         if(question.type == "scrollbar"){
             question.typeScroll = true;
@@ -201,10 +201,8 @@ Template.module.helpers({
         }
         if(question.type == "link"){
             question.typeLink = true;
-            console.log('hi');
             b = question.prompt.replace(/<a>/gm,"<a id='continueLink'>");
             question.prompt = b;
-            console.log(question.prompt);
         };
         if(question.type == "multiChoice"){
             question.typeMultiChoice = true;
@@ -220,14 +218,6 @@ Template.module.helpers({
             question.typeImageClick = true;
             imagePos = $('#imageClickOver').offset();
             answers = question.answers;
-            if(imagePos){
-                for(answer of answers){
-                    answer.xCoord = imagePos.left + parseInt(answer.xCoord);
-                    answer.yCoord = imagePos.top + parseInt(answer.yCoord);
-                    answer.scaledCoords = imageScaleValues(question.image,answer.xCoord,answer.yCoord, answer.width,answer.height);
-                }
-            }
-            console.log(answers);
             question.answers = answers
         };
         if(question.type == "reading"){
@@ -262,7 +252,6 @@ Template.module.helpers({
                 clozeNumber = i+1;
                 clozeNumber = "<u>Answer " + clozeNumber + "</u>";
                 question.prompt = question.prompt.replace("_",clozeNumber);
-                console.log(clozeNumber);
             }
             if(curModule.randomChoice){
                 let shuffled = question.answers
@@ -300,6 +289,14 @@ Template.module.helpers({
         }
         return question;
     },
+    'autoTutorHidden': function(){
+        //get template
+        let t = Template.instance();
+        //get autoTutorHidden from template
+        let autoTutorHidden = t.autoTutorHidden.get();
+        //return autoTutorHidden
+        return autoTutorHidden;
+    },
     'transcript': function(){
         let moduleId = Meteor.user().curModule.moduleId;
         results = ModuleResults.findOne({_id: moduleId});
@@ -312,10 +309,34 @@ Template.module.helpers({
             }
             return transcript;
         }
-    }
+    },
+    'avatarTimeOut': function(){
+        const t = Template.instance();
+        //return timer in seconds from milliseconds
+        return Math.round(t.avatarTimeOut.get() / 1000);
+    },
 });
 
 Template.module.events({
+    'load #imageClickOver': function(event, template){    
+        size = Session.get('windowSize');
+                page = Modules.findOne().pages[parseInt(this.pageId)];
+        question = page.questions[parseInt(this.questionId)];
+        obscuri = question.imageObscurus;
+        answers = question.answers;
+        answersWithXCoords = answers.filter(function(answer){
+            return answer.xCoord;
+        });
+        console.log(obscuri);
+        if(obscuri.length > 0){
+            image = $('#imageClickOver').attr('src');
+            displayObscuri(image,obscuri);
+        }
+        if(answersWithXCoords.length > 0){
+            image = $('#imageClickOver').attr('src');
+            displayClickOverOptions(image,answersWithXCoords);
+        }
+    },
     'keypress #response' : function(event){
         event.preventDefault();
         if (event.keyCode === 13) {
@@ -330,14 +351,29 @@ Template.module.events({
     },
     'mouseover .multichoice': function(event){
         response = $(event.target).html();
+        responseAlt = $(event.target).attr("data-alt");
         curModule = Modules.findOne();
         const t = Template.instance();
         recordEvent(t,"multiChoiceMouseOver",Meteor.userId(),{response: response});
-        if(curModule.autoTutorReadsResponse && response){
-            autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
-            autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
-            readTTS(t, response, autoTutorPromptCharacterVoice);
-         }
+        //wait 2000ms before playing audio
+        setTimeout(function(){
+            audioActive = t.audioActive.get();
+            if(!audioActive){
+                if(curModule.autoTutorReadsChoices && response){
+                    autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
+                    autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
+                    autoTutorPromptCaracterArt = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).art;
+                    if(responseAlt && responseAlt != ""){
+                        readTTS(t, response, autoTutorPromptCharacterVoice, autoTutorPromptCaracterArt, autoTutorReadsPrompt, responseAlt);
+                    } else {
+                        readTTS(t, response, autoTutorPromptCharacterVoice, autoTutorPromptCaracterArt, autoTutorReadsPrompt);
+                    }
+                    //append speaker icon
+                    speakerIcon = "<div class='temp-icon'><br><i class='fa fa-volume-up'></i></div>";
+                    $(event.target).append(speakerIcon);
+                }
+            }
+        }, 2000);
     },
     'click .readingNextPage': function(event){
         const t = Template.instance();
@@ -380,6 +416,51 @@ Template.module.events({
         event.preventDefault();
         recordEvent(t,"clearWordBankResponse");
         $(".textBank").val("");
+    },
+    'click .toggleMessageWindow': function(event){
+        const t = Template.instance();
+        //set autoTutorHidden to opposite of current value
+        t.autoTutorHidden.set(!t.autoTutorHidden.get());
+        //if autoTutorContainer class element exists
+        if($(".autoTutorHistory").length){
+            //add autoTutorHidden class element to autoTutorContainer
+            $(".autoTutorHistory").toggleClass("autoTutorHistoryHidden");
+            //get all divs inside autoTutorHistory
+            let divs = $(".autoTutorHistory").children();
+            //get the last div
+            let lastDiv = divs[divs.length - 1];
+            //get the last div's height
+            let lastDivHeight = $(lastDiv).height();
+            //display current height of autoTutorHistory
+            let currentHeight = $(".autoTutorHistory").height();
+            //if autoTutorHistory is hidden
+            if($(".autoTutorHistory").hasClass("autoTutorHistoryHidden")){
+                //change the height of the autoTutorHistory to the height of the last div plus 20px
+                $(".autoTutorHistory").height(lastDivHeight);
+                //scroll to the bottom of the autoTutorHistory
+                $(".autoTutorHistory").scrollTop($(".autoTutorHistory")[0].scrollHeight);
+            } else {
+                //change the height of the autoTutorHistory to the max height of 40vh and unset the height
+                $(".autoTutorHistory").height("");
+                //scroll to the bottom of the autoTutorHistory
+                $(".autoTutorHistory").scrollTop($(".autoTutorHistory")[0].scrollHeight);
+            }
+        }
+    },
+    'click #autotutor-video': function(event){
+        const t = Template.instance();
+        recordEvent(t,"videoClick");
+        //get this page
+        page = Modules.findOne().pages[parseInt(this.pageId)];
+        //get the videoReference
+        videoReference = page.questions[parseInt(this.questionId)].videoReference || false;
+        //if videoReference is not false
+        if(videoReference){
+            //open video in new window
+            window.open(videoReference, '_blank');
+        } else {
+            alert("No video reference found for this question");
+        }
     },
     'click .btn-read': function (event){
         const t = Template.instance();
@@ -471,13 +552,17 @@ Template.module.events({
         moduleData.nextPage = thisPage;
         Meteor.call("overrideUserDataRoutes",moduleData); 
         target = "/module/" + moduleId + "/" + thisPage + "/" + nextQuestion + "/return"; 
-        console.log(target);
         window.location.href = target;
     },
     'click .continue': async function(event) {
+        //scroll to top of page using animate
+        $('html, body').animate({ scrollTop: 0 }, 'slow');
         const t = Template.instance();
+        //change template studentAnswering to true
+        t.studentAnswering.set(true);
         recordEvent(t,"clickContinue");
         $(':button').prop('disabled', true); 
+        $(event.target).addClass("selected");
         event.preventDefault();
         curModule = Modules.findOne()
         command = t.command.get();
@@ -500,7 +585,6 @@ Template.module.events({
         if(t.pageType.get() == "activity"){
             if(transcript == "" || !transcript){
                 questionData = curModule.pages[thisPage].questions[thisQuestion];
-                console.log(questionData, thisPage, thisQuestion,moduleData, Meteor.user().curModule);
                 if(curModule.audioRecording){
                     questionData.audioRecorded = chunks;
 
@@ -546,17 +630,16 @@ Template.module.events({
                     userResponse = target.textContent;
                     answerValue = parseInt($(event.target).val()) || 0;
                     index = event.target.getAttribute('id');
-                    if(thisQuestionData.answers[index].feedback != "" || typeof thisQuestionData.answers[index].feedback != "undefined"){
+                    if(questionData.answers[index].feedback != "" || typeof questionData.answers[index].feedback != "undefined"){
                         refutation = thisQuestionData.answers[index].feedback;
                     }
                 }
                 if(questionData.type == "imageClick"){
-                    var target = event.target || event.srcElement;
-                    response = parseInt(target.innerHTML);
-                    index = event.target.getAttribute('id');
-                    userResponse = thisQuestionData.answers[response].answer;
-                    if(thisQuestionData.answers[index].feedback != "" || typeof thisQuestionData.answers[index].feedback != "undefined"){
-                        refutation = thisQuestionData.answers[index].feedback;
+                    response = parseInt(event.target.getAttribute('id'));
+                    index = parseInt(event.target.getAttribute('id'));
+                    userResponse = questionData.answers[index].answer;
+                    if(questionData.answers[index].feedback){
+                        refutation = questionData.answers[index].feedback;
                     }
                 }
                 if(questionData.type == "longtext"){
@@ -582,10 +665,34 @@ Template.module.events({
              if(question.type == "multiChoice"){
                 for(character of curModule.autoTutorCharacter){
                         if(character.answersQuestions){
-                            selectedAnswer = Math.floor(Math.random() * question.answers.length);
-                            characterResponse = questionData.answers[selectedAnswer];
-                            characterAnswer = characterResponse.answer;
-                            message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, selectedAnswer, 0, 0);
+                            if(character.expectedPerformance){
+                                if(character.expectedPerformance > Math.random()){
+                                    //get correct answer
+                                    characterResponse = question.correctAnswer;
+                                    //get index of correct answer
+                                    selectedAnswer = question.answers.findIndex(x => x.answer == correctAnswer);
+                                    characterAnswer = question.answers[selectedAnswer].answer;
+                                } else {
+                                    //get correct answer
+                                    correctAnswer = question.correctAnswer;
+                                    //get index of correct answer
+                                    selectedAnswer = question.answers.findIndex(x => x.answer == correctAnswer);
+                                    //get all incorrect answers
+                                    incorrectAnswers = question.answers.filter(function(answer) {
+                                        return answer.answer != correctAnswer;
+                                    });
+                                    //get random number between 0 and length of incorrect answers
+                                    selectedAnswer = Math.floor(Math.random() * incorrectAnswers.length);
+                                    //get random incorrect answer
+                                    characterResponse = incorrectAnswers[selectedAnswer];
+                                    characterAnswer = incorrectAnswers[selectedAnswer].answer;
+                                }
+                            } else {
+                                selectedAnswer = Math.floor(Math.random() * question.answers.length);
+                                characterResponse = questionData.answers[selectedAnswer];
+                                characterAnswer = questionData.answers[selectedAnswer].answer;
+                            }
+                            message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, selectedAnswer, selectedAnswer, 0);
                             readTTS(t, message, character.voice, character.name, character.art);
                             characterSpeech = message;
                             characterRepsonseData = {
@@ -598,16 +705,25 @@ Template.module.events({
                                 art: character.art
                             }
                             characterResponses.push(characterRepsonseData);
+                            //get target's x and y coordinates
+                            var target = document.getElementById(selectedAnswer);
+                            var rect = target.getBoundingClientRect();
+                            var x = 0;
+                            var y = 0;
+                            
+                            
+
                         }
                     }
                 }
                 if(question.type == "imageClick"){
                     for(character of curModule.autoTutorCharacter){
                             if(character.answersQuestions){
-                                characterResponseIndex = Math.floor(Math.random()*questionData.answers.length - 1)
-                                characterResponse = questionData.answers[Math.floor(Math.random()*questionData.answers.length)];
-                                characterAnswer = characterResponse.answer
-                                message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, characterResponseIndex, 0, 0);
+                                selectedAnswer = Math.floor(Math.random() * question.answers.length);
+                                characterResponse = questionData.answers[selectedAnswer];
+                                characterAnswer = questionData.answers[selectedAnswer].answer;
+                                //message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, selectedAnswer, 0, 0);
+                                message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, selectedAnswer, selectedAnswer, 0);
                                 readTTS(t, message, character.voice, character.name, character.art);
                                 characterSpeech = message;
                                 characterRepsonseData = {
@@ -615,11 +731,16 @@ Template.module.events({
                                     response: characterAnswer,
                                     voice: character.voice,
                                     value: characterResponse.value,
+                                    choiceIndex: selectedAnswer,
                                     speech: characterSpeech,
-                                    choiceIndex: characterResponseIndex,
                                     art: character.art
                                 }
                                 characterResponses.push(characterRepsonseData);
+                                var target = document.getElementById(selectedAnswer);
+                                var x = 0;
+                                var y = 0;
+
+
                             }
                         }
                     }
@@ -627,30 +748,40 @@ Template.module.events({
             moduleData.characterResponses[moduleData.responses.length - 1] = characterResponses;
             moduleData.nextPage = thisPage;
             moduleData.nextQuestion = thisQuestion + 1;
+            
             await Meteor.call("evaluateModuleData", moduleData, curModule._id , thisPage, thisQuestion, data.response, answerValue, characterResponses, function(err, res){                feedback = t.feedback.get();
                 moduleData = res.moduleData;
                 type = "danger";
                 username = Meteor.user().firstname;
-                message = refutation || question.incorrectFeedback || "you are not correct."
                 if(res != "disabled"){
-                    if(res.isCorrect == true){ 
-                        type = "success";
-                    } 
                     message = getAgentSpeech(username, curModule, "feedback", thisPage, thisQuestion, answerValue, 0, res.isCorrect);
                     for(charResponse of res.characterRefutation){
                         message += " "+ getAgentSpeech(charResponse.character, curModule, "feedback", thisPage, thisQuestion, charResponse.choiceIndex, 0, charResponse.isCorrect);
                     }
-                    recordEvent(t,"evaluate", "system", {result: res});
-                    addedClass = 'alert-' + type;
-                    $('#refutation').addClass(addedClass);
-                    $('#refutation').text(message);
-                    $('#refutation').show();
                     recordEvent(t,"showRefutation","system",{refutation:message});
                     if(curModule.autoTutorReadsRefutation){
                         autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
                         autoTutorCharacter = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts);
                         readTTS(t, message, autoTutorCharacter.voice, autoTutorCharacter.name, autoTutorCharacter.art);
                     }
+                    $('.multichoice').addClass('btn-selected');
+                    if(res.isCorrect == true){ 
+                        type = "success";
+                        $(event.target).addClass('btn-correct').removeClass('selected');
+                    } else {
+                        $(event.target).addClass('btn-wrong').removeClass('selected');
+                        correctIndex = res.correctAnswerIndex;
+                        $('.multichoice[id="'+correctIndex+'"]').addClass('btn-correct');
+                        $('.overlay[id="'+correctIndex+'"]').addClass('btn-correct');
+                    }
+    
+                    recordEvent(t,"evaluate", "system", {result: res});
+                    addedClass = 'alert-' + type;
+                    $('#refutation').addClass(addedClass);
+                    $('#refutation').text(message);
+                    $('#refutation').show();
+
+                    
                 }
                 moduleData.responses[moduleData.responses.length - 1].result = res.isCorrect || "disabled";
             });
@@ -712,7 +843,6 @@ Template.module.events({
                                 routePicked = true;
                                 moduleData.nextPage = conditions[i].route;
                                 moduleData.nextQuestion = 0;
-                                console.log(conditions[i].clearScoring);
                                 if(conditions[i].clearScoring){
                                     moduleData.score = 0;
                                 } 
@@ -788,7 +918,6 @@ Template.module.events({
                 
                 recordEvent(t,"routeToNext", "system", {target:target});
                 curModuleData = Meteor.user().curModule.nextPage;
-                console.log(curModuleData);
                 window.location.href = target;                
             }
         }
@@ -832,8 +961,8 @@ Template.module.events({
     }
 })
 Template.module.onCreated(function(){
+    template = this;
     params = Router.current().params;
-    console.log(params);
     Meteor.subscribe('curModule', params._id);
     this.command = new ReactiveVar(params._command);
     this.questionType = new ReactiveVar("");
@@ -852,12 +981,18 @@ Template.module.onCreated(function(){
     this.transcript = new ReactiveVar("");
     this.TTSTracPlaying = new ReactiveVar(0);
     this.events = new ReactiveVar([]);
+    this.timer = new ReactiveVar(false);
+    this.studentAnswering = new ReactiveVar(false);
+    this.autoTutorHidden = new ReactiveVar(false);
+    this.promptQueued = new ReactiveVar(false);
     
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function readTTS(template, message, voice, character,characterArt,scriptAlt){
+    //remove quotes from message
+    message = message.replace(/"/g, "");
     recordEvent(template,"addAutoTutorScriptToTTSQueue","system",{character:character, text:message});
     let curModule = Modules.findOne();
     let moduleId =  curModule._id;
@@ -865,7 +1000,6 @@ function readTTS(template, message, voice, character,characterArt,scriptAlt){
     template.audioActive.set(true);
     let displayMessage = character + ": " + message;
     const characterSearch = (element) => element.name == character;
-    console.log("Rusty",characterSearch);
     let characterIndex = curModule.autoTutorCharacter.findIndex(characterSearch);
     let audioObj = new Audio();
     let audioObjects = template.audioObjects.get();
@@ -881,7 +1015,6 @@ function readTTS(template, message, voice, character,characterArt,scriptAlt){
         }
         if(res != undefined){
             let audioObjects = template.audioObjects.get();
-            console.log(order, audioObjects[order]);
             audioObjects[order - 1].obj.src = "data:audio/ogg;base64," + res;
             template.audioObjects.set(audioObjects)
             if(!audioActive){
@@ -895,20 +1028,27 @@ function readTTS(template, message, voice, character,characterArt,scriptAlt){
 }
 
 async function playAudio(template){
+    //if template autoTutorHidden variable is true, simulate button click
+    let autoTutorHidden = template.autoTutorHidden.get();
+    if(autoTutorHidden){
+        $(".toggleMessageWindow").click();
+    }
     let TTSTracPlaying = template.TTSTracPlaying.get();
     let audioObjs = template.audioObjects.get();
     const audioObj = audioObjs[TTSTracPlaying].obj;
-    console.log(audioObjs);
     let atTemplate = "#ATTemplate" + audioObjs[TTSTracPlaying].characterIndex;
-    var clone = $(atTemplate).clone().prependTo('.autoTutorHistory');
+    var clone = $(atTemplate).clone().appendTo('.autoTutorHistory'); 
     $('.autoTutorHistory').show();
-    let scriptHandle = atTemplate + " .script";
-    let avatarHandle = atTemplate + " .avatar";
-    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art + "' style='max-width:100%;'><br>");
+    // let scriptHandle = atTemplate + " .script";
+    // let avatarHandle = atTemplate + " .avatar";
+    // get clone's child with class script
+    let scriptHandle = clone.find(".script");
+    let avatarHandle = clone.find(".avatar");
+    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art + "' class='img-responsive'><br>");
     $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
     $(clone).fadeIn();
-    $(clone).attr("id","ATTemplateFinished");
-    console.log(TTSTracPlaying, "of" , audioObjs.length) - 1;
+    var elem = document.getElementById("autoTutorHistory");
+    elem.scrollTop = elem.scrollHeight;
     template.TTSTracPlaying.set(TTSTracPlaying + 1);
     window.currentAudioObj = audioObj;
     window.currentAudioObj.addEventListener('ended', function(){
@@ -931,9 +1071,24 @@ async function playAudio(template){
             var curTime = new Date().getTime();
             var audioTime = curTime - template.startAudioTime.get();
             var speakingTime = template.speakingTime.get();
+            if(curModule.avatarTimeOutMin && curModule.avatarTimeOutMax){
+                startAgentSpeechTimer(template, curModule.avatarTimeOutMin, curModule.avatarTimeOutMax);
+            }
+           
             speakingTime = speakingTime + audioTime;
             template.speakingTime.set(speakingTime);
             sleep(1000).then(function(){
+                //if template autoTutorHidden variable is true, simulate button click
+                let autoTutorHidden = template.autoTutorHidden.get();
+                if(!autoTutorHidden){
+                    $(".toggleMessageWindow").click();
+                    //
+                }
+                //remove div element tags from class multichoice elements
+                $(".multichoice").each(function(){
+                   //remove all div tags
+                     $(this).find("div").remove();
+                });
                 recordEvent(template,"autoTutorScriptQueueEnd", "system");
                 questionType = template.questionType.get();
                 autoAdvance = template.autoAdvance.get();
@@ -986,7 +1141,6 @@ function setupRecording(template){
 
 
         recorder.ondataavailable = function(event) {
-            console.log(template.feedback.get());
             if (event.data.size > 0 && template.feedback.get() == false) {
                 chunks = [event.data];
                 processAudio(chunks);
@@ -1028,7 +1182,6 @@ function setupRecording(template){
 
   
       speechEvents.on('stopped_speaking', function() {
-           console.log('stopped_speaking');
            if(recorder.state == "recording"){
             recorder.stop();
             $('#audioRecordingNotice').html("I am thinking.");
@@ -1092,31 +1245,198 @@ function recordEvent(template,verb,actor,data){
     template.events.set(events);
 }
 
-function imageScaleValues(imgUrl, x, y, width, height){
-    source = $('#imageClickOver')
-    sourceWidth = source.width();
-    sourceHeight = source.height();
-    sourceX = source.offset().left;
-    sourceY = source.offset().top;
-    console.log("sourceWidth: " + sourceWidth);
-    console.log("sourceHeight: " + sourceHeight);
-    console.log("sourceX: " + sourceX);
-    console.log("sourceY: " + sourceY);
-    var xPercent = (x / sourceWidth) 
-    var yPercent = (y / sourceHeight) 
-    var widthPercent = (width / sourceWidth);
-    var heightPercent = (height / sourceHeight);
-    var parentXPosition = $('#imageClickOver').offset().left;
-    var parentYPosition = $('#imageClickOver').offset().top;
-    var xScaled =  (xPercent * sourceWidth)
-    var yScaled =  (yPercent * sourceHeight);
-    var widthScaled = (widthPercent * sourceWidth);
-    var heightScaled = (heightPercent* sourceHeight);
-    return {xPercent:xPercent, yPercent:yPercent, widthPercent:widthPercent, heightPercent:heightPercent, xScaled:xScaled, yScaled:yScaled, widthScaled:widthScaled, heightScaled:heightScaled, parentXPosition:parentXPosition, parentYPosition:parentYPosition};
+function displayObscuri(imageSrc, obscuri){
+    //create dummy image of imageSrc
+    var img = new Image();
+    img.src = imageSrc;
+    img.onload = function(){
+        //get image dimensions
+        var width = img.width;
+        var height = img.height;
+        //get display image
+        var dispImage = $('#imageClickOver');
+        //get dispImage dimensions
+        var dispWidth = dispImage.width();
+        var dispHeight = dispImage.height();
+        //get ratio of image to display image
+        var ratio = width/dispWidth;
+        //iterate through obscuri
+        for(var i = 0; i <= obscuri.length; i++){
+            console.log("obscuri", obscuri);
+            obscuris = obscuri[i];
+            //get obscuri dimensions and position, removiting trailing px
+            var obscuriWidth = obscuris.width.slice(0,-2);
+            var obscuriHeight = obscuris.height.slice(0,-2);
+            var obscuriX = obscuris.x.slice(0,-2);
+            var obscuriY = obscuris.y.slice(0,-2);
+            //get obscuri position on display image
+            var dispObscuriX = obscuriX/ratio;
+            var dispObscuriY = obscuriY/ratio;
+            //get obscuri dimensions on display image
+            var dispObscuriWidth = obscuriWidth/ratio;
+            var dispObscuriHeight = obscuriHeight/ratio;
+            //get obscruri font size, bgcolor, text color
+            var fontSize = obscuris.fontSize;
+            var fontFam = obscuris.fontFamily;
+            var bgColor = obscuris.bgColor;
+            var textColor = obscuris.textColor;
+            //get obscuri text
+            var text = obscuris.text;
+            //get elements div size
+            var divWidth = $('#elements').width();
+            var divHeight = $('#elements').height();
+            //get the difference between the div size and the display image size
+            var diffWidth = divWidth - dispWidth;
+            var diffHeight = divHeight - dispHeight;
+            //subtract the difference from the obscuri dimensions and position
+            dispObscuriX = dispObscuriX - diffWidth/2;
+            dispObscuriY = dispObscuriY - diffHeight/2;
+            dispObscuriWidth = dispObscuriWidth + diffWidth;
+            dispObscuriHeight = dispObscuriHeight + diffHeight;
+            //convert to percentage
+            var dispObscuriXPercent = dispObscuriX/dispWidth * 100;
+            var dispObscuriYPercent = dispObscuriY/dispHeight * 100;
+            var dispObscuriWidthPercent = dispObscuriWidth/dispWidth * 100;
+            var dispObscuriHeightPercent = dispObscuriHeight/dispHeight * 100;
+            //get 5 percent of the screen width
+            var fivePercent = $(window).width() * 0.05;
+            //create obscuri div
+            var obscuriDiv = $('<div class="obscuri"></div>').css({
+                'position': 'absolute',
+                'top': dispObscuriYPercent + '%',
+                'left': dispObscuriXPercent + '%',
+                'width': dispObscuriWidthPercent  - 10 + '%',
+                'height': dispObscuriHeightPercent + '%',
+                'background-color': bgColor,
+                'color': textColor,
+                'font-size': fontSize,
+                'text-align': 'center',
+                'vertical-align': 'middle',
+                'border-radius': '5px',
+                'margin-left': '5%',
+                'font-family': fontFam,
+            }).html(text);
+            //append obscuri div to display image
+            dispImage.append(obscuriDiv);
+            //add obscuri div to elements div
+            $('#elements').append(obscuriDiv);
+        }
+    }
 }
 
+function displayClickOverOptions(imgSrc, answers){
+    //create dummy image of imageSrc
+    var img = new Image();
+    img.src = imgSrc;
+    img.onload = function(){
+        //get image dimensions
+        var width = img.width;
+        var height = img.height;
+        //get display image
+        var dispImage = $('#imageClickOver');
+        //get dispImage dimensions
+        var dispWidth = dispImage.width();
+        var dispHeight = dispImage.height();
+        //get ratio of image to display image
+        var ratio = width/dispWidth;
+        //remove all previous answers
+        $('.answer').remove();
+        //iterate through answers
+        for(var i = 0; i < answers.length; i++){
+            answer = answers[i];
+            //get answer dimensions and position, removiting trailing px
+            var answerWidth = answer.width.slice(0,-2);
+            var answerHeight = answer.height.slice(0,-2);
+            var answerX = answer.xCoord.slice(0,-2);
+            var answerY = answer.yCoord.slice(0,-2);
+            //get answer position on display image
+            var dispAnswerX = answerX/ratio;
+            var dispAnswerY = answerY/ratio;
+            //get answer dimensions on display image
+            var dispAnswerWidth = answerWidth/ratio;
+            var dispAnswerHeight = answerHeight/ratio;
+            //get answer font size, bgcolor, text color
+            var fontSize = answer.fontSize;
+            var bgColor = answer.bgColor;
+            var textColor = answer.textColor;
+            //get answer text
+            var text = answer.answer;
+            //get elements div size
+            var divWidth = $('#elements').width();
+            var divHeight = $('#elements').height();
+            //get the difference between the div size and the display image size
+            var diffWidth = divWidth - dispWidth - 48;
+            var diffHeight = divHeight - dispHeight - 10;
+            //convert to percentage
+            var dispAnswerXPercent = dispAnswerX/divWidth * 100;
+            var dispAnswerYPercent = dispAnswerY/dispHeight * 100;
+            var dispAnswerWidthPercent = (dispAnswerWidth - diffWidth)/dispWidth * 100;
+            var dispAnswerHeightPercent = dispAnswerHeight/dispHeight * 100;
+            //get 5 percent of the screen width
+            var fivePercent = $(window).width() * 0.05;
+            //create answer div
+            var answerDiv = $('<button class="answer btn continue overlay"></button>').css({
+                'position': 'absolute',
+                'top': dispAnswerYPercent + '%',
+                'left': dispAnswerXPercent + '%',
+                'width': dispAnswerWidthPercent  + '%',
+                'height': dispAnswerHeightPercent + '%',
+                'background-color': bgColor,
+                'color': textColor,
+                'font-size': fontSize,
+                'text-align': 'center',
+                'vertical-align': 'middle',
+                'line-height': dispAnswerHeightPercent + '%',
+                'margin-left': '5%',
+            }).html(text).attr('id', i);
+            //append answer div to display image
+            dispImage.append(answerDiv);
+            //add answer div to elements div
+            $('#elements').append(answerDiv);
+        }
+    }
+}
+
+
+
+
+//call this function to wait for a time then call getAgentSpeech and readTTS
+function startAgentSpeechTimer(template, min, max){
+    //get student answering state
+    var studentAnswering = template.studentAnswering.get();
+    var promptQueued = template.promptQueued.get();
+    //if student is not answering
+    if(!studentAnswering && !promptQueued){
+        //get random time between min and max
+        randomTime = Math.floor(Math.random() * (max - min + 1) + min);
+        //get current module
+        var curModule = Modules.findOne();
+        //get user firstname
+        var user = Meteor.user().firstname;
+        //set time to timeOut
+        var type = "timeOut";
+        //log to console
+        console.log("timeOut set for " + randomTime + " seconds");
+        //sleep for random time
+        console.log("sleeping for " + randomTime + "miliseconds");
+        sleep(randomTime).then(() => {
+            //get agent speech
+            var speech = getAgentSpeech(user, curModule, type, 0, 0, 0, 0, 0);
+            //get agent art
+            autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
+            autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
+            autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
+            autoTutorPromptCaracterArt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
+            //read agent speech
+            readTTS(template, speech, autoTutorPromptCharacterVoice, autoTutorPromptCharacterName, autoTutorPromptCaracterArt);
+            template.promptQueued.set(true);
+        });
+    }
+}  
+
+
+//call google api with speech bags
 function getAgentSpeech(speakingTo, module, type, page, question, answerId, response, isCorrect){
-    console.log("getAgentSpeech", speakingTo, module, type, page, question, answerId, response, isCorrect);
     simpleFeedbackBag = module.simpleFeedbackBag || {correct: ["Good job {{speakingTo}}!", "Well done, {{speakingTo}}!"], incorrect: ["Not Quite, {{speakingTo}}.", "No, {{speakingTo}}."]};
     if(typeof module.pages[page].questions[question].answers[answerId].feedback !== "undefined"){
         elaboratedFeedback = module.pages[page].questions[question].answers[answerId].feedback;
@@ -1154,16 +1474,31 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
         feedback = feedback.replace("{{speakingTo}}", speakingTo);
         feedback = feedback.replace("{{response}}", response);
         feedback = feedback.replace("{{user}}", Meteor.user().firstname);
-        console.log("feedback", feedback);
         return feedback;
     }
     if(type == "response"){
-        textResponse = module.pages[page].questions[question].answers[response].answer || "No response; Error in getAgentSpeech";
-        bag1 = module.responseBag || ["I  think it is {{response}}","{{response}} is my guess", "{{response}}? I think so."];
+        //get answer
+        var answer = module.pages[page].questions[question].answers[response];
+        if(answer.altAnswer){
+            textResponse = answer.altAnswer;
+        } else {
+            textResponse = answer.answer;
+        }
+        bag1 = module.responseBag || ["I  think it is {{response}}.","{{response}} is my guess.", "{{response}}? I think so."];
         responseSpeech = bag1[Math.floor(Math.random() * bag1.length)];
+        //remove trailing punctuation
+        textResponse = textResponse.replace(/[\.,-\/#!%\^&\*;:{}=\-_`~()]/g,"");
+        //remove trailing spaces
+        textResponse = textResponse.replace(/\s{2,}/g," ");
+        //add quotes to text response
+        textResponse = '"' + textResponse + '"';
+        //make text response first letter lowercase
+        textResponse = textResponse.charAt(0).toLowerCase() + textResponse.slice(1);
         responseSpeech = responseSpeech.replace("{{response}}", textResponse);
         responseSpeech = responseSpeech.replace("{{speakingTo}}", speakingTo);
         responseSpeech = responseSpeech.replace("{{user}}", Meteor.user().firstname);
+        //uppercase first letter
+        responseSpeech = responseSpeech.charAt(0).toUpperCase() + responseSpeech.slice(1);
         return responseSpeech;
     }
     if(type == "timeOut"){
