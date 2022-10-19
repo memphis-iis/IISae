@@ -19,6 +19,15 @@
         <div class="col-4">
             <h2>Control Panel</h2>
             {{#if isInRole 'admin'}}
+            <div id="options">
+                <h3>Options</h3>
+                <p>Enable Classroom System:</p>
+                {{#if options.classSystemEnabled}}
+                    <button id="disable-option" data-option="classSystemEnabled" class="btn btn-caution">Disable</button>
+                {{else}}
+                    <button id="enable-option" data-option="classSystemEnabled" class="btn btn-caution">Enable</button>
+                {{/if}}
+            </div>
             <div id="users">
                 <h3>Supervisors</h3>
                 <table class="table" id="supervisorListTable">

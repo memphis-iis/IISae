@@ -10,6 +10,16 @@ Template.adminControlPanel.helpers({
     'author': function(){
         return Meteor.user().author;
     } ,
+    'options': function(){
+        //get user org
+        let org = Meteor.user().organization;
+        //get org from database
+        let orgObj = Orgs.findOne({_id: org});
+        //get options from org
+        let options = orgObj.options;
+        return options;
+    },
+
     currentUpload() {
         return Template.instance().currentUpload.get();
     },
@@ -131,6 +141,32 @@ Template.adminControlPanel.events({
     'click #close-mods-alert': function(event){
         $('#alert-mods').hide();
 
+    },
+    'click #enable-option': function(event){
+        event.preventDefault();
+        org = Orgs.findOne({_id: Meteor.user().organization});
+        option = $(event.target).data("option");
+        //check if option exists
+        if(org.options){
+            org.options[option] = true;
+        } else {
+            org.options = {};
+            org.options[option] = true;
+        }
+        Meteor.call('changeOrgOptions', org.options);
+    },
+    'click #disable-option': function(event){
+        event.preventDefault();
+        org = Orgs.findOne({_id: Meteor.user().organization});
+        option = $(event.target).data("option");
+        //check if the option exists
+        if(org.options){
+            org.options[option] = false;
+        } else {
+            org.options = {};
+            org.options[option] = false;
+        }
+        Meteor.call('changeOrgOptions', org.options);
     },
     'click #copy-module': function (event){
         newModule = $(event.target).data("module-id");

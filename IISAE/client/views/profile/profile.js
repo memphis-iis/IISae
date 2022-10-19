@@ -7,6 +7,13 @@ Template.profile.helpers({
         return assignment;
     },
     'userIsAdminOrSupervisor': () => Roles.userIsInRole(Meteor.userId(), ['admin', 'supervisor']),
+    'options': function(){
+        //get user's organization
+        org = Orgs.findOne({orgOwnerId: Meteor.userId()});
+        if(org){
+            return org.options;
+        }
+    }
 })
 
 Template.profile.events({

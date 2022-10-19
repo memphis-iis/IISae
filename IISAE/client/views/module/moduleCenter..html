@@ -1,7 +1,6 @@
 <template name="moduleCenter">
     <div class="px-4 py-5 my-5 text-center">
        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-        <h1>Classrooms</h1>
         {{#if classes}}
         <p class="lead mb-4">Below are a list of classes you are enrolled in.</p>
             {{#each classes}} 
@@ -22,7 +21,7 @@
                 {{/if}}
             {{/each}}
         {{else}}
-                You are not enrolled in any classes.
+                You are not currently assigned to any modules or classes.
         {{/if}}
         </div>
     </div>
