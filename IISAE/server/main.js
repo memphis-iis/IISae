@@ -227,6 +227,15 @@ Meteor.methods({
             });
         });
     },
+    exportModule: function(moduleId){
+        //get module by moduleId and return it as a json string
+        const fs = Npm.require('fs');
+        const bound = Meteor.bindEnvironment((callback) => {callback();});
+        var module = Modules.findOne({_id: moduleId});
+        //export as json pretty print
+        var json = JSON.stringify(module, null, 2);
+        return json;
+    },
     changeModule(input){
         moduleId = input.moduleId;
         field = input.field;
