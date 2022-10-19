@@ -98,7 +98,8 @@ Meteor.methods({
             orgName: newOrgName,
             orgOwnerId: newOrgOwner,
             orgDesc: newOrgDesc,
-            newUserAssignments: newUserAssignments
+            newUserAssignments: newUserAssignments,
+            options: {}
         });
         newOrgId = Orgs.findOne({orgOwnerId: newOrgOwner})._id;
         Meteor.users.update({ _id: newOrgOwner }, 
@@ -208,6 +209,12 @@ Meteor.methods({
             }
         }
         Modules.insert(newModule);
+    },
+    changeOrgOptions: function(input){
+        console.log(input);
+        orgId = Meteor.user().organization;
+        Orgs.upsert({_id: orgId}, {$set: {options: input}});
+        console.log(Orgs.findOne({_id: orgId}));
     },
     uploadModule: function(path,user){
         const fs = Npm.require('fs');

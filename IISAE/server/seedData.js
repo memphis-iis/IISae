@@ -88,7 +88,8 @@ export function insertSeedData(){
                     orgName: "IIS",
                     orgOwnerId: uid,
                     orgDesc: "Testing",
-                    newUserAssignments: assignments
+                    newUserAssignments: assignments,
+                    options: {}
                 });
                 newOrgId = Orgs.findOne({orgOwnerId: uid})._id;
                 const d = new Date();

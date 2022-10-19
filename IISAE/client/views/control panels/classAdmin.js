@@ -10,6 +10,10 @@ Template.classAdmin.helpers({
         data = Modules.find().fetch();
         return data;
     },
+    'options': function(){
+        //return user's organization options
+        return Orgs.findOne({orgOwnerId: Meteor.userId()}).options;
+    },
     'selectedClass': function(){
         const t = Template.instance();
         selectedClass = t.classSelected.get();
