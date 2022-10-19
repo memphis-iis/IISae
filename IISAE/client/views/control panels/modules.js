@@ -298,7 +298,24 @@ Template.modulesAdmin.events({
         assigned[index + 1] = a;
         Meteor.call('changeAssignmentToNewUsers', assigned);
     },
-})
+    'click #export-module': function(event){
+        event.preventDefault();
+        module = $(event.target).data("module-id");
+        //get module
+        Meteor.call('exportModule', module, function(err,res){
+            if(err){
+                alert("export failed");
+            } else {
+                //download return json
+                var blob = new Blob([res], {type: "application/json"});
+                var link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = "module.json";
+                link.click();
+            }
+        });
+    }
+});
 
 Template.modulesAdmin.onCreated(function() {
     Meteor.subscribe('getUsersInOrg');
