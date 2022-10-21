@@ -1,9 +1,7 @@
 import hark from 'hark';
-import { Module } from 'module';
 
 
 var chunks = [];
-var template;
 
 Template.module.onRendered(function (){
     $('#scrollArea').scroll(function(){
@@ -769,7 +767,14 @@ Template.module.events({
                 if(res != "disabled"){
                     message = getAgentSpeech(username, curModule, "feedback", thisPage, thisQuestion, answerValue, 0, res.isCorrect);
                     for(charResponse of res.characterRefutation){
-                        message += " "+ getAgentSpeech(charResponse.character, curModule, "feedback", thisPage, thisQuestion, charResponse.choiceIndex, 0, charResponse.isCorrect);
+                        //check if charResponse.isCorrect and res.isCorrect are the same
+                        if(charResponse.isCorrect == res.isCorrect){
+                            //if they are the same, then the character is agreeing with the user
+                            speakingToArray = [username, charResponse.character];
+                            message = getAgentSpeech(speakingToArray, curModule, "feedback", thisPage, thisQuestion, answerValue, 0, res.isCorrect);
+                        } else {
+                            message += " "+ getAgentSpeech(charResponse.character, curModule, "feedback", thisPage, thisQuestion, charResponse.choiceIndex, 0, charResponse.isCorrect);
+                        }
                     }
                     recordEvent(t,"showRefutation","system",{refutation:message});
                     if(curModule.autoTutorReadsRefutation){
@@ -1458,6 +1463,7 @@ function startAgentSpeechTimer(template, min, max){
 //call google api with speech bags
 function getAgentSpeech(speakingTo, module, type, page, question, answerId, response, isCorrect){
     simpleFeedbackBag = module.simpleFeedbackBag || {correct: ["Good job {{speakingTo}}!", "Well done, {{speakingTo}}!"], incorrect: ["Not Quite, {{speakingTo}}.", "No, {{speakingTo}}."]};
+    groupFeedbackBag = module.groupFeedbackBag || {correct: ["Good job {{speakingTo}}!", "Well done, {{speakingTo}}!"], incorrect: ["Not Quite, {{speakingTo}}.", "No, {{speakingTo}}."]};
     if(typeof module.pages[page].questions[question].answers[answerId].feedback !== "undefined"){
         elaboratedFeedback = module.pages[page].questions[question].answers[answerId].feedback;
     } else {
@@ -1474,21 +1480,43 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
         if(module.feedbackThreshold){
             threshold = module.feedbackThreshold || threshold;
         }
-        if(elaboratedTrigger < threshold){
-            if(isCorrect){
-                simpleFeedback = simpleFeedbackBag.correct[Math.floor(Math.random() * simpleFeedbackBag.correct.length)] || "{{speakingTo}} is correct.";
-                combinedFeedback = simpleFeedback + " " + elaboratedFeedback || "Correct";
-                feedback = combinedFeedback;
+        //check if speaking to is an array
+        if(Array.isArray(speakingTo)){
+            speakingTo = speakingTo.join(" and ");
+            if(elaboratedTrigger < threshold){
+                if(isCorrect){
+                    simpleFeedback = groupFeedbackBag.correct[Math.floor(Math.random() * groupFeedbackBag.correct.length)];
+                    combinedFeedback = simpleFeedback + " " + elaboratedFeedback;
+                    feedback = combinedFeedback;
+                } else {
+                    simpleFeedback = groupFeedbackBag.incorrect[Math.floor(Math.random() * groupFeedbackBag.incorrect.length)];
+                    combinedFeedback = simpleFeedback + " " + elaboratedFeedback;
+                    feedback = combinedFeedback;
+                }
             } else {
-                simpleFeedback = simpleFeedbackBag.incorrect[Math.floor(Math.random() * simpleFeedbackBag.incorrect.length)] || "{{speakingTo}} is incorrect.";
-                combinedFeedback = simpleFeedback + " " + elaboratedFeedback || "Incorrect";
-                feedback = combinedFeedback;
+                if(isCorrect){
+                    feedback = groupFeedbackBag.correct[Math.floor(Math.random() * groupFeedbackBag.correct.length)];
+                } else {
+                    feedback = groupFeedbackBag.incorrect[Math.floor(Math.random() * groupFeedbackBag.incorrect.length)];
+                }
             }
         } else {
-            if(isCorrect){
-                feedback = simpleFeedbackBag.correct[Math.floor(Math.random() * simpleFeedbackBag.correct.length)] || "{{speakingTo}} is correct.";
+            if(elaboratedTrigger < threshold){
+                if(isCorrect){
+                    simpleFeedback = simpleFeedbackBag.correct[Math.floor(Math.random() * simpleFeedbackBag.correct.length)] || "{{speakingTo}} is correct.";
+                    combinedFeedback = simpleFeedback + " " + elaboratedFeedback || "Correct";
+                    feedback = combinedFeedback;
+                } else {
+                    simpleFeedback = simpleFeedbackBag.incorrect[Math.floor(Math.random() * simpleFeedbackBag.incorrect.length)] || "{{speakingTo}} is incorrect.";
+                    combinedFeedback = simpleFeedback + " " + elaboratedFeedback || "Incorrect";
+                    feedback = combinedFeedback;
+                }
             } else {
-                feedback = simpleFeedbackBag.incorrect[Math.floor(Math.random() * simpleFeedbackBag.incorrect.length)] || "{{speakingTo}} is incorrect.";
+                if(isCorrect){
+                    feedback = simpleFeedbackBag.correct[Math.floor(Math.random() * simpleFeedbackBag.correct.length)] || "{{speakingTo}} is correct.";
+                } else {
+                    feedback = simpleFeedbackBag.incorrect[Math.floor(Math.random() * simpleFeedbackBag.incorrect.length)] || "{{speakingTo}} is incorrect.";
+                }
             }
         }
         feedback = feedback.replace("{{speakingTo}}", speakingTo);
