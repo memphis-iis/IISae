@@ -47,8 +47,14 @@ Template.DefaultLayout.helpers({
     }
     window.document.title = title + " on the ISSAE engine";
     return title;
-  }  
-})
+  },
+  'options': function(){
+    //get user's organization
+    org = Orgs.findOne({_id: Meteor.user().organization});
+        return org.options;
+    }
+});
+
 Template.DefaultLayout.events({
   'click #logoutButton': function(event) {
     event.preventDefault();
@@ -58,6 +64,18 @@ Template.DefaultLayout.events({
   'click #navbar-brand': function(event){
     event.preventDefault();
     Router.go("/");
+  },
+  'click #reportError': function(event){
+    event.preventDefault();
+    //set the session variable Pause to true
+    Session.set('pauseSession', true);
+    console.log("pauseSession: " + Session.get('pauseSession'));    
+  },
+  'click #closeModal': function(event){
+    event.preventDefault();
+    //set the session variable Pause to false
+    Session.set('pauseSession', false);
+    console.log("pauseSession: " + Session.get('pauseSession'));
   }
 });
 

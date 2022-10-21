@@ -1,0 +1,37 @@
+<template name="reportingModal">
+    <h4>Report an Error</h4>
+    <form class="login">
+      <div class="form-floating mb-3">
+        <p>This form will send relevant data to the development and content teams. Please be detailed. There is no need to include the URL or page title, module, et cetera, but you may upload a screenshot of the javascript console as well.</p>
+        <a href="https://community.widen.com/collective/s/article/How-do-I-capture-screenshots-of-errors-in-my-JavaScript-Console" target="_blank">How to take a screenshot of JavaScript Console</a>
+        <br>
+        <hr>
+        <!-- form for reporting an error -->
+        <!-- option box for type of error-->
+        <label for="errorType">Type of Error</label>
+        <select id="errorType" class="form-control">
+          <option value="Bug">Bug</option>
+          <option value="Feature">Feature Request</option>
+          <option value="Content">Content</option>
+        </select>
+        <br>
+        <label for="errorReport">Error Report</label>
+        <textarea
+          id="errorReport"
+          type="text"
+          placeholder="Please describe the error you encountered"
+          name="reportingModal"
+          class="form-control"
+          required></textarea>
+        {{#with currentUpload}}
+        Uploading <b>{{file.name}}</b>:
+           <span id="progress">{{progress.get}}%</span>
+         {{else}}<br>
+          <input id="fileInput" style="display:block;" type="file" />
+        {{/with}}
+      </div>
+        <div style="margin-top:10px;">
+            <button id="reportingModal" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</template>

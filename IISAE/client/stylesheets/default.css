@@ -18,6 +18,17 @@ body{
     margin-right:10px;
     margin-top:10px;
 }
+.nav-btn{
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 20px;
+    line-height: 20px;
+    height: 35px;
+    width: 200px;
+
+}
 .nav-link span{
     font-size:22px;;
     width:22px;

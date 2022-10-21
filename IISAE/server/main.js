@@ -869,6 +869,22 @@ Meteor.methods({
     changeClassName(classId, name){
         Classes.update({"_id":classId}, {$set:{name: name}});
     },
+    sendErrorReport(error){
+        Errors.insert(error);
+        return "Success";
+    },
+    getErrorReports(){
+        //return a combined array of errors from the database
+        errors = Errors.find({}).fetch();
+        //iterate through the errors, converting objects to string
+        for(var i = 0; i < errors.length; i++){
+            errors[i].content = JSON.stringify(errors[i]);
+        }
+        return errors;
+    },
+    deleteErrorReport(id){
+        Errors.remove({"_id": id});
+    }
 });
 
 //Server Methods
