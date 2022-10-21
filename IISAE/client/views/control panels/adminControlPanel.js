@@ -86,6 +86,9 @@ Template.adminControlPanel.helpers({
         return api;
       },
     'showToken': true,
+    'errorReports': function(){
+        return Session.get('errorReports');
+    },
 })
 
 Template.adminControlPanel.events({
@@ -229,7 +232,7 @@ Template.adminControlPanel.events({
               alert(`Error during upload: ${error}`);
             } else {
               alert(`File "${fileObj.name}" successfully uploaded`);
-              link = Images.link(fileObj);
+              link = FileStore.link(fileObj);
               fileName = fileObj.name;
               type = fileObj.type;
               Meteor.call('addFileToOrg',  link, fileName, type);
@@ -283,6 +286,22 @@ Template.adminControlPanel.events({
     'click #regen-link': function(event){
         Meteor.call('generateInvite', Meteor.userId());
     },
+    'click #delete-error-report': function(event){
+        event.preventDefault();
+        errorId = $(event.target).attr('data-error-id');
+        alert("Deleting error report: " + errorId);
+        Meteor.call('deleteErrorReport', errorId);
+        Meteor.call('getErrorReports', function(error, result){
+            if(error){
+                console.log(error);
+            } else {
+               Session.set('errorReports', result);
+            }
+        }
+        );
+        //reload the page
+        Router.go('/control-panel');
+    }
 })
 
 Template.adminControlPanel.onCreated(function() {
@@ -292,4 +311,14 @@ Template.adminControlPanel.onCreated(function() {
     Meteor.subscribe('modules');
     this.selectedUser = new ReactiveVar("org");
     this.currentUpload = new ReactiveVar(false);
+    this.errorReports = new ReactiveVar(false);
+    //get error reports from server
+    Meteor.call('getErrorReports', function(error, result){
+        if(error){
+            console.log(error);
+        } else {
+           Session.set('errorReports', result);
+        }
+    }
+    );
 })

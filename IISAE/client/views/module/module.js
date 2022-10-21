@@ -135,8 +135,8 @@ Template.module.helpers({
         $('#refutation').removeClass('alert-danger');
         $('#refutation').text("");
         $('#refutation').hide();
-        $(':button').prop('disabled', false); 
-        $(':button').removeClass('btn-info');
+        $('.continue').prop('disabled', false); 
+        $('.continue').removeClass('btn-info');
         page = Modules.findOne().pages[parseInt(this.pageId)];
         const t = Template.instance();
         if(page){
@@ -329,6 +329,13 @@ Template.module.helpers({
         //return timer in seconds from milliseconds
         return Math.round(t.avatarTimeOut.get() / 1000);
     },
+    'options': function(){
+        //get user's organization
+        org = Orgs.findOne({orgOwnerId: Meteor.userId()});
+        if(org){
+            return org.options;
+        }
+    }
 });
 
 Template.module.events({
@@ -551,7 +558,7 @@ Template.module.events({
 
     },
     'click .selectionboard': function(event){
-        $(':button').prop('disabled', true); 
+        $('.continue').prop('disabled', true); 
         event.preventDefault();
         moduleData = ModuleResults.findOne({_id: moduleId});
         nextQuestion =  event.target.getAttribute("data-index");
@@ -572,7 +579,7 @@ Template.module.events({
         //change template studentAnswering to true
         t.studentAnswering.set(true);
         recordEvent(t,"clickContinue");
-        $(':button').prop('disabled', true); 
+        $('.continue').prop('disabled', true); 
         $(event.target).addClass("selected");
         event.preventDefault();
         curModule = Modules.findOne()
@@ -927,8 +934,8 @@ Template.module.events({
                     $('#refutation').removeClass('alert-danger');
                     $('#refutation').text("");
                     $('#refutation').hide();
-                    $(':button').prop('disabled', false); 
-                    $(':button').removeClass('btn-info');
+                    $('.continue').prop('disabled', false); 
+                    $('.continue').removeClass('btn-info');
                     setTimeout(finishQuestion, timeOut, target);
                 }
             }
@@ -1036,8 +1043,8 @@ function readTTS(template, message, voice, character,characterArt,scriptAlt){
             audioObjects[order - 1].obj.src = "data:audio/ogg;base64," + res;
             template.audioObjects.set(audioObjects)
             if(!audioActive){
-                $(':button').prop('disabled', true); 
-                $(':button').prop('hidden', true); 
+                $('.continue').prop('disabled', true); 
+                $('.continue').prop('hidden', true); 
                 template.audioActive.set(true);
                 playAudio(template);
             }
@@ -1075,14 +1082,24 @@ async function playAudio(template){
         template.TTSTracPlaying.set(TTSTracPlaying);
         if(audioObjs.length > TTSTracPlaying){
             sleep(1000).then(function(){
-                playAudio(template);
-                curModule = Modules.findOne();
-                if(curModule.scriptFadeTime || curModule.scriptFadeTime == "" || curModule.scriptFadeTime == 0){
-                    fadeTime = curModule.scriptFadeTimeout * 1000;
-                    sleep(300).then(function(){
-                        $(clone).fadeOut(fadeTime);
-                    });
-                }
+               //get pausedSession session variable
+                let pausedSession = Session.get("pauseSession");
+                //wait until pausedSession is false using an interval
+                let interval = setInterval(function(){
+                    pausedSession = Session.get("pauseSession");
+                    console.log("pausedSession: ", pausedSession);
+                    if(!pausedSession){
+                        clearInterval(interval);
+                        playAudio(template);
+                        curModule = Modules.findOne();
+                        if(curModule.scriptFadeTime || curModule.scriptFadeTime == "" || curModule.scriptFadeTime == 0){
+                            fadeTime = curModule.scriptFadeTimeout * 1000;
+                            sleep(300).then(function(){
+                                $(clone).fadeOut(fadeTime);
+                            });
+                        }
+                    }
+                }, 1000);
             });
         }
         else{
@@ -1120,11 +1137,11 @@ async function playAudio(template){
                 }
                 questionType = template.questionType.get();
                 if(questionType == "video" || questionType == "link" || questionType == "scrollbar"){
-                    $(':button').prop('disabled', true); 
-                    $(':button').prop('hidden', true); 
+                    $('.continue').prop('disabled', true); 
+                    $('.continue').prop('hidden', true); 
                 } else {
-                    $(':button').prop('disabled', false); 
-                    $(':button').prop('hidden', false); 
+                    $('.continue').prop('disabled', false); 
+                    $('.continue').prop('hidden', false); 
                     $('.continue').prop('disabled', false);
                     $('.continue').prop('hidden', false);
                 }
