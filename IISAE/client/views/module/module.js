@@ -3,7 +3,14 @@ import hark from 'hark';
 
 var chunks = [];
 
+//disable back button
+history.pushState(null, null, window.location.href);
+history.back();
+window.onpopstate = () => history.forward();
+
 Template.module.onRendered(function (){
+
+ 
     $('#scrollArea').scroll(function(){
         element = document.getElementById('scrollArea');
         if(Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) === 0){
