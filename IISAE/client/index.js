@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import WebPush, { CordovaPush } from 'meteor/activitree:push';
 
+
 Template.DefaultLayout.onCreated(function() {
 
 })
@@ -52,6 +53,9 @@ Template.DefaultLayout.helpers({
     //get user's organization
     org = Orgs.findOne({_id: Meteor.user().organization});
         return org.options;
+    },
+    'modalTemplate': function(){
+        return Session.get('modalTemplate');
     }
 });
 
@@ -70,12 +74,17 @@ Template.DefaultLayout.events({
     //set the session variable Pause to true
     Session.set('pauseSession', true);
     console.log("pauseSession: " + Session.get('pauseSession'));    
+    //set the modalTemplate session variable to the reportError template
+    Session.set('modalTemplate', 'reportingModal');
+    console.log("modalTemplate: " + Session.get('modalTemplate'));
   },
   'click #closeModal': function(event){
     event.preventDefault();
     //set the session variable Pause to false
     Session.set('pauseSession', false);
     console.log("pauseSession: " + Session.get('pauseSession'));
+    //set the modalTemplate session variable to null
+    Session.set('modalTemplate', null);
   }
 });
 
