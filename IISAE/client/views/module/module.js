@@ -417,6 +417,9 @@ Template.module.events({
             }
         }, 2000);
     },
+    'click .nav-link': function(event){
+        pauseAudio();
+    },
     'click .readingNextPage': function(event){
         const t = Template.instance();
         recordEvent(t,"readNextPage");
