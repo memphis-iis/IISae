@@ -24,6 +24,13 @@
                     </div>
                     <div class="autoTutorContainer">
                         <div class="Messages text-left" id="Messages">Conversation</div>
+                        {{#if showAudioPlayButton}}
+                        <button class="btn btn-success" id="playAudio">Play <span class="glyphicon glyphicon-play"></span></button>
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
+                            <span class="glyphicon glyphicon-exclamation-sign"></span>
+                            Autoplay is disabled
+                        </button>
+                        {{/if}}
                         <div class="autoTutorHistory" id="autoTutorHistory">
                         </div>
                     </div>
@@ -83,6 +90,13 @@
                         <div class="Messages" id="Messages">
                             <span class="glyphicon glyphicon-comment"></span>
                         </div>
+                        {{#if showAudioPlayButton}}
+                            <button class="btn btn-success" id="playAudio">Play <span class="glyphicon glyphicon-play"></span></button>
+                            <button type="button" class="btn btn-btn-info" data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
+                                <span class="glyphicon glyphicon-exclamation-sign"></span>
+                                Autoplay is disabled
+                            </button>
+                        {{/if}}
                         <div class="autoTutorHistory" id="autoTutorHistory">
                         </div>
                     </div>
@@ -467,5 +481,4 @@
                 <button class="btn btn-caution" id="goBack"><span class="glyphicon glyphicon-repeat"></span> I'm not ready.</button>
             {{/if}}
     </div>
-    
 </template>

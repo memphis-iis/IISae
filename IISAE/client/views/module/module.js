@@ -46,6 +46,7 @@ Template.module.onRendered(function() {
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
     if(autoTutorReadsScript && scriptsToRead.length > 0 && typeof moduleResults.questionBoardAnswered == 'undefined'){
+        readTTS(t, " ", autoTutorPromptCharacterVoice, autoTutorPromptCharacterName, " ", " ");
         for(let scriptIndex in scriptsToRead){
             script = scriptsToRead[scriptIndex];
             if(script.scriptAlt)
@@ -121,6 +122,12 @@ Template.module.helpers({
             displayClickOverOptions(image,answersWithXCoords);
         }
         return "";
+    },
+    'showAudioPlayButton': function(){
+        template = Template.instance();
+        displayButton = template.showPlayButton.get();
+        console.log("Display Audio Button: " + displayButton);
+        return displayButton;
     },
     'module': () => Modules.findOne(),
     'trialData': function(){
@@ -409,6 +416,9 @@ Template.module.events({
                 }
             }
         }, 2000);
+    },
+    'click .nav-link': function(event){
+        pauseAudio();
     },
     'click .readingNextPage': function(event){
         const t = Template.instance();
@@ -951,7 +961,7 @@ Template.module.events({
                     $('#refutation').removeClass('alert-danger');
                     $('#refutation').text("");
                     $('#refutation').hide();
-                    $('.continue').prop('disabled', false); 
+                    $('.continue').prop('disabled', false);
                     $('.continue').removeClass('btn-info');
                     setTimeout(finishQuestion, timeOut, target);
                 }
@@ -1000,7 +1010,21 @@ Template.module.events({
     },
     'click #continueLink': function(){
         $(".continue").prop( "disabled", false );
-    }
+    },
+    'click #playAudio': function(event){
+        template.audioActive.set(true);
+        template.showPlayButton.set(false);
+        playAudio(template);
+    },
+    'click #autoplayModal': function(event){
+        event.preventDefault();
+        //set the session variable Pause to true
+        Session.set('pauseSession', true);
+        console.log("pauseSession: " + Session.get('pauseSession'));    
+        //set the modalTemplate session variable to the reportError template
+        Session.set('modalTemplate', 'autoplayModal');
+        console.log("modalTemplate: " + Session.get('modalTemplate'));
+    },
 })
 Template.module.onCreated(function(){
     template = this;
@@ -1027,6 +1051,7 @@ Template.module.onCreated(function(){
     this.studentAnswering = new ReactiveVar(false);
     this.autoTutorHidden = new ReactiveVar(false);
     this.promptQueued = new ReactiveVar(false);
+    this.showPlayButton = new ReactiveVar(false);
     
 })
 function sleep(ms) {
@@ -1172,7 +1197,17 @@ async function playAudio(template){
         }
     });
     recordEvent(template,"autoTutorScriptAudioStart", "system");
-    window.currentAudioObj.play();
+    promise = window.currentAudioObj.play();
+    if (promise !== undefined) {
+        promise.then(_ => {
+            // Autoplay started!
+            console.log("Audio started playing");
+        }).catch(error => {
+            //set showPlayButton to true
+            template.showPlayButton.set(true);
+            $(clone).hide();
+        });
+    }
     template.startAudioTime.set(new Date().getTime());
 }
 function setupRecording(template){
