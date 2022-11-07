@@ -3,14 +3,24 @@ import hark from 'hark';
 
 var chunks = [];
 
-//disable back button
-history.pushState(null, null, window.location.href);
-history.back();
-window.onpopstate = () => history.forward();
+//pause and remove src from all audio dom elements when we leave the page
+function pauseAudio(){
+    let audioObjects = document.getElementsByTagName('audio');
+    for(let i = 0; i < audioObjects.length; i++){
+        audioObjects[i].pause();
+        audioObjects[i].src = "";
+    }
+    template.audioObjects.set([]);
+    template.audioActive.set(false);
+}
 
-Template.module.onRendered(function (){
+//onbeforeunload, call pauseAudio
+window.onbeforeunload = function() {
+    pauseAudio();
+};
 
- 
+Template.module.onRendered(function() {
+
     $('#scrollArea').scroll(function(){
         element = document.getElementById('scrollArea');
         if(Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) === 0){
