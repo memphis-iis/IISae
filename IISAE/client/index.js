@@ -60,6 +60,18 @@ Template.DefaultLayout.helpers({
 });
 
 Template.DefaultLayout.events({
+  'click .nav-link': function(event){
+    //stop all audio and video on page
+    console.log("stop all audio and video on page");
+    $('audio').each(function(){
+      this.pause();
+      this.currentTime = 0;
+    });
+    $('video').each(function(){
+      this.pause();
+      this.currentTime = 0;
+    });
+  },
   'click #logoutButton': function(event) {
     event.preventDefault();
     Router.go("/logout");
