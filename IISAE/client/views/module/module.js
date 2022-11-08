@@ -9,6 +9,8 @@ function pauseAudio(){
     for(let i = 0; i < audioObjects.length; i++){
         audioObjects[i].pause();
         audioObjects[i].src = "";
+        //delete audioObjects[i];
+        audioObjects[i].remove();
     }
     template.audioObjects.set([]);
     template.audioActive.set(false);
@@ -1014,7 +1016,8 @@ Template.module.events({
     'click #playAudio': function(event){
         template.audioActive.set(true);
         template.showPlayButton.set(false);
-        playAudio(template);
+        audioObj = template.firstAudioObj.get();
+        audioObj.play();
     },
     'click #autoplayModal': function(event){
         event.preventDefault();
@@ -1052,6 +1055,7 @@ Template.module.onCreated(function(){
     this.autoTutorHidden = new ReactiveVar(false);
     this.promptQueued = new ReactiveVar(false);
     this.showPlayButton = new ReactiveVar(false);
+    this.firstAudioObj = new ReactiveVar(false);
     
 })
 function sleep(ms) {
@@ -1206,6 +1210,8 @@ async function playAudio(template){
             //set showPlayButton to true
             template.showPlayButton.set(true);
             $(clone).hide();
+            //set template.firstAudio to window.currentAudioObj
+            template.firstAudioObj.set(window.currentAudioObj);
         });
     }
     template.startAudioTime.set(new Date().getTime());
