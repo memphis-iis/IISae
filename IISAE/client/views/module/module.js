@@ -48,7 +48,6 @@ Template.module.onRendered(function() {
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
     if(autoTutorReadsScript && scriptsToRead.length > 0 && typeof moduleResults.questionBoardAnswered == 'undefined'){
-        readTTS(t, " ", autoTutorPromptCharacterVoice, autoTutorPromptCharacterName, " ", " ");
         for(let scriptIndex in scriptsToRead){
             script = scriptsToRead[scriptIndex];
             if(script.scriptAlt)
