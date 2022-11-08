@@ -2,3 +2,5 @@
 issae/.idea
 issae/node_modules
 staging-key-final.pem
+id_rsa.pub
+id_rsa
