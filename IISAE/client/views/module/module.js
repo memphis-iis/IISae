@@ -1017,6 +1017,21 @@ Template.module.events({
         template.showPlayButton.set(false);
         audioObj = template.firstAudioObj.get();
         audioObj.play();
+        //get audioObject info
+        avatarInfo = template.firstAudioAvatarInfo.get();
+        console.log("avatarInfo", avatarInfo);
+        let atTemplate = "#ATTemplate" + avatarInfo.characterIndex;
+        var clone = $(atTemplate).clone().appendTo('.autoTutorHistory'); 
+        $('.autoTutorHistory').show();
+        // let scriptHandle = atTemplate + " .script";
+        // let avatarHandle = atTemplate + " .avatar";
+        // get clone's child with class script
+        let scriptHandle = clone.find(".script");
+        let avatarHandle = clone.find(".avatar");
+        $(avatarHandle).html("<img src='" + avatarInfo.art + "' class='img-responsive'><br>");
+        $(scriptHandle).html(avatarInfo.displayMessage);
+        $(clone).fadeIn();
+        console.log("clone", clone);
     },
     'click #autoplayModal': function(event){
         event.preventDefault();
@@ -1055,6 +1070,7 @@ Template.module.onCreated(function(){
     this.promptQueued = new ReactiveVar(false);
     this.showPlayButton = new ReactiveVar(false);
     this.firstAudioObj = new ReactiveVar(false);
+    this.firstAudioAvatarInfo = new ReactiveVar(false);
     
 })
 function sleep(ms) {
@@ -1211,6 +1227,7 @@ async function playAudio(template){
             $(clone).hide();
             //set template.firstAudio to window.currentAudioObj
             template.firstAudioObj.set(window.currentAudioObj);
+            template.firstAudioAvatarInfo.set(audioObjs[TTSTracPlaying]);
         });
     }
     template.startAudioTime.set(new Date().getTime());
