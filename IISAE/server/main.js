@@ -750,34 +750,54 @@ Meteor.methods({
         Classes.insert(data);
     },
     joinClassByCode(code){
+        console.log("adding user to class with code: " + code);
         userId = Meteor.userId();
         user = Meteor.users.findOne({_id: userId});
+        classFound = false;
         addClass = Classes.findOne({inviteLink: code});
-        data = {
-            classId: addClass._id,
-            assignments: []
+        console.log(addClass);
+        if(typeof addClass._id !== "undefined"){
+            classFound = true;
+        };
+        isInClassAlready = false;
+        if(user.classList == undefined){
+            user.classList = [];
         }
-        classList = user.classList || [];
-        classList.push(data);
-        Meteor.users.update({ _id: userId }, 
-            {   $set: 
-                {
-                    classList: classList
-                }
-            });
-        students = Classes.findOne({inviteLink: code}).students;
-        student = {
-            id: userId,
-            firstName: user.firstname,
-            lastName: user.lastname
-        }
-        students.push(student);
-        Classes.update({inviteLink: code},{
-            $set:
-            {
-                students: students
+        for(i=0; i<user.classList.length; i++){
+            if(user.classList[i].classId == addClass._id){
+                isInClassAlready = true;
+                console.log("user is already in class");
             }
-        })
+        }
+        if(isInClassAlready == false && classFound == true){
+            data = {
+                classId: addClass._id,
+                assignments: []
+            }
+            classList = user.classList || [];
+            classList.push(data);
+            Meteor.users.update({ _id: userId }, 
+                {   $set: 
+                    {
+                        classList: classList
+                    }
+                });
+            students = Classes.findOne({inviteLink: code}).students;
+            student = {
+                id: userId,
+                firstName: user.firstname,
+                lastName: user.lastname
+            }
+            students.push(student);
+            Classes.update({inviteLink: code},{
+                $set:
+                {
+                    students: students
+                }
+            })
+            return "success";
+        } 
+        return "failure";
     },
     addUserToClass(classId,userId){
         user = Meteor.users.findOne({_id: userId});
@@ -810,9 +830,15 @@ Meteor.methods({
         })
     },
     removeUserFromClass(classId, userId){
+        console.log("removing user from class: " + classId + " user: " + userId);
         user = Meteor.users.findOne({_id: userId});
         classList = user.classList || [];
-        classList.splice(classId,1);
+        //iterate through class list and remove the class
+        for(i=0; i<classList.length; i++){
+            if(classList[i].classId == classId){
+                classList.splice(i,1);
+            }
+        }
         Meteor.users.update({ _id: userId }, 
             {   $set: 
                 {

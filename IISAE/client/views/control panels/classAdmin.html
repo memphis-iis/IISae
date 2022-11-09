@@ -70,6 +70,7 @@
 
         />     
         <button class="btn btn-primary" id="changeClassName">Change Class Name</button>  
+        <button class="btn btn-primary" id="deleteClass">Delete Class</button>
         <br>
         <h4>Class Roster</h4>
             {{#if selectedClass.students}}
@@ -82,6 +83,9 @@
                 {{#each selectedClass.students}}
                     <tr>
                         <td>{{this.lastName}}, {{this.firstName}}</td>
+                        <td>
+                            <a href="#" id="remove-student" data-student="{{this.id}}">Remove Student</a><br>
+                        </td>
                     </tr>
                 {{/each}}
                 </tbody>
