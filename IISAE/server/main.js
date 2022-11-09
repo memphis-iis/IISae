@@ -281,6 +281,20 @@ Meteor.methods({
         curModule = Modules.findOne({_id: moduleId});
         text = "curModule." + field;
         newField = eval(text);
+        if(field = "simpleFeedbackBag.correct"){
+            if(curModule.simpleFeedbackBag == undefined){
+                curModule.simpleFeedbackBag = {correct: [], incorrect: []};
+            }
+            console.log("Adding correct feedback");
+            curModule.simpleFeedbackBag.correct.push("New");
+        }
+        if(field = "simpleFeedbackBag.incorrect"){
+            if(curModule.simpleFeedbackBag == undefined){
+                curModule.simpleFeedbackBag = {correct: [], incorrect: []};
+            }
+            curModule.simpleFeedbackBag.incorrect.push("New");
+            console.log("Adding incorrect feedback");
+        }
         if(typeof newField !== "undefined" && typeof newField[0] !== "undefined"){
             if(typeof newField[0] === "object"){
                 keys = Object.keys(newField[0]);

@@ -206,8 +206,45 @@
             {{else}}
             <input class="markCorrect"  data-field="autoTutorReadsRefutation" data-value="true" type="checkbox" >
             {{/if}}        
-          </div>
-          
+            {{#if module.autoTutorReadsRefutation}}
+            <h3>Bags of Words Responses:</h3>
+            <p>You may use speakingTo as a variable in curly brackets. It may address more than one avatar.</p>
+            AutoTutor Correct Response Bag:  
+            <table class="table" id="correctResponseBag">
+                <thead>
+                    <th scope="col" width="75%">Response</th>
+                    <th scope="col" width="25%">Action</th>
+                </thead>
+                <tbody>
+                    {{#each module.simpleFeedbackBag.correct}}
+                    <tr>
+                        <td>{{this}}</td>   <a id="open-editor" data-value={{this}} data-field="simpleFeedbackBag.correct[{{@index}}]"> Edit</a>
+                        <a id="delete-item" data-field="simpleFeedbackBag.correct[{{@index}}]">Delete</a><br>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <a id="add-item" data-field="simpleFeedbackBag.correct">Add Correct Response</a>
+            <br><br>
+            AutoTutor Incorrect Response Bag:  
+            <table class="table" id="correctResponseBag">
+                <thead>
+                    <th scope="col" width="75%">Response</th>
+                    <th scope="col" width="25%">Action</th>
+                </thead>
+                <tbody>
+                    {{#each module.simpleFeedbackBag.incorrect}}
+                    <tr>
+                        <td>{{this}}</td>   <a id="open-editor" data-value={{this}} data-field="simpleFeedbackBag.incorrect[{{@index}}]"> Edit</a>
+                        <a id="delete-item" data-field="simpleFeedbackBag.incorrect[{{@index}}]">Delete</a><br>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <a id="add-item" data-field="simpleFeedbackBag.incorrect">Add Incorrect Response</a>
+            {{/if}}
+            </div> 
+
           <br>
           {{#if module.autoTutorCharacter}}
           <h4>AutoTutor Characters</h4>
@@ -219,7 +256,9 @@
             {{/each}}
         </select>
         <br>
-        Script Display Timeout (Fade, 0 for no fade): {{module.scriptFadeTimeout}}<a id="open-editor" data-value={{module.scriptFadeTimeout}} data-field="identifier"> Edit</a><br>
+        Script Display Timeout (Fade, 0 for no fade): {{module.scriptFadeTimeout}}<a id="open-editor" data-value={{module.scriptFadeTimeout}} data-field="scriptFadeTimeout"> Edit</a><br>
+        Avatar No Response Reminder Timeout Minimum Milliseconds (0 for none): {{module.avatarTimeOutMin}}<a id="open-editor" data-value={{module.avatarTimeOutMin}} data-field="avatarTimeOutMin"> Edit</a><br>
+        Avatar No Response Reminder Timeout Maximum Milliseconds (0 for none): {{module.avatarTimeOutMax}}<a id="open-editor" data-value={{module.avatarTimeOutMax}} data-field="avatarTimeOutMax"> Edit</a><br>
           <table class="table" id="autoTutorCharacters">
             <thead>
                 <th scope="col" width="25%">Name</th>
