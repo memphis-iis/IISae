@@ -76,7 +76,7 @@
                  User Flow can be seen when selecting an individual user  that you supervise.
             {{else}}
             {{#if userSelected.editedClassList}}
-            <h4>Entrolled Classes</h4>
+            <h4>Enrolled Classes</h4>
             <table class="table" id="classList">
                 <thead>
                     <th scope="col" width="50%">Classes</th>
@@ -127,7 +127,7 @@
                     <th scope="col" width="30%">Actions</th>
                 </thead>
                 <tbody>
-                {{#each classes}}
+                {{#each classesAvailable}}
                     <tr>
                         <td>{{this.name}}</td>
                         <td><a id="assign-class" data-class-id="{{this._id}}">Enroll User</a></td>

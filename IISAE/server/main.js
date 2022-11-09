@@ -783,6 +783,7 @@ Meteor.methods({
         user = Meteor.users.findOne({_id: userId});
         addClass = Classes.findOne({_id: classId});
         data = {
+            _id: addClass._id,
             classId: classId,
             assignments: []
         }
