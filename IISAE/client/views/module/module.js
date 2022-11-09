@@ -89,7 +89,7 @@ Template.module.onRendered(function() {
             }
         }
     }
-    if(autoTutorReadsPrompt && promptToRead){   
+    if(autoTutorReadsPrompt && promptToRead && questionType != "html"){
         readTTS(t, promptToRead, autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
     } 
     if(moduleData.audioRecording && !moduleData.enableAutoTutor){
@@ -493,20 +493,23 @@ Template.module.events({
             }
         }
     },
-    'click #autotutor-video': function(event){
+    'click .video-reference': function(event){
         const t = Template.instance();
         recordEvent(t,"videoClick");
         //get this page
-        page = Modules.findOne().pages[parseInt(this.pageId)];
+        thisModule = Modules.findOne();
         //get the videoReference
-        videoReference = page.questions[parseInt(this.questionId)].videoReference || false;
-        //if videoReference is not false
-        if(videoReference){
-            //open video in new window
-            window.open(videoReference, '_blank');
-        } else {
-            alert("No video reference found for this question");
-        }
+        videoReference = thisModule.videoReference;
+        //if videoReference is not false set the modal template to htmlModal
+        //set the session variable Pause to true
+        Session.set('pauseSession', true);
+        console.log("pauseSession: " + Session.get('pauseSession'));    
+        //set the modalTemplate session variable to the reportError template
+        Session.set('modalTemplate', 'htmlModal');
+        console.log("modalTemplate: " + Session.get('htmlModal'));
+        //set the modalHTMLContent session variable to the videoReference
+        Session.set('modalHTMLContent', videoReference);
+        console.log("modalHTMLContent: " + Session.get('modalHTMLContent'));
     },
     'click .btn-read': function (event){
         const t = Template.instance();
