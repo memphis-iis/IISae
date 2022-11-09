@@ -9,8 +9,11 @@ Template.profile.helpers({
     'userIsAdminOrSupervisor': () => Roles.userIsInRole(Meteor.userId(), ['admin', 'supervisor']),
     'options': function(){
         //get user's organization
-        org = Orgs.findOne({orgOwnerId: Meteor.userId()});
+        user = Meteor.user();
+        org = user.organization;
+        org = Orgs.findOne({_id: org});
         if(org){
+            console.log("options",org.options);
             return org.options;
         }
     }

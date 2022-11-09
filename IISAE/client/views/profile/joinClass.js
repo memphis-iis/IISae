@@ -6,8 +6,8 @@ Template.joinClass.events({
         event.preventDefault();
         code = $('#code').val();
         Meteor.call('joinClassByCode',code,function(err,res){
-            if(err){
-                alert("Class was not found");
+            if(res == "failure"){
+                alert("Class not found or already joined");
             }
         });
         Router.go('/profile')

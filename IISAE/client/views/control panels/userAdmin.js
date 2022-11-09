@@ -9,7 +9,25 @@ Template.usersAdmin.helpers({
             return false;
         }
     },
-    'classesAvailable': () => Classes.find({owner: Meteor.userId()}),
+    'classesAvailable': function(){
+        const t = Template.instance();
+        user = Meteor.users.findOne({_id: t.selectedUser.get()});
+        console.log(user.classList);
+        classes = Classes.find({owner: Meteor.userId()}).fetch();
+        console.log(classes);
+        //iterate through classes and check if user is in class
+        for(i=0; i<classes.length; i++){
+            //iterate through user's classes
+            for(j=0; j<user.classList.length; j++){
+                if(classes[i]._id == user.classList[j]._id){
+                    //remove class from list
+                    classes.splice(i, 1);
+                    console.log("removed class");
+                }
+            }
+        }
+        return classes;
+    },
     
     'organization': () => Orgs.findOne(),
 
@@ -40,6 +58,7 @@ Template.usersAdmin.helpers({
 
     'classes':function(){
         return Classes.find().fetch();
+        
     },
 
     'userSelected': function(){

@@ -33,6 +33,7 @@ Template.classAdmin.helpers({
                 thisClass.flow[index].last = true;
             }
         }
+        console.log(thisClass);
         return thisClass;
     },
     'organization': () => Orgs.findOne(),
@@ -130,6 +131,12 @@ Template.classAdmin.events({
         curClass.flow = assigned;
         Meteor.call('changeClassAssignment', classId, curClass.flow);
     },
+    'click #remove-student': function(event){
+        const t = Template.instance();
+        selectedClass = t.classSelected.get();
+        removeStudent = $(event.target).attr("data-student");
+        Meteor.call('removeUserFromClass',selectedClass,removeStudent);
+    }
     
 })
 
