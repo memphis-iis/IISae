@@ -50,10 +50,10 @@
                         <br>
                     {{/if}}
                     <div class="menuBar">
-                        {{#if page.videoReference}}
-                        <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                        {{else}}
-                        <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                        {{#if module.videoReference}}
+                        <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                            Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                        </button>
                         {{/if}}
                         {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -61,11 +61,11 @@
                     </div>
                 {{/if}}
                 {{#if page.typeEmbed}}
-                <div class="menuBar">
-                    {{#if page.videoReference}}
-                    <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                    {{else}}
-                    <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                <div class="">
+                    {{#if module.videoReference}}
+                    <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                        Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                    </button>
                     {{/if}}
                     {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -130,10 +130,10 @@
                         <div class="menuBar">
                             {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                             {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
-                            {{#if page.videoReference}}
-                            <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                            {{else}}
-                            <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                            {{#if module.videoReference}}
+                            <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                                Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                            </button>
                             {{/if}}
                             <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Continue <span class="glyphicon glyphicon-play"></span></button>
                         </div>
@@ -143,6 +143,11 @@
                         <div class="col-md-6 col-xs-10"><video id="videoPrompt" autoplay style="width:100%" onended="$('.continue').prop('disabled',false); $('.continue').click()"><source src="{{question.prompt}}"></video></div>
                         <div class="col-md-6 col-xs-1"></div>
                         <div class="menuBar">
+                            {{#if module.videoReference}}
+                            <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                                Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                            </button>
+                            {{/if}}
                             {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
                             <button  class="btn btn-primary continue" data-group="{{this.group}}" style="white-space: normal;" value="0">Continue <span class="glyphicon glyphicon-play"></span></button>
@@ -151,10 +156,10 @@
                     {{#if question.typeHTML}}
                     {{{question.prompt}}}
                     <div class="menuBar">
-                        {{#if page.videoReference}}
-                        <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                        {{else}}
-                        <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                        {{#if module.videoReference}}
+                        <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                            Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                        </button>
                         {{/if}}
                         {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -183,10 +188,10 @@
                         {{/if}}
                         <br>
                         <div class="menuBar">
-                            {{#if page.videoReference}}
-                            <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                            {{else}}
-                            <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                            {{#if module.videoReference}}
+                            <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                                Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                            </button>
                             {{/if}}
                         {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -218,10 +223,10 @@
                         </p>
                         <br>
                         <div class="menuBar">
-                            {{#if page.videoReference}}
-                            <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                            {{else}}
-                            <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                            {{#if module.videoReference}}
+                            <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                                Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                            </button>
                             {{/if}}
                             {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -233,10 +238,10 @@
                         </form>
                         <br>
                         <div class="menuBar">
-                            {{#if page.videoReference}}
-                            <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                            {{else}}
-                            <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                            {{#if module.videoReference}}
+                            <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                                Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                            </button>
                             {{/if}}
                             {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -290,10 +295,10 @@
                     <br>
                    
                     <div class="menuBar">
-                        {{#if page.videoReference}}
-                        <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                        {{else}}
-                        <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                        {{#if module.videoReference}}
+                        <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                            Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                        </button>
                         {{/if}}
                         {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
             {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -321,10 +326,10 @@
                         </div>
                     {{/if}}
                     <div class="menuBar">
-                        {{#if page.videoReference}}
-                        <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                        {{else}}
-                        <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                        {{#if module.videoReference}}
+                        <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                            Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                        </button>
                         {{/if}}
                         {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -362,10 +367,10 @@
                     </form>
                     <br>
                     <div class="menuBar">
-                        {{#if page.videoReference}}
-                        <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                        {{else}}
-                        <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                        {{#if module.videoReference}}
+                        <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                            Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                        </button>
                         {{/if}}
                         {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -390,10 +395,10 @@
                         {{/each}}
                     </form>
                     <div class="menuBar">
-                        {{#if page.videoReference}}
-                        <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                        {{else}}
-                        <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                        {{#if module.videoReference}}
+                        <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                            Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                        </button>
                         {{/if}}
                         {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -417,10 +422,10 @@
                         <br>
                         <br>
                         <div class="menuBar">
-                            {{#if page.videoReference}}
-                            <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                            {{else}}
-                            <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                            {{#if module.videoReference}}
+                            <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                                Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                            </button>
                             {{/if}}
                             {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
@@ -442,6 +447,11 @@
                     </div>
                     {{/if}}
                     <div class="menuBar">
+                        {{#if module.videoReference}}
+                        <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                            Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                        </button>
+                        {{/if}}
                         <button id="continue" class="btn btn-success readingPrevPage" >Previous Page <span class="glyphicon glyphicon-step-backward"></span></button>
                         <button id="continue" class="btn btn-success readingNextPage" >Next Page <span class="glyphicon glyphicon-step-forward"></span></button>
                         <button id="continue" class="btn btn-success readingLastPage" >Last Page <span class="glyphicon glyphicon-fast-forward"></span></button><br>
@@ -453,10 +463,10 @@
                         {{{question.prompt}}}</div>
                     <br>
                     <div class="menuBar">
-                        {{#if page.videoReference}}
-                        <button class="btn btn-video btn-success" id="autotutor-video">Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
-                        {{else}}
-                        <button class="btn btn-video btn-success" id="autotutor-video" disabled>Video Reference <span class="glyphicon glyphicon-facetime-video"></span></button>
+                        {{#if module.videoReference}}
+                        <button type="button" class="btn btn-btn-info video-reference" data-toggle="modal" data-target="#reportingModal" id="htmlModal">
+                            Video Reference <span class="glyphicon glyphicon-facetime-video"></span>
+                        </button>
                         {{/if}}
                         {{#if page.text}}{{#if module.autoTutorCanReadPassage}}<br> <button class="btn btn-read btn-success" id="autotutor-read">Read Text <span class="glyphicon glyphicon-comment"></span></button>{{/if}}{{/if}}
                 {{#if module.autoTutorRepeat}} <button class="btn btn-repeat btn-success" id="autotutor-repeat">Repeat Conversation <span class="glyphicon glyphicon-repeat"></span></button>{{/if}}
