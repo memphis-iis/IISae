@@ -27,9 +27,9 @@ Meteor.startup(async function() {
         });
     }
     //load default JSON assessment/modules into mongo collection
-    insertDefaultAssignments().then(function(){
+    // insertDefaultAssignments().then(function(){
 
-    });  
+    // });  
 });
 
 //Global Methods
@@ -448,7 +448,6 @@ Meteor.methods({
             } else {
                 correctAnswer = curModule.pages[pageId].questions[questionId].correctAnswer;
             }
-            console.log(correctAnswer, response);
             enableFeedback = curModule.enableFeedback;
             skipFeedback = curModule.pages[pageId].questions[questionId].noRefutation;
             enableWeightedQuestions = curModule.enableWeightedQuestions;

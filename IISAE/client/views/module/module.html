@@ -267,13 +267,13 @@
                                     
                                     {{#if this.image}}
                                         <div class="col col-xs-6" style="margin: auto;">
-                                        <button  class="btn btn-lg btn-primary text-nowrap btn-block multichoice continue" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="" data-alt="{{this.altAnswer}}">
-                                            {{this.answer}}<img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="">{{text}}
+                                        <button  class="btn btn-lg btn-primary text-nowrap btn-block multichoice continue" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">
+                                            {{this.answer}}<img class="img-responsive center-block multichoice" src="{{this.image}}" alt="Your Alt Text" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">{{text}}
                                         </button>
                                         </div>
             
                                     {{else}}
-                                    <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="" data-alt="{{this.altAnswer}}">{{this.answer}}</button>
+                                    <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="" data-alt="{{this.responseAlt}}">{{this.answer}}</button>
                                     {{/if}}
                               
                                 {{/each}}
@@ -289,6 +289,34 @@
                         <div class="col-md-hidden col-sm-12 col-xs-12"><br></div>
                     </div>
 
+                    {{else}}
+                    <div class="col-md-12 col-sm-12 col-xs-12 align-middle answerbox">
+                        <h3 id="prompt">{{{question.prompt}}}</h3><br>
+                        <form>
+                            <div class="row justify-content-center">
+                            {{#each question.answers}}
+                                
+                                {{#if this.image}}
+                                    <div class="col-xs-6 col-md-4 mx-auto" style="margin: auto; padding: 20px; max-height:30vh;">
+                                        <button  class="btn btn-lg btn-block btn-primary text-nowrap btn-block multichoice continue"  data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; height:100%;" id="{{@index}}" value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">
+                                            {{this.answer}}<img class="img-responsive center-block multichoice" src="{{this.image}}" alt="Your Alt Text" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; max-height:30vh;" id="{{@index}}" value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">{{text}}
+                                        </button>
+                                    </div>
+        
+                                {{else}}
+                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="" data-alt="{{this.responseAlt}}">{{this.answer}}</button>
+                                {{/if}}
+                          
+                            {{/each}}
+                            </div>
+                        </form>
+                        {{#if module.autoTutorReadsRefutation}}
+                        {{else}}
+                            <div class="alert" id="refutation" role="alert" hidden>
+                            Message: {{feedback.message}}
+                            </div>
+                        {{/if}}
+                    </div>
                     {{/if}}
 
           

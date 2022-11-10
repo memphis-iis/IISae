@@ -11,7 +11,7 @@ export function answerAssess(correctAnswer, response, type="simpleMatch"){
     return data;
 }
 function simpleMatch(correctAnswer, response){
-    if(response.toLowerCase() == correctAnswer.toLowerCase()){
+    if(response.toLowerCase().trim() == correctAnswer.toLowerCase().trim()){
         isCorrect = true;
     } else {
         isCorrect = false;

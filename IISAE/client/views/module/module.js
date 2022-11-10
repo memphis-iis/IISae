@@ -47,6 +47,7 @@ Template.module.onRendered(function() {
     autoTutorReadsScript = moduleData.autoTutorReadsScript;
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
+    questionType = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].type;
     if(autoTutorReadsScript && scriptsToRead.length > 0 && typeof moduleResults.questionBoardAnswered == 'undefined'){
         for(let scriptIndex in scriptsToRead){
             script = scriptsToRead[scriptIndex];
@@ -245,6 +246,7 @@ Template.module.helpers({
         };
         if(question.type == "multiChoice"){
             question.typeMultiChoice = true;
+            console.log("MultiChoice, question: " + JSON.stringify(question));
             if(curModule.randomChoice){
                 let shuffled = question.answers
                 .map(value => ({ value, sort: Math.random() }))
@@ -252,6 +254,8 @@ Template.module.helpers({
                 .map(({ value }) => value)
                 question.answers = shuffled;
             }
+            //divide question answer count by 12, maximum 4
+            question.answerCountAdjust = Math.max(Math.ceil(question.answers.length / 12), 4);
         };
         if(question.type == "imageClick"){
             question.typeImageClick = true;
@@ -398,6 +402,7 @@ Template.module.events({
     'mouseover .multichoice': function(event){
         response = $(event.target).html();
         responseAlt = $(event.target).attr("data-alt");
+        console.log(response, responseAlt);
         curModule = Modules.findOne();
         const t = Template.instance();
         recordEvent(t,"multiChoiceMouseOver",Meteor.userId(),{response: response});
@@ -410,7 +415,7 @@ Template.module.events({
                     autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
                     autoTutorPromptCaracterArt = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).art;
                     if(responseAlt && responseAlt != ""){
-                        readTTS(t, response, autoTutorPromptCharacterVoice, autoTutorPromptCaracterArt, autoTutorReadsPrompt, responseAlt);
+                        readTTS(t, responseAlt, autoTutorPromptCharacterVoice, autoTutorPromptCaracterArt, autoTutorReadsPrompt, responseAlt);
                     } else {
                         readTTS(t, response, autoTutorPromptCharacterVoice, autoTutorPromptCaracterArt, autoTutorReadsPrompt);
                     }
@@ -676,7 +681,8 @@ Template.module.events({
                 }
                 if(questionData.type == "multiChoice"){
                     var target = event.target || event.srcElement;
-                    userResponse = target.textContent;
+                    userResponse = $(target).val();
+                    response = userResponse;
                     answerValue = parseInt($(event.target).val()) || 0;
                     index = event.target.getAttribute('id');
                     if(questionData.answers[index].feedback != "" || typeof questionData.answers[index].feedback != "undefined"){
@@ -797,7 +803,7 @@ Template.module.events({
             moduleData.characterResponses[moduleData.responses.length - 1] = characterResponses;
             moduleData.nextPage = thisPage;
             moduleData.nextQuestion = thisQuestion + 1;
-            
+            console.log("Response: " + response);
             await Meteor.call("evaluateModuleData", moduleData, curModule._id , thisPage, thisQuestion, data.response, answerValue, characterResponses, function(err, res){                feedback = t.feedback.get();
                 moduleData = res.moduleData;
                 type = "danger";
@@ -1080,6 +1086,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function readTTS(template, message, voice, character,characterArt,scriptAlt){
+    console.log("readTTS", message, voice, character, characterArt, scriptAlt);
     //remove quotes from message
     message = message.replace(/"/g, "");
     recordEvent(template,"addAutoTutorScriptToTTSQueue","system",{character:character, text:message});
@@ -1539,16 +1546,20 @@ function startAgentSpeechTimer(template, min, max){
         //sleep for random time
         console.log("sleeping for " + randomTime + "miliseconds");
         sleep(randomTime).then(() => {
-            //get agent speech
-            var speech = getAgentSpeech(user, curModule, type, 0, 0, 0, 0, 0);
-            //get agent art
-            autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
-            autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
-            autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
-            autoTutorPromptCaracterArt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
-            //read agent speech
-            readTTS(template, speech, autoTutorPromptCharacterVoice, autoTutorPromptCharacterName, autoTutorPromptCaracterArt);
-            template.promptQueued.set(true);
+            //check if student is still not answering
+            studentAnswering = template.studentAnswering.get();
+            if(!studentAnswering){
+                //get agent speech
+                var speech = getAgentSpeech(user, curModule, type, 0, 0, 0, 0, 0);
+                //get agent art
+                autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
+                autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
+                autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
+                autoTutorPromptCaracterArt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
+                //read agent speech
+                readTTS(template, speech, autoTutorPromptCharacterVoice, autoTutorPromptCharacterName, autoTutorPromptCaracterArt);
+                template.promptQueued.set(true);
+            }
         });
     }
 }  
