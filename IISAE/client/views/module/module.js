@@ -681,8 +681,9 @@ Template.module.events({
                 }
                 if(questionData.type == "multiChoice"){
                     var target = event.target || event.srcElement;
-                    userResponse = $(target).val();
+                    userResponse = event.target.value;
                     response = userResponse;
+                    console.log("userResponse: " + userResponse);
                     answerValue = parseInt($(event.target).val()) || 0;
                     index = event.target.getAttribute('id');
                     if(questionData.answers[index].feedback != "" || typeof questionData.answers[index].feedback != "undefined"){
