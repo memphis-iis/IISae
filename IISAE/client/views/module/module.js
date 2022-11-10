@@ -680,10 +680,14 @@ Template.module.events({
                     answerValue = answerValue;
                 }
                 if(questionData.type == "multiChoice"){
-                    var target = event.target || event.srcElement;
-                    userResponse = event.target.value;
+                    userResponse = $(event.target).attr("data-value");
+                    console.log(event.target);
                     response = userResponse;
                     console.log("userResponse: " + userResponse);
+                    if(response == undefined){
+                        alert("Something went wrong. Please try again.");
+                        return;
+                    }
                     answerValue = parseInt($(event.target).val()) || 0;
                     index = event.target.getAttribute('id');
                     if(questionData.answers[index].feedback != "" || typeof questionData.answers[index].feedback != "undefined"){

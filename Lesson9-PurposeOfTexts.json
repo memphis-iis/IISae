@@ -404,7 +404,7 @@
               ]
             },
             {
-              "prompt": "This request is actually for someone else. My sister is really into romance books. , Do you see anything that she might enjoy\"",
+              "prompt": "This request is actually for someone else. My sister is really into romance books. Do you see anything that she might enjoy\"",
               "type": "multiChoice",
               "value": 0,
               "feedback": "",
@@ -476,7 +476,7 @@
               ]
             },
             {
-              "prompt": "My church recommends reading some books on the history of Christianity. , Do you see a book that will teach me about that?",
+              "prompt": "My church recommends reading some books on the history of Christianity. Do you see a book that will teach me about that?",
               "type": "multiChoice",
               "value": 0,
               "feedback": "",
@@ -524,7 +524,7 @@
               ]
             },
             {
-              "prompt": "Oh, I almost forgot! I also want to cook for my mother when I visit her, but I don't know how to cook. , which book do you think would help me?",
+              "prompt": "Oh, I almost forgot! I also want to cook for my mother when I visit her, but I don't know how to cook. which book do you think would help me?",
               "type": "multiChoice",
               "value": 0,
               "feedback": "",

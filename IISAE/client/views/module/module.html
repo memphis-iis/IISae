@@ -267,9 +267,9 @@
                                     
                                     {{#if this.image}}
                                         <div class="col col-xs-6" style="margin: auto;">
-                                        <button  class="btn btn-lg btn-primary text-nowrap btn-block multichoice continue" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">
-                                            {{this.answer}}<img class="img-responsive center-block multichoice" src="{{this.image}}" alt="Your Alt Text" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal;" id="{{@index}}" value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">{{text}}
-                                        </button>
+                                            <button  class="btn btn-lg btn-block btn-primary text-nowrap btn-block multichoice continue"  data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; height:100%;" id="{{@index}}" data-value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">
+                                                {{this.answer}}<img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; max-height:30vh;" id="{{@index}}" data-value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">{{text}}
+                                            </button>
                                         </div>
             
                                     {{else}}
@@ -298,8 +298,8 @@
                                 
                                 {{#if this.image}}
                                     <div class="col-xs-6 col-md-4 mx-auto" style="margin: auto; padding: 20px; max-height:30vh;">
-                                        <button  class="btn btn-lg btn-block btn-primary text-nowrap btn-block multichoice continue"  data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; height:100%;" id="{{@index}}" value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">
-                                            {{this.answer}}<img class="img-responsive center-block multichoice" src="{{this.image}}" alt="Your Alt Text" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; max-height:30vh;" id="{{@index}}" value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">{{text}}
+                                        <button  class="btn btn-lg btn-block btn-primary text-nowrap btn-block multichoice continue"  data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; height:100%;" id="{{@index}}" data-value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">
+                                            {{this.answer}}<img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; max-height:30vh;" id="{{@index}}" data-value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">{{text}}
                                         </button>
                                     </div>
         
