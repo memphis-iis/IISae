@@ -270,10 +270,10 @@
                                             <button  class="btn btn-lg btn-block btn-primary text-nowrap btn-block multichoice continue"  data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; height:100%;" id="{{@index}}" data-value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">
                                                 {{this.answer}}<img class="img-responsive center-block" src="{{this.image}}" alt="Your Alt Text" data-group="{{this.group}}" data-index="{{@index}}" style="white-space: normal; max-height:30vh;" id="{{@index}}" data-value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">{{text}}
                                             </button>
-                                        </div>
+                                        </div>s
             
                                     {{else}}
-                                    <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="" data-alt="{{this.responseAlt}}">{{this.answer}}</button>
+                                    <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" data-value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">{{this.answer}}</button>
                                     {{/if}}
                               
                                 {{/each}}
@@ -304,7 +304,7 @@
                                     </div>
         
                                 {{else}}
-                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" value="{{this.value}}" name="" data-alt="{{this.responseAlt}}">{{this.answer}}</button>
+                                <button  class="btn btn-primary text-nowrap btn-lg btn-block multichoice continue" data-group="{{this.group}}" style="white-space: normal;" id="{{@index}}" data-value="{{this.answer}}" name="" data-alt="{{this.responseAlt}}">{{this.answer}}</button>
                                 {{/if}}
                           
                             {{/each}}

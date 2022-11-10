@@ -657,6 +657,7 @@ Template.module.events({
                 }
                 if(questionData.type == "autotutorscript"){
                     userResponse = "continue";
+                    response = "continue";
                     answerValue = 0;
                 }
                 if(questionData.type == "video"){
@@ -678,6 +679,10 @@ Template.module.events({
                 if(questionData.type == "link"){
                     response = thisQuestion.correctAnswer || true;
                     answerValue = answerValue;
+                }
+                if(questionData.type == "html"){
+                    response = "continue";
+                    answerValue = 0;
                 }
                 if(questionData.type == "multiChoice"){
                     userResponse = $(event.target).attr("data-value");
