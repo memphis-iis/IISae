@@ -996,7 +996,7 @@ Template.module.events({
     },
     'click #startActivity': function(event){
         target =  $(location).attr('href') + "/0";
-        window.location.href = target;
+        Router.go(target);
     },
     'click .multichoice': function(event){
         event.preventDefault();
@@ -1014,15 +1014,25 @@ Template.module.events({
     },
     'click #startModule': function(event){
         event.preventDefault();
-        data = {
-            userId: Meteor.userId(),
-            moduleId: Modules.findOne()._id, 
-            responses: [],
-            characterResponses: []
+        //play mainAudio object
+        audioObject = $('#mainAudio');
+        console.log("audioObject count: " + audioObject.length);
+        promise = audioObject[0].play();
+        if(promise !== undefined){
+            promise.then(_ => {
+                data = {
+                    userId: Meteor.userId(),
+                    moduleId: Modules.findOne()._id, 
+                    responses: [],
+                    characterResponses: []
+                }
+                Meteor.call("createNewModuleTrial", data);
+                target = "/module/" + Modules.findOne()._id + "/0";
+                Router.go(target);
+            }).catch(error => {
+                $('#autoplayModal').click();
+            });
         }
-        Meteor.call("createNewModuleTrial", data);
-        target = "/module/" + Modules.findOne()._id + "/0";
-        window.location.href = target;
     },
     'click #goBack': function(event){
         target = "/profile/"
@@ -1034,8 +1044,14 @@ Template.module.events({
     'click #playAudio': function(event){
         template.audioActive.set(true);
         template.showPlayButton.set(false);
-        audioObj = template.firstAudioObj.get();
-        audioObj.play();
+        audioObj = $('#mainAudio');
+        promise = audioObj[0].play();
+        if(promise !== undefined){
+            promise.then(_ => {
+            }).catch(error => {
+                $('#reportError').click();
+            });
+        }
         //get audioObject info
         avatarInfo = template.firstAudioAvatarInfo.get();
         console.log("avatarInfo", avatarInfo);
@@ -1107,9 +1123,8 @@ function readTTS(template, message, voice, character,characterArt,scriptAlt){
     let displayMessage = character + ": " + message;
     const characterSearch = (element) => element.name == character;
     let characterIndex = curModule.autoTutorCharacter.findIndex(characterSearch);
-    let audioObj = new Audio();
     let audioObjects = template.audioObjects.get();
-    audioObjects.push({obj:audioObj, art:characterArt, character:character, displayMessage:displayMessage, characterIndex:characterIndex});
+    audioObjects.push({art:characterArt, character:character, displayMessage:displayMessage, characterIndex:characterIndex});
     let order = audioObjects.length;
     template.audioObjects.set(audioObjects);
     if(scriptAlt){
@@ -1121,7 +1136,7 @@ function readTTS(template, message, voice, character,characterArt,scriptAlt){
         }
         if(res != undefined){
             let audioObjects = template.audioObjects.get();
-            audioObjects[order - 1].obj.src = "data:audio/ogg;base64," + res;
+            audioObjects[order - 1].src = "data:audio/mp3;base64," + res;
             template.audioObjects.set(audioObjects)
             if(!audioActive){
                 $('.continue').prop('disabled', true); 
@@ -1140,8 +1155,8 @@ async function playAudio(template){
         $(".toggleMessageWindow").click();
     }
     let TTSTracPlaying = template.TTSTracPlaying.get();
+    const audioObj = $("#mainAudio");
     let audioObjs = template.audioObjects.get();
-    const audioObj = audioObjs[TTSTracPlaying].obj;
     let atTemplate = "#ATTemplate" + audioObjs[TTSTracPlaying].characterIndex;
     var clone = $(atTemplate).clone().appendTo('.autoTutorHistory'); 
     $('.autoTutorHistory').show();
@@ -1156,8 +1171,9 @@ async function playAudio(template){
     var elem = document.getElementById("autoTutorHistory");
     elem.scrollTop = elem.scrollHeight;
     template.TTSTracPlaying.set(TTSTracPlaying + 1);
-    window.currentAudioObj = audioObj;
-    window.currentAudioObj.addEventListener('ended', function(){
+    $(audioObj).attr("src", audioObjs[TTSTracPlaying].src);
+    //add event listener to audio object
+    audioObj.on('ended', function(){
         TTSTracPlaying++;
         recordEvent(template,"autoTutorScriptLineEnd", "system");
         template.TTSTracPlaying.set(TTSTracPlaying);
@@ -1236,11 +1252,18 @@ async function playAudio(template){
         }
     });
     recordEvent(template,"autoTutorScriptAudioStart", "system");
-    promise = window.currentAudioObj.play();
+    promise = audioObj[0].play();
     if (promise !== undefined) {
         promise.then(_ => {
             // Autoplay started!
-            console.log("Audio started playing");
+            //check if client is IOS
+            isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if(isIOS){
+                //if IOS, show play button
+                template.showPlayButton.set(true);
+            } else {
+                template.showPlayButton.set(false);
+            }
         }).catch(error => {
             //set showPlayButton to true
             template.showPlayButton.set(true);
@@ -1294,7 +1317,7 @@ function setupRecording(template){
           
             });
             results = ModuleResults.findOne({_id: moduleId});
-            if(!results.responses[results.responses.length - 1].transcription){
+            if(!results.responses[results.responsrcses.length - 1].transcription){
                 $('#audioRecordingNotice').html("I am listening.");
                 $('#audiovis').show();
             } else {
