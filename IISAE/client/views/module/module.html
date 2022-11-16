@@ -1,5 +1,6 @@
 <template name="module">
     <div class="px-4 py-5 my-5 text-center">
+        <audio id="mainAudio" src="/500-milliseconds-of-silence.mp3" hidden></audio>
         {{windowSize}}
         {{#if this.pageId}}
             {{#if completed}}
