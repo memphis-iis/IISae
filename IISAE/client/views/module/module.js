@@ -1014,25 +1014,15 @@ Template.module.events({
     },
     'click #startModule': function(event){
         event.preventDefault();
-        //play mainAudio object
-        audioObject = $('#mainAudio');
-        console.log("audioObject count: " + audioObject.length);
-        promise = audioObject[0].play();
-        if(promise !== undefined){
-            promise.then(_ => {
-                data = {
-                    userId: Meteor.userId(),
-                    moduleId: Modules.findOne()._id, 
-                    responses: [],
-                    characterResponses: []
-                }
-                Meteor.call("createNewModuleTrial", data);
-                target = "/module/" + Modules.findOne()._id + "/0";
-                Router.go(target);
-            }).catch(error => {
-                $('#autoplayModal').click();
-            });
+        data = {
+            userId: Meteor.userId(),
+            moduleId: Modules.findOne()._id, 
+            responses: [],
+            characterResponses: []
         }
+        Meteor.call("createNewModuleTrial", data);
+        target = "/module/" + Modules.findOne()._id + "/0";
+        Router.go(target);
     },
     'click #goBack': function(event){
         target = "/profile/"
@@ -1045,11 +1035,12 @@ Template.module.events({
         template.audioActive.set(true);
         template.showPlayButton.set(false);
         audioObj = $('#mainAudio');
+        audioObj[0].load();
         promise = audioObj[0].play();
         if(promise !== undefined){
             promise.then(_ => {
             }).catch(error => {
-                $('#reportError').click();
+                alert("There was an error playing the audio. Please make a report.");
             });
         }
         //get audioObject info
@@ -1103,7 +1094,7 @@ Template.module.onCreated(function(){
     this.studentAnswering = new ReactiveVar(false);
     this.autoTutorHidden = new ReactiveVar(false);
     this.promptQueued = new ReactiveVar(false);
-    this.showPlayButton = new ReactiveVar(false);
+    this.showPlayButton = new ReactiveVar(true);
     this.firstAudioObj = new ReactiveVar(false);
     this.firstAudioAvatarInfo = new ReactiveVar(false);
     
@@ -1252,24 +1243,19 @@ async function playAudio(template){
         }
     });
     recordEvent(template,"autoTutorScriptAudioStart", "system");
+    audioObj[0].load();
     promise = audioObj[0].play();
+    template.showPlayButton.set(true); 
     if (promise !== undefined) {
         promise.then(_ => {
-            // Autoplay started!
-            //check if client is IOS
-            isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if(isIOS){
-                //if IOS, show play button
-                template.showPlayButton.set(true);
-            } else {
-                template.showPlayButton.set(false);
-            }
+            //Audio Started
+            template.showPlayButton.set(false);
         }).catch(error => {
             //set showPlayButton to true
             template.showPlayButton.set(true);
             $(clone).hide();
             //set template.firstAudio to window.currentAudioObj
-            template.firstAudioObj.set(window.currentAudioObj);
+            template.firstAudioObj.set(audioObj[0]);
             template.firstAudioAvatarInfo.set(audioObjs[TTSTracPlaying]);
         });
     }

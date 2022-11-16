@@ -24,17 +24,14 @@
                         </div>
                     </div>
                     <div class="autoTutorContainer">
-                        <div class="Messages text-left" id="Messages">
-                            <div class="Messages" id="Messages">
-                                <span class="glyphicon glyphicon-comment"><a id="playAudio">Can't hear the Audio? <span class="glyphicon glyphicon-play"></span></a></span>
-                                {{#if showAudioPlayButton}}
-                                <a  data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
-                                    <span class="glyphicon glyphicon-exclamation-sign"></span>
-                                    Autoplay is disabled
-                                </a>
-                                {{/if}}
-                            </div>
-                        </div>
+                        <div class="Messages text-left" id="Messages">Conversation</div>
+                        {{#if showAudioPlayButton}}
+                        <button class="btn btn-success" id="playAudio">Play <span class="glyphicon glyphicon-play"></span></button>
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
+                            <span class="glyphicon glyphicon-exclamation-sign"></span>
+                            Autoplay is disabled
+                        </button>
+                        {{/if}}
                         <div class="autoTutorHistory" id="autoTutorHistory">
                         </div>
                     </div>
@@ -92,14 +89,15 @@
                     </div>
                     <div class="autoTutorContainer">
                         <div class="Messages" id="Messages">
-                            <span class="glyphicon glyphicon-comment">&nbsp;</span><a id="playAudio">Can't hear the Audio? Click Here.</a>
-                            {{#if showAudioPlayButton}}
-                            <a  data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
+                            <span class="glyphicon glyphicon-comment"></span>
+                        </div>
+                        {{#if showAudioPlayButton}}
+                            <button class="btn btn-success" id="playAudio">Play <span class="glyphicon glyphicon-play"></span></button>
+                            <button type="button" class="btn btn-btn-info" data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
                                 <span class="glyphicon glyphicon-exclamation-sign"></span>
                                 Autoplay is disabled
-                            </a>
-                            {{/if}}
-                        </div>
+                            </button>
+                        {{/if}}
                         <div class="autoTutorHistory" id="autoTutorHistory">
                         </div>
                     </div>
