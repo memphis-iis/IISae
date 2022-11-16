@@ -197,6 +197,7 @@ Template.module.helpers({
         autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
         page = Modules.findOne().pages[parseInt(this.pageId)];
         question = page.questions[parseInt(this.questionId)];
+        question.autoTutorDisplay = true;
         const t = Template.instance();
         question.audioRecording = curModule.audioRecording;
         if(question.type == "blank"){
@@ -312,6 +313,7 @@ Template.module.helpers({
         };
         if(question.type == "html"){
             question.typeHTML = true;
+            question.autoTutorDisplay = false;
         };
         if(question.type == "video"){
             question.typeVideo = true;

@@ -87,6 +87,7 @@
                             <div class="speaker avatar col-xs-3 col-md-1" style="text-align: left;" id="avatar"></div>
                         </div>
                     </div>
+                    {{#if question.autoTutorDisplay}}
                     <div class="autoTutorContainer">
                         <div class="Messages" id="Messages">
                             <span class="glyphicon glyphicon-comment"></span>
@@ -101,6 +102,7 @@
                         <div class="autoTutorHistory" id="autoTutorHistory">
                         </div>
                     </div>
+                    {{/if}}
                     {{#if autoTutorHidden}}
                     <div class="hideAutoTutorHistory">
                         <a class="toggleMessageWindow"><span class="glyphicon glyphicon-chevron-down"></span></a>
