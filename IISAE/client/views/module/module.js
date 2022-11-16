@@ -22,7 +22,13 @@ window.onbeforeunload = function() {
 };
 
 Template.module.onRendered(function() {
-
+    //check if the user client is safari or on IOS
+    let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if(isSafari || isIOS){
+        //if so, set the display the play button
+        template.showPlayButton.set(true);
+    }
     $('#scrollArea').scroll(function(){
         element = document.getElementById('scrollArea');
         if(Math.abs(element.scrollHeight - element.clientHeight - element.scrollTop) === 0){
@@ -627,7 +633,7 @@ Template.module.events({
         moduleData.responseTime = timeStamp.getTime();
         moduleData.renderTime = t.renderTime.get();
         moduleData.speakingTime = t.speakingTime.get();
-        data = moduleData.responses[moduleData.responses.length - 1];
+        data = moduleData.responses[moduleData.responses.length - 1] || {};
         moduleData.lastAccessed = Date.now().toString();
         thisPage = Meteor.user().curModule.pageId;
         thisQuestion = parseInt(Meteor.user().curModule.questionId);
@@ -1245,7 +1251,6 @@ async function playAudio(template){
     recordEvent(template,"autoTutorScriptAudioStart", "system");
     audioObj[0].load();
     promise = audioObj[0].play();
-    template.showPlayButton.set(true); 
     if (promise !== undefined) {
         promise.then(_ => {
             //Audio Started
