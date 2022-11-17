@@ -50,7 +50,7 @@
   "identfier" : "L8-TextSignals",
   "display" : true,
   "description" : "This lesson will help you understand how to use text signals on books and other materials.",
-  "videoReference" :"<iframe width='420' height='315' src='https://youtu.be/bFD64MrdhS0?autoplay=1'></iframe>",
+  "videoReference" :"<iframe src='https://www.youtube.com/embed/bFD64MrdhS0?' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowfullscreen>></iframe>",
   "avatarTimeOutMin" : 20000,
   "avatarTimeOutMax" : 60000,
   "pages" : [ 
@@ -63,7 +63,7 @@
           "questions" : [ 
             {
                 "type" :"html",
-                "prompt": "<iframe width='420' height='315' src='https://youtu.be/bFD64MrdhS0?autoplay=1'></iframe>"
+                "prompt": "<iframe src='https://www.youtube.com/embed/bFD64MrdhS0?' frameborder='0' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture' allowfullscreen>></iframe>"
             },
             {
                   "type" : "autotutorscript",
