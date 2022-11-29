@@ -1114,7 +1114,9 @@ function readTTS(template, message, voice, character,characterArt,scriptAlt){
     console.log("readTTS", message, voice, character, characterArt, scriptAlt);
     //remove quotes from message
     message = message.replace(/"/g, "");
+    //replace any underscore groups with the word "blank"
     recordEvent(template,"addAutoTutorScriptToTTSQueue","system",{character:character, text:message});
+    message = message.replace(/_+/g, " blank ");
     let curModule = Modules.findOne();
     let moduleId =  curModule._id;
     let audioActive = template.audioActive.get();

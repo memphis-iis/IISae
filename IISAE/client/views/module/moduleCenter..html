@@ -6,16 +6,28 @@
             {{#each classes}} 
             <hr>
             <h2>{{this.name}}</h2>
+            <br>
                 {{#if this.hasModules}}
+                <div class="container">
+                    <div class="row row-cols-sm-6 row-cols-md-12 justify-content-center text-center">
                     {{#each this.flow}}
-                        <div class="module" style="margin-top:5px;">
-                            <button id="{{this.moduleId}}" class="startModule btn btn-primary startAssessment">{{this.title}} 
-                                {{#if this.isPractice}}
-                                    <i>(practice)</i>
-                                {{/if}}
-                            </button>
-                        </div>
+
+                        <div class="col module-column" style="display: inline-block;">
+                            <div class="card module-card">
+                                <div class="card-body">
+                                    <button id="{{this.moduleId}}" class="startModule btn btn-primary startAssessment">
+                                    <h4>{{this.title}}
+                                        {{#if this.isPractice}}
+                                        <i>(practice)</i>
+                                        {{/if}}
+                                        </h4>
+                                </button>
+                                </div>
+                              </div>
+                            </div> 
                     {{/each}}
+                </div>
+            </div> 
                 {{else}}
                 There are no modules in this class.
                 {{/if}}

@@ -47,11 +47,39 @@ body{
 .btn{
     margin-bottom:20px;
 }
+.btn-wide{
+    width: 100%;
+    margin-bottom: 0;  
+
+}
+.module-card{
+    margin-bottom: 20px;
+}
+.module-card button{
+    white-space: normal;
+    height: 200px;
+    padding: 5px;
+    width: 100%;
+    margin-bottom: 0px !important;
+    padding: 10px;
+    /* background texture small hash blue and light blue repeating */
+    background-image: repeating-linear-gradient(45deg, #286588, #35779c 10px, #35779c 10px, #35779c 20px);
+    font-size: large !important;
+    font-weight: bold !important;
+}
+
+
+
 .calendar-today {
     background-color: #74c3f0;
 }
 .nav-calendar{
     padding-left:revert;
+}
+.module-card{
+    border: #286588 1px solid;
+    border-radius: 10px;
+    max-width: 25vw;
 }
 input, option, textarea {
     border: none;
