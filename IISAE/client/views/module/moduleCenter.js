@@ -31,7 +31,6 @@ Template.moduleCenter.events({
         let moduleId = event.target.getAttribute("id");
         target = "/module/" + moduleId;
         window.location.href = target;
-        Router.go(target);
     },
 })
 Template.moduleCenter.onCreated(function() {
