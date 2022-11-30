@@ -27,8 +27,11 @@ Template.moduleCenter.helpers({
 Template.moduleCenter.events({
     'click .startModule': function(event){
         event.preventDefault();
-        target = "/module/" + event.target.id;
+        //get data-module
+        let moduleId = event.target.getAttribute("id");
+        target = "/module/" + moduleId;
         window.location.href = target;
+        Router.go(target);
     },
 })
 Template.moduleCenter.onCreated(function() {
