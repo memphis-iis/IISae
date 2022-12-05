@@ -52,7 +52,7 @@ body{
     margin-bottom: 0;  
 
 }
-.animatedAvatar img{
+.animAvatar img{
     border: #286588;
     overflow: hidden;
     border-radius: 10px;

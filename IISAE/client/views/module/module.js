@@ -3,8 +3,6 @@ import hark from 'hark';
 
 var chunks = [];
 
-var curModule;
-
 //pause and remove src from all audio dom elements when we leave the page
 function pauseAudio(){
     let audioObjects = document.getElementsByTagName('audio');
@@ -16,6 +14,7 @@ function pauseAudio(){
     }
     template.audioObjects.set([]);
     template.audioActive.set(false);
+    templat.showAudioPlayButton.set(true);
 }
 
 //onbeforeunload, call pauseAudio
@@ -175,11 +174,7 @@ Template.module.helpers({
         return displayButton;
     },
     'module': function(){
-        moduleInfo = Modules.findOne();
-        animatedAvatarsEnabled = moduleInfo.enableAnimatedAvatars;
-        template = Template.instance();
-        template.animatedAvatarsEnabled.set(animatedAvatarsEnabled);
-        return moduleInfo;
+        return Modules.findOne();
     },  
     'trialData': function(){
         let moduleId = Meteor.user().curModule.moduleId;
@@ -628,7 +623,7 @@ Template.module.events({
                     promptToRead = questionPrompt.replace(regex,moduleResults.answerTags[keys]);
                 }
             }
-         }
+        }
         if(autoTutorReadsPrompt && promptToRead){
             readTTS(t, promptToRead,autoTutorPromptCharacterName);
         } 
@@ -1078,6 +1073,7 @@ Template.module.events({
     'click #playAudio': function(event){
         template.audioActive.set(true);
         template.showPlayButton.set(false);
+        TTSTracPlaying = template.TTSTracPlaying.get();
         audioObj = $('#mainAudio');
         audioObj[0].load();
         promise = audioObj[0].play();
@@ -1087,27 +1083,29 @@ Template.module.events({
                 alert("There was an error playing the audio. Please make a report.");
             });
         }
+        
         //get audioObject info
         avatarInfo = template.firstAudioAvatarInfo.get();
-        animatedAvatarsEnabled = template.animatedAvatarsEnabled.get();
+        animatedAvatarsEnabled = Modules.findOne().enableAnimatedAvatars;
         console.log("avatarInfo", avatarInfo);
         let atTemplate = "#ATTemplate" + avatarInfo.characterIndex;
         var clone = $(atTemplate).clone().appendTo('.autoTutorHistory'); 
         $('.autoTutorHistory').show();
         // let scriptHandle = atTemplate + " .script";
         // let avatarHandle = atTemplate + " .avatar";
+        // get clone's child with class script
         //check if animatedavatars is false
-        if(!animatedAvatarsEnabled){
-            let scriptHandle = clone.find(".script");
-            let avatarHandle = clone.find(".avatar");
-            $(avatarHandle).html("<img src='" + avatarInfo.static + "' class='img-responsive'><br>");
-            $(scriptHandle).html(avatarInfo.displayMessage);
-        } else {
-            let scriptHandle = $('#Avatar1')
-            let avatarHandle = $('#Avatar2')
-            $(avatarHandle).html("<img src='" + avatarInfo.talking + "' class='img-responsive'><br>");
-            $(scriptHandle).html(avatarInfo.displayMessage);
+        let scriptHandle = clone.find(".script");
+        let avatarHandle = clone.find(".avatar");
+        if(animatedAvatarsEnabled){
+            avatarLocation = 0;
+            avatarSearch = "animAvatar" + avatarLocation;
+            template.avatar1Status.set("talking");
+            template.avatar2Status.set("talking");
+            avatarHandle = document.getElementById(avatarSearch);
         }
+        $(avatarHandle).html("<img src='" + avatarInfo.art.talking + "' class='img-responsive'><br>");
+        $(scriptHandle).html(avatarInfo.displayMessage);
         $(clone).fadeIn();
         console.log("clone", clone);
     },
@@ -1149,17 +1147,15 @@ Template.module.onCreated(function(){
     this.showPlayButton = new ReactiveVar(true);
     this.firstAudioObj = new ReactiveVar(false);
     this.firstAudioAvatarInfo = new ReactiveVar(false);
-    this.animatedAvatarsEnabled = new ReactiveVar(false);
     this.avatar1Status = new ReactiveVar("idle");
     this.avatar2Status = new ReactiveVar("idle");
     this.avatar1Gifs = new ReactiveVar({idle: "", talking: "", static: "", headTurn: ""});
-    this.avatar2Gifs = new ReactiveVar({idle: "", talking: "", static: "", headTurn: ""});   
+    this.avatar2Gifs = new ReactiveVar({idle: "", talking: "", static: "", headTurn: ""});    
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function readTTS(template, message, character,scriptAlt){
-    console.log("readTTS", message,  character);
     //remove quotes from message
     message = message.replace(/"/g, "");
     //replace any underscore groups with the word "blank"
@@ -1167,9 +1163,9 @@ function readTTS(template, message, character,scriptAlt){
     message = message.replace(/_+/g, " blank ");
     let curModule = Modules.findOne();
     let moduleId =  curModule._id;
-    //get characterArt by searching for character name
-    character = curModule.autoTutorCharacter.find(o => o.name ==character);
-    characterIndex = curModule.autoTutorCharacter.indexOf(character);
+    //get index of character name that matches character
+    let characterIndex = curModule.autoTutorCharacter.findIndex(x => x.name == character);
+    character = curModule.autoTutorCharacter[characterIndex];
     characterArt = {
         talking: character.talking,
         talkingDelay: character.talkingDelay,
@@ -1185,10 +1181,10 @@ function readTTS(template, message, character,scriptAlt){
     let audioActive = template.audioActive.get();
     template.audioActive.set(true);
     let displayMessage = character.name + ": " + message;
-    console.log("characterIndex", characterIndex, character.name);
     let audioObjects = template.audioObjects.get();
     audioObjects.push({art:characterArt, character:character, displayMessage:displayMessage, characterIndex:characterIndex});
     let order = audioObjects.length;
+    console.log("audioObjects", audioObjects);
     template.audioObjects.set(audioObjects);
     if(scriptAlt){
         message = scriptAlt;
@@ -1220,55 +1216,51 @@ async function playAudio(template){
     let TTSTracPlaying = template.TTSTracPlaying.get();
     const audioObj = $("#mainAudio");
     let audioObjs = template.audioObjects.get();
-    console.log("TTSTracPlaying", TTSTracPlaying, audioObjs.length);
-    if(TTSTracPlaying >= audioObjs.length){
-        return
-    }
     let atTemplate = "#ATTemplate" + audioObjs[TTSTracPlaying].characterIndex;
     var clone = $(atTemplate).clone().appendTo('.autoTutorHistory'); 
-    animatedAvatarsEnabled = template.animatedAvatarsEnabled.get();
+    animatedAvatarsEnabled = Modules.findOne().enableAnimatedAvatars;
     $('.autoTutorHistory').show();
     // let scriptHandle = atTemplate + " .script";
     // let avatarHandle = atTemplate + " .avatar";
-    // check if animatedavatarsEnabled is false
+    // get clone's child with class script
     let scriptHandle = clone.find(".script");
-    let avatarSearch = "Avatar" + audioObjs[TTSTracPlaying].characterIndex;
-    avatarHandle = clone.find(".avatar");
-    console.log("animatedAvatarsEnabled", animatedAvatarsEnabled);;
-    if(!animatedAvatarsEnabled){
-        $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.static + "' class='img-responsive'><br>");
-        $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
-    } else {
+    let avatarHandle = clone.find(".avatar");
+    if(animatedAvatarsEnabled){
+        avatarLocation = audioObjs[TTSTracPlaying].characterIndex;
+        avatarSearch = "animAvatar" + avatarLocation;
+        template.avatar1Status.set("talking");
+        template.avatar2Status.set("talking");
+        
         avatarHandle = document.getElementById(avatarSearch);
-        $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.talking + "' class='img-responsive'><br>");
-        $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
+        audioObjs[TTSTracPlaying].avatarHandle = avatarHandle;
+        template.audioObjects.set(audioObjs);
     }
-    audioObjs[TTSTracPlaying].avatarHandle = avatarHandle;
-    template.audioObjects.set(audioObjs);
-    console.log("Displaying art", audioObjs[TTSTracPlaying].art.talking, "avatarsearch", avatarSearch);
+    //delete all html in avatarHandle
+    $(avatarHandle).empty();
+    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.talking + "' class='img-responsive'><br>");
+    $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
     $(clone).fadeIn();
     var elem = document.getElementById("autoTutorHistory");
     elem.scrollTop = elem.scrollHeight;
-    template.TTSTracPlaying.set(TTSTracPlaying + 1);
     $(audioObj).attr("src", audioObjs[TTSTracPlaying].src);
     //add event listener to audio object
     audioObj.on('ended', function(){
+        audioObj.off('ended');
+        console.log(TTSTracPlaying + " ended");
         avatarHandle = audioObjs[TTSTracPlaying].avatarHandle;
         if(!animatedAvatarsEnabled){
             $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.static + "' class='img-responsive'><br>");
-            $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
         } else {
-            avatarHandle = document.getElementById(avatarSearch);
             $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.idle + "' class='img-responsive'><br>");
-            $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
+            template.avatar1Status.set("idle");
+            template.avatar2Status.set("idle");
         }
-        console.log("Displaying art", audioObjs[TTSTracPlaying].art.talking, "avatarsearch", $(avatarHandle).attr("id"));
         TTSTracPlaying++;
         recordEvent(template,"autoTutorScriptLineEnd", "system");
         template.TTSTracPlaying.set(TTSTracPlaying);
         if(audioObjs.length > TTSTracPlaying){
-            sleep(1000).then(function(){
-               //get pausedSession session variable
+            sleep(1000).then(function(){              
+                 //get pausedSession session variable
                 let pausedSession = Session.get("pauseSession");
                 //wait until pausedSession is false using an interval
                 let interval = setInterval(function(){
@@ -1290,7 +1282,6 @@ async function playAudio(template){
         }
         else{
             if(animatedAvatarsEnabled){
-                avatarHandle = document.getElementById(avatarSearch);
                 avatarIdleAnimation(avatarHandle, audioObjs[TTSTracPlaying - 1].art, 1000);
             }
             var curTime = new Date().getTime();
@@ -1298,7 +1289,7 @@ async function playAudio(template){
             var speakingTime = template.speakingTime.get();
             if(curModule.avatarTimeOutMin && curModule.avatarTimeOutMax){
                 startAgentSpeechTimer(template, curModule.avatarTimeOutMin, curModule.avatarTimeOutMax);
-            }
+            } 
             speakingTime = speakingTime + audioTime;
             template.speakingTime.set(speakingTime);
             sleep(1000).then(function(){
@@ -1345,21 +1336,33 @@ async function playAudio(template){
     });
     recordEvent(template,"autoTutorScriptAudioStart", "system");
     audioObj[0].load();
-    promise = audioObj[0].play();
-    if (promise !== undefined) {
-        promise.then(_ => {
-            //Audio Started
-            template.showPlayButton.set(false);
-        }).catch(error => {
-            //set showPlayButton to true
-            template.showPlayButton.set(true);
-            $(clone).hide();
-            //set template.firstAudio to window.currentAudioObj
-            template.firstAudioObj.set(audioObj[0]);
-            template.firstAudioAvatarInfo.set(audioObjs[TTSTracPlaying]);
-        });
+    if(Session.get('pauseSession') == true){
+        audioObj[0].pause();
+        template.showPlayButton.set(true);
+    } else {
+        promise = audioObj[0].play();
+        if (promise !== undefined) {
+            promise.then(_ => {
+                //Audio Started
+                template.showPlayButton.set(false);
+            }).catch(error => {
+                if(!animatedAvatarsEnabled){
+                    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.static + "' class='img-responsive'><br>");
+                } else {
+                    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.idle + "' class='img-responsive'><br>");
+                    template.avatar1Status.set("idle");
+                    template.avatar2Status.set("idle");
+                }
+                //set showPlayButton to true
+                template.showPlayButton.set(true);
+                $(clone).hide();
+                //set template.firstAudio to window.currentAudioObj
+                template.firstAudioObj.set(audioObj[0]);
+                template.firstAudioAvatarInfo.set(audioObjs[TTSTracPlaying]);
+            });
+        }
+        template.startAudioTime.set(new Date().getTime());
     }
-    template.startAudioTime.set(new Date().getTime());
 }
 function setupRecording(template){
     recordEvent(template,"initializeVoiceRecognition", "system");
@@ -1815,6 +1818,7 @@ function avatarIdleAnimation(avatarHandle, avatarArt, timeDelay)
         avatarHandle.innerHTML = "";
         //append avatarReplacement to avatarHandle
         $(avatarHandle).append(avatarReplacement);
+        console.log("avatar idle animation for " + gifDuration + "ms");
         sleep(gifDuration).then(() => {
             $(avatarHandle).empty();
             $(avatarHandle).append(avatarIdle);
@@ -1834,6 +1838,8 @@ function avatarIdleAnimation(avatarHandle, avatarArt, timeDelay)
             if(avatarStatus == "idle"){
                 randomTimeDelay = Math.floor(Math.random() * 5000) + 3000;
                 avatarIdleAnimation(avatarHandle, avatarArt, randomTimeDelay);
+            } else {
+                return;
             }
         });
     });
