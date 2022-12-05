@@ -14,6 +14,7 @@ function pauseAudio(){
     }
     template.audioObjects.set([]);
     template.audioActive.set(false);
+    templat.showAudioPlayButton.set(true);
 }
 
 //onbeforeunload, call pauseAudio
@@ -37,6 +38,44 @@ Template.module.onRendered(function() {
     });
     $('#visualizer').hide();
     moduleData = Modules.findOne();
+    template = Template.instance();
+    //if the module has animated characters, preload the images
+    if(moduleData.autoTutorCharacter && moduleData.enableAnimatedAvatars){
+        for(let index in moduleData.autoTutorCharacter){
+            let character = moduleData.autoTutorCharacter[index];
+            //get static, idle, talking, blink, and headTurn images
+            let staticImage = character.static;
+            let idleImage = character.idle;
+            let talkingImage = character.talking;
+            let blinkImage = character.blink;
+            let headTurnImage = character.headTurn;
+            //preload the images
+            let staticImagePreload = new Image();
+            staticImagePreload.src = staticImage;
+            let idleImagePreload = new Image();
+            idleImagePreload.src = idleImage;
+            let talkingImagePreload = new Image();
+            talkingImagePreload.src = talkingImage;
+            let blinkImagePreload = new Image();
+            blinkImagePreload.src = blinkImage;
+            let headTurnImagePreload = new Image();
+            headTurnImagePreload.src = headTurnImage;
+            //set the images to the character object
+            character.staticImage = staticImagePreload;
+            character.idleImage = idleImagePreload;
+            character.talkingImage = talkingImagePreload;
+            character.blinkImage = blinkImagePreload;
+            character.headTurnImage = headTurnImagePreload;
+            //set the character object to the template that matches the index - 1
+            if(index == 0){
+                template.avatar1Gifs.set(character);
+                console
+            }
+            if(index == 1){
+                template.avatar2Gifs.set(character);
+            }
+        }
+    }
     let moduleId = Meteor.user().curModule.moduleId;
     const t = Template.instance();
     moduleResults = ModuleResults.findOne({_id: moduleId});
@@ -49,7 +88,6 @@ Template.module.onRendered(function() {
     autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
     autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
     autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
-    art = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
     autoTutorReadsScript = moduleData.autoTutorReadsScript;
     promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
     scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
@@ -60,8 +98,6 @@ Template.module.onRendered(function() {
             if(script.scriptAlt)
             scriptToAdd = ""
             character = script.character;
-            voice = moduleData.autoTutorCharacter.find(o => o.name == script.character).voice;
-            art = moduleData.autoTutorCharacter.find(o => o.name == script.character).art;
             if(moduleData.enableAnswerTags){
                 if(typeof moduleResults.answerTags !== "undefined"){
                     for(let keys of Object.keys(moduleResults.answerTags)){
@@ -75,14 +111,14 @@ Template.module.onRendered(function() {
                         scriptToAdd = script.scriptAlt.replace(regex,moduleResults.answerTags[keys]);
                     }
                     scriptToAdd = scriptToAdd.replace('_user_', Meteor.user().firstname);
-                    readTTS(t,scriptToAdd,voice,character, art, script.scriptAlt);
+                    readTTS(t,scriptToAdd,character, script.scriptAlt);
                 } else {
                     scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
-                    readTTS(t,scriptToAdd,voice,character, art, script.scriptAlt);
+                    readTTS(t,scriptToAdd,character, script.scriptAlt);
                 }
             } else {
                 scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
-                readTTS(t,scriptToAdd,voice,character, art, script.scriptAlt);
+                readTTS(t,scriptToAdd,character, script.scriptAlt);
             }
         }
     }
@@ -97,7 +133,7 @@ Template.module.onRendered(function() {
         }
     }
     if(autoTutorReadsPrompt && promptToRead && questionType != "html"){
-        readTTS(t, promptToRead, autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
+        readTTS(t, promptToRead, autoTutorPromptCharacterName);
     } 
     if(moduleData.audioRecording && !moduleData.enableAutoTutor){
         setupRecording(t);
@@ -137,7 +173,9 @@ Template.module.helpers({
         console.log("Display Audio Button: " + displayButton);
         return displayButton;
     },
-    'module': () => Modules.findOne(),
+    'module': function(){
+        return Modules.findOne();
+    },  
     'trialData': function(){
         let moduleId = Meteor.user().curModule.moduleId;
         let moduleData = ModuleResults.findOne({_id: moduleId});
@@ -420,12 +458,11 @@ Template.module.events({
             if(!audioActive){
                 if(curModule.autoTutorReadsChoices && response){
                     autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
-                    autoTutorPromptCharacterVoice = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).voice;
-                    autoTutorPromptCaracterArt = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).art;
+                    autoTutorPromptCharacter = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts).name;
                     if(responseAlt && responseAlt != ""){
-                        readTTS(t, responseAlt, autoTutorPromptCharacterVoice, autoTutorPromptCaracterArt, autoTutorReadsPrompt, responseAlt);
+                        readTTS(t, responseAlt, autoTutorPromptCharacter, responseAlt);
                     } else {
-                        readTTS(t, response, autoTutorPromptCharacterVoice, autoTutorPromptCaracterArt, autoTutorReadsPrompt);
+                        readTTS(t, response, autoTutorPromptCharacter);
                     }
                 }
             }
@@ -531,13 +568,11 @@ Template.module.events({
         let moduleId = Meteor.user().curModule.moduleId;
         moduleResults = ModuleResults.findOne({_id: moduleId});
         autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
-        autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
         autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
-        art = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
         textToRead = moduleData.pages[Meteor.user().curModule.pageId].text || false;
         textToReadStripped = $(textToRead).text();
-        readTTS(t, "Let me read that for you.", autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
-        readTTS(t, textToReadStripped, autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
+        readTTS(t, "Let me read that for you.", autoTutorPromptCharacterName);
+        readTTS(t, textToReadStripped, autoTutorPromptCharacterName);
     },
     'click .btn-repeat': function (event){
         const t = Template.instance();
@@ -546,9 +581,7 @@ Template.module.events({
         let moduleId = Meteor.user().curModule.moduleId;
         moduleResults = ModuleResults.findOne({_id: moduleId});
         autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
-        autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
         autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
-        art = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
         autoTutorReadsScript = moduleData.autoTutorReadsScript;
         promptToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].prompt || false;
         scriptsToRead = moduleData.pages[Meteor.user().curModule.pageId].questions[Meteor.user().curModule.questionId].autoTutorScript || [];
@@ -557,8 +590,6 @@ Template.module.events({
                 script = scriptsToRead[scriptIndex];
                 scriptToAdd = ""
                 character = script.character;
-                voice = moduleData.autoTutorCharacter.find(o => o.name == script.character).voice;
-                art = moduleData.autoTutorCharacter.find(o => o.name == script.character).art;
                 if(moduleData.enableAnswerTags){
                     if(typeof moduleResults.answerTags !== "undefined" || typeof Meteor.user().persistantAnswerTags !== "undefined"){
                         for(let keys of Object.keys(moduleResults.answerTags)){
@@ -572,14 +603,14 @@ Template.module.events({
                             scriptToAdd = scriptToAdd.replace(regex,Meteor.user().persistantAnswerTags[keys]);
                         }
                         scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
-                        readTTS(t,scriptToAdd,voice,character, art);
+                        readTTS(t,scriptToAdd,character);
                     } else {
                         scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
-                        readTTS(t,script.script,voice,character, art);
+                        readTTS(t,script.script,character);
                     }
                 } else {
                     scriptToAdd = script.script.replace('_user_', Meteor.user().firstname);
-                    readTTS(t,script.script,voice,character, art);
+                    readTTS(t,script.script,character);
                 }
             }
         }
@@ -592,9 +623,9 @@ Template.module.events({
                     promptToRead = questionPrompt.replace(regex,moduleResults.answerTags[keys]);
                 }
             }
-         }
+        }
         if(autoTutorReadsPrompt && promptToRead){
-            readTTS(t, promptToRead, autoTutorPromptCharacterVoice,autoTutorPromptCharacterName, art);
+            readTTS(t, promptToRead,autoTutorPromptCharacterName);
         } 
         if(moduleData.audioRecording && !moduleData.enableAutoTutor){
             setupRecording(t);
@@ -766,7 +797,7 @@ Template.module.events({
                                 characterAnswer = questionData.answers[selectedAnswer].answer;
                             }
                             message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, selectedAnswer, selectedAnswer, 0);
-                            readTTS(t, message, character.voice, character.name, character.art);
+                            readTTS(t, message, character.name);
                             characterSpeech = message;
                             characterRepsonseData = {
                                 name: character.name,
@@ -775,7 +806,7 @@ Template.module.events({
                                 value: characterResponse.value,
                                 choiceIndex: selectedAnswer,
                                 speech: characterSpeech,
-                                art: character.art
+                                static: character.static
                             }
                             characterResponses.push(characterRepsonseData);
                             //get target's x and y coordinates
@@ -797,7 +828,7 @@ Template.module.events({
                                 characterAnswer = questionData.answers[selectedAnswer].answer;
                                 //message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, selectedAnswer, 0, 0);
                                 message = getAgentSpeech(character.name, curModule, "response", thisPage, thisQuestion, selectedAnswer, selectedAnswer, 0);
-                                readTTS(t, message, character.voice, character.name, character.art);
+                                readTTS(t, message,  character.name);
                                 characterSpeech = message;
                                 characterRepsonseData = {
                                     name: character.name,
@@ -806,7 +837,7 @@ Template.module.events({
                                     value: characterResponse.value,
                                     choiceIndex: selectedAnswer,
                                     speech: characterSpeech,
-                                    art: character.art
+                                    art: character.static
                                 }
                                 characterResponses.push(characterRepsonseData);
                                 var target = document.getElementById(selectedAnswer);
@@ -842,7 +873,7 @@ Template.module.events({
                     if(curModule.autoTutorReadsRefutation){
                         autoTutorReadsPrompt = curModule.autoTutorReadsPrompt;
                         autoTutorCharacter = curModule.autoTutorCharacter.find(o => o.name == curModule.characterReadsPrompts);
-                        readTTS(t, message, autoTutorCharacter.voice, autoTutorCharacter.name, autoTutorCharacter.art);
+                        readTTS(t, message, autoTutorCharacter.name);
                     }
                     $('.multichoice').addClass('btn-selected');
                     if(res.isCorrect == true){ 
@@ -1042,6 +1073,7 @@ Template.module.events({
     'click #playAudio': function(event){
         template.audioActive.set(true);
         template.showPlayButton.set(false);
+        TTSTracPlaying = template.TTSTracPlaying.get();
         audioObj = $('#mainAudio');
         audioObj[0].load();
         promise = audioObj[0].play();
@@ -1051,8 +1083,10 @@ Template.module.events({
                 alert("There was an error playing the audio. Please make a report.");
             });
         }
+        
         //get audioObject info
         avatarInfo = template.firstAudioAvatarInfo.get();
+        animatedAvatarsEnabled = Modules.findOne().enableAnimatedAvatars;
         console.log("avatarInfo", avatarInfo);
         let atTemplate = "#ATTemplate" + avatarInfo.characterIndex;
         var clone = $(atTemplate).clone().appendTo('.autoTutorHistory'); 
@@ -1060,9 +1094,17 @@ Template.module.events({
         // let scriptHandle = atTemplate + " .script";
         // let avatarHandle = atTemplate + " .avatar";
         // get clone's child with class script
+        //check if animatedavatars is false
         let scriptHandle = clone.find(".script");
         let avatarHandle = clone.find(".avatar");
-        $(avatarHandle).html("<img src='" + avatarInfo.art + "' class='img-responsive'><br>");
+        if(animatedAvatarsEnabled){
+            avatarLocation = 0;
+            avatarSearch = "animAvatar" + avatarLocation;
+            template.avatar1Status.set("talking");
+            template.avatar2Status.set("talking");
+            avatarHandle = document.getElementById(avatarSearch);
+        }
+        $(avatarHandle).html("<img src='" + avatarInfo.art.talking + "' class='img-responsive'><br>");
         $(scriptHandle).html(avatarInfo.displayMessage);
         $(clone).fadeIn();
         console.log("clone", clone);
@@ -1105,13 +1147,15 @@ Template.module.onCreated(function(){
     this.showPlayButton = new ReactiveVar(true);
     this.firstAudioObj = new ReactiveVar(false);
     this.firstAudioAvatarInfo = new ReactiveVar(false);
-    
+    this.avatar1Status = new ReactiveVar("idle");
+    this.avatar2Status = new ReactiveVar("idle");
+    this.avatar1Gifs = new ReactiveVar({idle: "", talking: "", static: "", headTurn: ""});
+    this.avatar2Gifs = new ReactiveVar({idle: "", talking: "", static: "", headTurn: ""});    
 })
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-function readTTS(template, message, voice, character,characterArt,scriptAlt){
-    console.log("readTTS", message, voice, character, characterArt, scriptAlt);
+function readTTS(template, message, character,scriptAlt){
     //remove quotes from message
     message = message.replace(/"/g, "");
     //replace any underscore groups with the word "blank"
@@ -1119,14 +1163,28 @@ function readTTS(template, message, voice, character,characterArt,scriptAlt){
     message = message.replace(/_+/g, " blank ");
     let curModule = Modules.findOne();
     let moduleId =  curModule._id;
+    //get index of character name that matches character
+    let characterIndex = curModule.autoTutorCharacter.findIndex(x => x.name == character);
+    character = curModule.autoTutorCharacter[characterIndex];
+    characterArt = {
+        talking: character.talking,
+        talkingDelay: character.talkingDelay,
+        idle: character.idle,
+        idleDelay: character.idleDelay,
+        blinking: character.blink,
+        blinkDelay: character.blinkDelay,
+        headTurn: character.headTurn,
+        headTurnDelay: character.headTurnDelay,
+        static: character.static,
+    }
+    voice = character.voice;
     let audioActive = template.audioActive.get();
     template.audioActive.set(true);
-    let displayMessage = character + ": " + message;
-    const characterSearch = (element) => element.name == character;
-    let characterIndex = curModule.autoTutorCharacter.findIndex(characterSearch);
+    let displayMessage = character.name + ": " + message;
     let audioObjects = template.audioObjects.get();
     audioObjects.push({art:characterArt, character:character, displayMessage:displayMessage, characterIndex:characterIndex});
     let order = audioObjects.length;
+    console.log("audioObjects", audioObjects);
     template.audioObjects.set(audioObjects);
     if(scriptAlt){
         message = scriptAlt;
@@ -1160,27 +1218,49 @@ async function playAudio(template){
     let audioObjs = template.audioObjects.get();
     let atTemplate = "#ATTemplate" + audioObjs[TTSTracPlaying].characterIndex;
     var clone = $(atTemplate).clone().appendTo('.autoTutorHistory'); 
+    animatedAvatarsEnabled = Modules.findOne().enableAnimatedAvatars;
     $('.autoTutorHistory').show();
     // let scriptHandle = atTemplate + " .script";
     // let avatarHandle = atTemplate + " .avatar";
     // get clone's child with class script
     let scriptHandle = clone.find(".script");
     let avatarHandle = clone.find(".avatar");
-    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art + "' class='img-responsive'><br>");
+    if(animatedAvatarsEnabled){
+        avatarLocation = audioObjs[TTSTracPlaying].characterIndex;
+        avatarSearch = "animAvatar" + avatarLocation;
+        template.avatar1Status.set("talking");
+        template.avatar2Status.set("talking");
+        
+        avatarHandle = document.getElementById(avatarSearch);
+        audioObjs[TTSTracPlaying].avatarHandle = avatarHandle;
+        template.audioObjects.set(audioObjs);
+    }
+    //delete all html in avatarHandle
+    $(avatarHandle).empty();
+    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.talking + "' class='img-responsive'><br>");
     $(scriptHandle).html(audioObjs[TTSTracPlaying].displayMessage);
     $(clone).fadeIn();
     var elem = document.getElementById("autoTutorHistory");
     elem.scrollTop = elem.scrollHeight;
-    template.TTSTracPlaying.set(TTSTracPlaying + 1);
     $(audioObj).attr("src", audioObjs[TTSTracPlaying].src);
     //add event listener to audio object
     audioObj.on('ended', function(){
+        audioObj.off('ended');
+        console.log(TTSTracPlaying + " ended");
+        avatarHandle = audioObjs[TTSTracPlaying].avatarHandle;
+        if(!animatedAvatarsEnabled){
+            $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.static + "' class='img-responsive'><br>");
+        } else {
+            $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.idle + "' class='img-responsive'><br>");
+            template.avatar1Status.set("idle");
+            template.avatar2Status.set("idle");
+        }
         TTSTracPlaying++;
         recordEvent(template,"autoTutorScriptLineEnd", "system");
         template.TTSTracPlaying.set(TTSTracPlaying);
         if(audioObjs.length > TTSTracPlaying){
-            sleep(1000).then(function(){
-               //get pausedSession session variable
+            sleep(1000).then(function(){              
+                 //get pausedSession session variable
                 let pausedSession = Session.get("pauseSession");
                 //wait until pausedSession is false using an interval
                 let interval = setInterval(function(){
@@ -1201,13 +1281,15 @@ async function playAudio(template){
             });
         }
         else{
+            if(animatedAvatarsEnabled){
+                avatarIdleAnimation(avatarHandle, audioObjs[TTSTracPlaying - 1].art, 1000);
+            }
             var curTime = new Date().getTime();
             var audioTime = curTime - template.startAudioTime.get();
             var speakingTime = template.speakingTime.get();
             if(curModule.avatarTimeOutMin && curModule.avatarTimeOutMax){
                 startAgentSpeechTimer(template, curModule.avatarTimeOutMin, curModule.avatarTimeOutMax);
-            }
-           
+            } 
             speakingTime = speakingTime + audioTime;
             template.speakingTime.set(speakingTime);
             sleep(1000).then(function(){
@@ -1254,21 +1336,33 @@ async function playAudio(template){
     });
     recordEvent(template,"autoTutorScriptAudioStart", "system");
     audioObj[0].load();
-    promise = audioObj[0].play();
-    if (promise !== undefined) {
-        promise.then(_ => {
-            //Audio Started
-            template.showPlayButton.set(false);
-        }).catch(error => {
-            //set showPlayButton to true
-            template.showPlayButton.set(true);
-            $(clone).hide();
-            //set template.firstAudio to window.currentAudioObj
-            template.firstAudioObj.set(audioObj[0]);
-            template.firstAudioAvatarInfo.set(audioObjs[TTSTracPlaying]);
-        });
+    if(Session.get('pauseSession') == true){
+        audioObj[0].pause();
+        template.showPlayButton.set(true);
+    } else {
+        promise = audioObj[0].play();
+        if (promise !== undefined) {
+            promise.then(_ => {
+                //Audio Started
+                template.showPlayButton.set(false);
+            }).catch(error => {
+                if(!animatedAvatarsEnabled){
+                    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.static + "' class='img-responsive'><br>");
+                } else {
+                    $(avatarHandle).html("<img src='" + audioObjs[TTSTracPlaying].art.idle + "' class='img-responsive'><br>");
+                    template.avatar1Status.set("idle");
+                    template.avatar2Status.set("idle");
+                }
+                //set showPlayButton to true
+                template.showPlayButton.set(true);
+                $(clone).hide();
+                //set template.firstAudio to window.currentAudioObj
+                template.firstAudioObj.set(audioObj[0]);
+                template.firstAudioAvatarInfo.set(audioObjs[TTSTracPlaying]);
+            });
+        }
+        template.startAudioTime.set(new Date().getTime());
     }
-    template.startAudioTime.set(new Date().getTime());
 }
 function setupRecording(template){
     recordEvent(template,"initializeVoiceRecognition", "system");
@@ -1579,13 +1673,10 @@ function startAgentSpeechTimer(template, min, max){
             if(!studentAnswering){
                 //get agent speech
                 var speech = getAgentSpeech(user, curModule, type, 0, 0, 0, 0, 0);
-                //get agent art
                 autoTutorReadsPrompt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts);
-                autoTutorPromptCharacterVoice = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).voice;
                 autoTutorPromptCharacterName = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).name;
-                autoTutorPromptCaracterArt = moduleData.autoTutorCharacter.find(o => o.name == moduleData.characterReadsPrompts).art;
                 //read agent speech
-                readTTS(template, speech, autoTutorPromptCharacterVoice, autoTutorPromptCharacterName, autoTutorPromptCaracterArt);
+                readTTS(template, speech,  autoTutorPromptCharacterName);
                 template.promptQueued.set(true);
             }
         });
@@ -1691,4 +1782,65 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
         return timeOutSpeech;
     }
     return("Error in getAgentSpeech, type not found");
+}
+
+// avatar idle animation
+function avatarIdleAnimation(avatarHandle, avatarArt, timeDelay)
+{   
+    console.log("avatarIdleAnimation", avatarHandle, avatarArt, timeDelay);
+    //preload avatar images
+    var avatarBlink = new Image();
+    avatarBlink.src = avatarArt.blinking;
+    var avatarHeadTurn = new Image();
+    avatarHeadTurn.src = avatarArt.headTurn;
+    var avatarIdle = new Image();
+    avatarIdle.src = avatarArt.idle;
+    gifDuration = avatarArt.blinkDelay;
+    //get random int between 0 and 1
+    randomInt = Math.floor(Math.random() * 2);
+    //set avatarReplacement
+    avatarReplacement = avatarBlink;
+    //if randomInt is 1, set avatarReplacement to avatarArt.headTurn
+    if(randomInt == 1){
+        avatarReplacement = avatarHeadTurn;
+        gifDuration = avatarArt.headTurnDelay;
+    }
+    console.log("avatarReplacement", avatarReplacement, gifDuration);
+    //sleep for timeDelay, then change avatarHandle's innerHTML to avatarArt for gifDuration
+    sleep(timeDelay).then(() => {
+        //get avatarReplacement's src
+        avatarReplacementSrc = avatarReplacement.src;
+        //clear avatarReplacement's src
+        avatarReplacement.src = "";
+        //reload avatarReplacement's src
+        avatarReplacement.src = avatarReplacementSrc;
+        //empty avatarHandle
+        avatarHandle.innerHTML = "";
+        //append avatarReplacement to avatarHandle
+        $(avatarHandle).append(avatarReplacement);
+        console.log("avatar idle animation for " + gifDuration + "ms");
+        sleep(gifDuration).then(() => {
+            $(avatarHandle).empty();
+            $(avatarHandle).append(avatarIdle);
+            avatar1Status = template.avatar1Status.get();
+            avatar2Status = template.avatar2Status.get();
+            //get the last character in avatarHandle
+            var lastChar = $(avatarHandle).attr('id').substr(-1);
+            //if the last character is 1, then avatarStatus is avatar1Status
+            if(lastChar == "0"){
+                avatarStatus = avatar1Status;
+            }
+            //if the last character is 2, then avatarStatus is avatar2Status
+            if(lastChar == "1"){
+                avatarStatus = avatar2Status;
+            }
+            //if avatarStatus is "idle", then call avatarIdleAnimation again, with a random timeDelay between 3 and 8 seconds
+            if(avatarStatus == "idle"){
+                randomTimeDelay = Math.floor(Math.random() * 5000) + 3000;
+                avatarIdleAnimation(avatarHandle, avatarArt, randomTimeDelay);
+            } else {
+                return;
+            }
+        });
+    });
 }

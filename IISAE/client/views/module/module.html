@@ -12,6 +12,14 @@
                 {{#if page.typeText}}
                     {{#if module.enableAutoTutor}}
                     <div class="autoTutorTemplate" hidden>
+                        {{#if module.enableAnimatedAvatars}}
+                        <div id="ATTemplate0" class="row attemplate row" hidden>
+                            <div class="speaker script col-xs-12 col-md-12" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                        </div>
+                        <div id="ATTemplate1" class="row attemplate row" hidden>
+                            <div class="speaker script col-xs-12 col-md-12" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                        </div>
+                        {{else}}
                         <div id="ATTemplate0" class="row attemplate row" hidden>
                             <div class="speaker avatar col-xs-3 col-md-1" style="text-align: right;" id="avatar"></div>
                             <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
@@ -22,6 +30,7 @@
                             <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
                             <div class="speaker avatar col-xs-3 col-md-1" style="text-align: left;" id="avatar"></div>
                         </div>
+                        {{/if}}
                     </div>
                     <div class="autoTutorContainer">
                         <div class="Messages text-left" id="Messages">Conversation</div>
@@ -32,8 +41,17 @@
                             Autoplay is disabled
                         </button>
                         {{/if}}
+                        {{#if module.enableAnimatedAvatars}}
+                        <div class="row" id="animatedAvatars">
+                            <div class="animAvatar col-md-2 col-xs-4" id="animAvatar0"></div>
+                            <div class="autoTutorHistory col-md-8 col-xs-6" id="autoTutorHistory">
+                            </div>
+                            <div class="animAvatar col-md-2 col-xs-4" id="animAvatar1"></div>
+                        </div>
+                        {{else}}
                         <div class="autoTutorHistory" id="autoTutorHistory">
                         </div>
+                        {{/if}}
                     </div>
                     <div class="scrollDownIndicator">
                         <div class="scrollDownIndicatorText">Scroll Down</div>
@@ -76,16 +94,25 @@
                 {{#if this.questionId}}
                     {{#if module.enableAutoTutor}}
                     <div class="autoTutorTemplate" hidden>
+                        {{#if module.enableAnimatedAvatars}}
+                        <div id="ATTemplate0" class="row attemplate row" hidden>
+                            <div class="speaker script col-xs-12 col-md-12" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                        </div>
+                        <div id="ATTemplate1" class="row attemplate row" hidden>
+                            <div class="speaker script col-xs-12 col-md-12" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                        </div>
+                        {{else}}
                         <div id="ATTemplate0" class="row attemplate row" hidden>
                             <div class="speaker avatar col-xs-3 col-md-1" style="text-align: right;" id="avatar"></div>
-                            <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large; border-radius: 3px; margin-bottom: 20px;"></div>
+                            <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
                             <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullavatar"></div>
                         </div>
                         <div id="ATTemplate1" class="row attemplate row" hidden>
                             <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullAvatar"></div>
-                            <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large; border-radius: 3px; margin-bottom: 20px;"></div>
+                            <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
                             <div class="speaker avatar col-xs-3 col-md-1" style="text-align: left;" id="avatar"></div>
                         </div>
+                        {{/if}}
                     </div>
                     {{#if question.autoTutorDisplay}}
                     <div class="autoTutorContainer">
@@ -99,8 +126,17 @@
                                 Autoplay is disabled
                             </button>
                         {{/if}}
+                        {{#if module.enableAnimatedAvatars}}
+                        <div class="row" id="animatedAvatars">
+                            <div class="animAvatar col-md-2 col-xs-4" id="animAvatar0"></div>
+                            <div class="autoTutorHistory col-md-8 col-xs-6" id="autoTutorHistory">
+                            </div>
+                            <div class="animAvatar col-md-2 col-xs-4" id="animAvatar1"></div>
+                        </div>
+                        {{else}}
                         <div class="autoTutorHistory" id="autoTutorHistory">
                         </div>
+                        {{/if}}
                     </div>
                     {{/if}}
                     {{#if autoTutorHidden}}

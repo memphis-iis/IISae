@@ -8,6 +8,8 @@ import { insertSeedData } from './seedData'
 import { LSA } from './macineLearning/LSA'
 import { answerAssess } from './answerAssess'
 import { Console } from 'console';
+import { parseGIF, decompressFrames } from 'gifuct-js'
+import fetch from 'node-fetch';
 
 export { addUserToRoles }
 
@@ -244,13 +246,55 @@ Meteor.methods({
         return json;
     },
     changeModule(input){
+        console.log(input);
         moduleId = input.moduleId;
         field = input.field;
         result = input.result
         curModule = Modules.findOne({_id: moduleId});
         text = "curModule." + field + "=" + result;
         eval(text);
-        Modules.update(moduleId, {$set: curModule});
+        //get substring of field to the last period seperated value
+        //if result ends in .gif
+        if(result.endsWith(".gif\"")){
+            //strip the last ' from the string
+            result = result.substring(0, result.length - 1);
+            // remove the leading " from the string
+            result = result.substring(1, result.length);
+            console.log("New GIF Avatar Animation Added");
+            var lastPeriod = field.lastIndexOf(".");
+            var fieldToChange = field.substring(lastPeriod+1);
+            var fieldToChangeParent = field.substring(0,lastPeriod);
+            //if fieldtochange is .idle, .talking, .headTurn, or .static, then we need to get the duration of the url in result
+            if(fieldToChange == "idle" || fieldToChange == "talking" ||  fieldToChange == "blink" || fieldToChange == "headTurn" || fieldToChange == "static"){
+                fieldToChangeDelay = fieldToChange + "Delay";
+                //use fetch to get the gif from the url
+                var gif = fetch(result, {method: 'GET', mode: 'no-cors', headers: {'Content-Type': 'image/gif'}});
+                var arrayBuffer = gif.then(function(response) {
+                    return response.arrayBuffer();
+                });
+                var duration = arrayBuffer.then(function(buffer) {
+                    var gif = parseGIF(buffer);
+                    frames = decompressFrames(gif, true);
+                    console.log("Frames: " + frames.length);
+                    var totalDuration = 0;
+                    for(i = 0; i < frames.length; i++){
+                        totalDuration += frames[i].delay;
+                    }
+                    console.log("Frames per seoncd: " + frames.length/totalDuration * 1000);
+                    return totalDuration;
+                });
+                duration.then(function(duration){
+                    console.log("Duration: " + duration);        
+                    evalText = "curModule." + fieldToChangeParent + "." + fieldToChange + "Delay" +  "=" + duration;
+                    console.log("Eval Text: " + evalText);
+                    eval(evalText);
+                    Modules.upsert({_id: moduleId}, {$set: curModule});
+                });
+        
+            }
+        } else {
+            Modules.update(moduleId, {$set: curModule});
+        }
     },
     deleteModuleItem(input){
         moduleId = input.moduleId;

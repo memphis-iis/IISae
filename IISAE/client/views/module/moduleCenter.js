@@ -28,7 +28,10 @@ Template.moduleCenter.events({
     'click .startModule': function(event){
         event.preventDefault();
         //get data-module
-        let moduleId = event.target.getAttribute("id");
+        let index = event.target.getAttribute("data-index");
+        //get module that matches index
+        let moduleId = Modules.find().fetch();
+        moduleId = moduleId[index]._id;
         target = "/module/" + moduleId;
         window.location.href = target;
     },
