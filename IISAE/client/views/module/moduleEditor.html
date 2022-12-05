@@ -248,6 +248,13 @@
           <br>
           {{#if module.autoTutorCharacter}}
           <h4>AutoTutor Characters</h4>
+          Enable Animated Characters
+          {{#if module.enableAnimatedAvatars}}
+          <input class="markCorrect"  data-field="enableAnimatedAvatars" data-value="false" type="checkbox"  checked>
+          {{else}}
+          <input class="markCorrect"  data-field="enableAnimatedAvatars" data-value="true" type="checkbox" >
+          {{/if}}        
+          <br>
           Who Reads Prompts and Refutation?
           <select id="type" class="combo-save" data-field="characterReadsPrompts">
             <option>{{module.characterReadsPrompts}}</option>
@@ -264,7 +271,11 @@
                 <th scope="col" width="25%">Name</th>
                 <th scope="col" width="15%">Voice</th>
                 <th scope="col" width="20%">Options</th>
-                <th scope="col" width="10%">Art URL</th>
+                {{#if module.enableAnimatedAvatars}}
+                <th scope="col" width="10%">Animated GIF URLs</th>
+                {{else}}
+                <th scope="col" width="10%">Static Art URL</th>
+                {{/if}}
                 <th scope="col" width="10%">Chat Color (hex)</th>
                 <th scope="col" width="25%">Actions</th>
             </thead>
@@ -292,7 +303,21 @@
                         {{/if}}        
                     </td>
                     <td>
-                        <img src="{{this.art}}" style="max-width: 100px;" /><a id="open-editor" data-field="autoTutorCharacter[{{@index}}].art"  data-value="{{this.art}}"> Edit</a><br>
+                        Static: <a id="open-editor" data-field="autoTutorCharacter[{{@index}}].static"  data-value="{{this.static}}"> Edit</a><br>
+                        <img src="{{this.static}}" width="100px" height="100px"><br>
+                        Delay: {{this.staticDelay}}<br>
+                        Idle: <a id="open-editor" data-field="autoTutorCharacter[{{@index}}].idle"  data-value="{{this.idle}}"> Edit</a><br>
+                        <img src="{{this.idle}}" width="100px" height="100px"><br>
+                        Delay: {{this.idleDelay}}<br>
+                        Talking: <a id="open-editor" data-field="autoTutorCharacter[{{@index}}].talking"  data-value="{{this.talking}}"> Edit</a><br>
+                        <img src="{{this.talking}}" width="100px" height="100px"><br>
+                        Delay: {{this.talkingDelay}}<br>
+                        Blink: <a id="open-editor" data-field="autoTutorCharacter[{{@index}}].blink"  data-value="{{this.blink}}"> Edit</a><br>
+                        <img src="{{this.blink}}" width="100px" height="100px"><br>
+                        Delay: {{this.blinkDelay}}<br>
+                        HeadTurn: <a id="open-editor" data-field="autoTutorCharacter[{{@index}}].headTurn"  data-value="{{this.headTurn}}"> Edit</a><br>
+                        <img src="{{this.headTurn}}" width="100px" height="100px"><br>
+                        Delay: {{this.headTurnDelay}}<br>
                     </td>
                     <td>
                         Background:<br> <input type="color" class="combo-save" data-field="autoTutorCharacter[{{@index}}].chatColor" data-value="{{this.chatColor}}" value="{{this.chatColor}}"><br>

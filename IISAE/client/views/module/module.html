@@ -11,35 +11,90 @@
                 <br>
                 {{#if page.typeText}}
                     {{#if module.enableAutoTutor}}
-                    <div class="autoTutorTemplate" hidden>
-                        <div id="ATTemplate0" class="row attemplate row" hidden>
-                            <div class="speaker avatar col-xs-3 col-md-1" style="text-align: right;" id="avatar"></div>
-                            <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
-                            <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullavatar"></div>
+                        {{#if module.enableAnimatedAvatars}}
+                            <div class="autoTutorTemplate" hidden>
+                                <div id="ATTemplate0" class="row attemplate" hidden>
+                                    <div class="speaker script col-xs-10 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                                    <div class="speaker avatarnull col-xs-2 col-md-2" style="text-align: right;" id="nullavatar"></div>
+                                </div>
+                                <div id="ATTemplate1" class="row attemplate" hidden>
+                                    <div class="speaker avatarnull col-xs-2 col-md-2" style="text-align: right;" id="nullAvatar"></div>
+                                    <div class="speaker script col-xs-10 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                                </div>
+                            </div>
+                            {{#if question.autoTutorDisplay}}
+                            <div class="autoTutorContainer">
+                                <div class="Messages" id="Messages">
+                                    <span class="glyphicon glyphicon-comment"></span>
+                                </div>
+                                {{#if showAudioPlayButton}}
+                                    <button class="btn btn-success" id="playAudio">Play <span class="glyphicon glyphicon-play"></span></button>
+                                    <button type="button" class="btn btn-btn-info" data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
+                                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                                        Autoplay is disabled
+                                    </button>
+                                {{/if}}
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-2 animatedAvatar" id="Avatar0"></div>   
+                                        <div class="autoTutorHistory col-md-8" id="autoTutorHistory">
+                                        </div>
+                                        <div class="col-md-2 animatedAvatar" id="Avatar1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{/if}}
+                            {{#if autoTutorHidden}}
+                            <div class="hideAutoTutorHistory">
+                                <a class="toggleMessageWindow"><span class="glyphicon glyphicon-chevron-down"></span></a>
+                            </div>
+                            {{else}}
+                            <div class="showAutoTutorHistory">
+                                <a class="toggleMessageWindow"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                            </div>
+                            {{/if}}
+                            <br>
+                        {{else}}
+                        <div class="autoTutorTemplate" hidden>
+                            <div id="ATTemplate0" class="row attemplate" hidden>
+                                <div class="speaker avatar col-xs-3 col-md-1" style="text-align: right;" id="avatar"></div>
+                                <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                                <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullavatar"></div>
+                            </div>
+                            <div id="ATTemplate1" class="row attemplate" hidden>
+                                <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullAvatar"></div>
+                                <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                                <div class="speaker avatar col-xs-3 col-md-1" style="text-align: left;" id="avatar"></div>
+                            </div>
                         </div>
-                        <div id="ATTemplate1" class="row attemplate row" hidden>
-                            <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullAvatar"></div>
-                            <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
-                            <div class="speaker avatar col-xs-3 col-md-1" style="text-align: left;" id="avatar"></div>
+                        {{#if question.autoTutorDisplay}}
+                        <div class="autoTutorContainer">
+                            <div class="Messages" id="Messages">
+                                <span class="glyphicon glyphicon-comment"></span>
+                            </div>
+                            {{#if showAudioPlayButton}}
+                                <button class="btn btn-success" id="playAudio">Play <span class="glyphicon glyphicon-play"></span></button>
+                                <button type="button" class="btn btn-btn-info" data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
+                                    <span class="glyphicon glyphicon-exclamation-sign"></span>
+                                    Autoplay is disabled
+                                </button>
+                            {{/if}}
+                            <div class="autoTutorHistory" id="autoTutorHistory">
+                            </div>
                         </div>
-                    </div>
-                    <div class="autoTutorContainer">
-                        <div class="Messages text-left" id="Messages">Conversation</div>
-                        {{#if showAudioPlayButton}}
-                        <button class="btn btn-success" id="playAudio">Play <span class="glyphicon glyphicon-play"></span></button>
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
-                            <span class="glyphicon glyphicon-exclamation-sign"></span>
-                            Autoplay is disabled
-                        </button>
                         {{/if}}
-                        <div class="autoTutorHistory" id="autoTutorHistory">
+                        {{#if autoTutorHidden}}
+                        <div class="hideAutoTutorHistory">
+                            <a class="toggleMessageWindow"><span class="glyphicon glyphicon-chevron-down"></span></a>
                         </div>
-                    </div>
-                    <div class="scrollDownIndicator">
-                        <div class="scrollDownIndicatorText">Scroll Down</div>
-                    </div>
-                    <br>
-                    {{/if}}
+                        {{else}}
+                        <div class="showAutoTutorHistory">
+                            <a class="toggleMessageWindow"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                        </div>
+                        {{/if}}
+                        <br>
+                        {{/if}}
+                        {{/if}}
                     {{#if page.imageAbove}}
                         <img src="{{page.image}}" class="mx-auto img-fluid rounded" style="{{page.imgStyle}}">
                         <br>
@@ -75,19 +130,63 @@
             {{/if}}
                 {{#if this.questionId}}
                     {{#if module.enableAutoTutor}}
+                    {{#if module.enableAnimatedAvatars}}
                     <div class="autoTutorTemplate" hidden>
-                        <div id="ATTemplate0" class="row attemplate row" hidden>
-                            <div class="speaker avatar col-xs-3 col-md-1" style="text-align: right;" id="avatar"></div>
-                            <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large; border-radius: 3px; margin-bottom: 20px;"></div>
-                            <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullavatar"></div>
+                        <div id="ATTemplate0" class="row attemplate" hidden>
+                            <div class="speaker script col-xs-10 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                            <div class="speaker avatarnull col-xs-2 col-md-1" style="text-align: right;" id="nullavatar"></div>
                         </div>
-                        <div id="ATTemplate1" class="row attemplate row" hidden>
-                            <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullAvatar"></div>
-                            <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large; border-radius: 3px; margin-bottom: 20px;"></div>
-                            <div class="speaker avatar col-xs-3 col-md-1" style="text-align: left;" id="avatar"></div>
+                        <div id="ATTemplate1" class="row attemplate" hidden>
+                            <div class="speaker avatarnull col-xs-2 col-md-2" style="text-align: right;" id="nullAvatar"></div>
+                            <div class="speaker script col-xs-10 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
                         </div>
                     </div>
                     {{#if question.autoTutorDisplay}}
+                    <div class="autoTutorContainer">
+                        <div class="Messages" id="Messages">
+                            <span class="glyphicon glyphicon-comment"></span>
+                        </div>
+                        {{#if showAudioPlayButton}}
+                            <button class="btn btn-success" id="playAudio">Play <span class="glyphicon glyphicon-play"></span></button>
+                            <button type="button" class="btn btn-btn-info" data-toggle="modal" data-target="#reportingModal" id="autoplayModal">
+                                <span class="glyphicon glyphicon-exclamation-sign"></span>
+                                Autoplay is disabled
+                            </button>
+                        {{/if}}
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-2 animatedAvatar" id="Avatar0"></div>   
+                                <div class="autoTutorHistory col-md-8" id="autoTutorHistory">
+                                </div>
+                                <div class="col-md-2 animatedAvatar" id="Avatar1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {{/if}}
+                    {{#if autoTutorHidden}}
+                    <div class="hideAutoTutorHistory">
+                        <a class="toggleMessageWindow"><span class="glyphicon glyphicon-chevron-down"></span></a>
+                    </div>
+                    {{else}}
+                    <div class="showAutoTutorHistory">
+                        <a class="toggleMessageWindow"><span class="glyphicon glyphicon-chevron-up"></span></a>
+                    </div>
+                    {{/if}}
+                    <br>
+                {{else}}
+                <div class="autoTutorTemplate" hidden>
+                    <div id="ATTemplate0" class="row attemplate" hidden>
+                        <div class="speaker avatar col-xs-3 col-md-1" style="text-align: right;" id="avatar"></div>
+                        <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                        <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullavatar"></div>
+                    </div>
+                    <div id="ATTemplate1" class="row attemplate" hidden>
+                        <div class="speaker avatarnull col-xs-3 col-md-1" style="text-align: right;" id="nullAvatar"></div>
+                        <div class="speaker script col-xs-6 col-md-10" style="text-align: left; font-size: large;color: white; border-radius: 3px; margin-bottom: 20px;"></div>
+                        <div class="speaker avatar col-xs-3 col-md-1" style="text-align: left;" id="avatar"></div>
+                    </div>
+                </div>
+                {{#if question.autoTutorDisplay}}
                     <div class="autoTutorContainer">
                         <div class="Messages" id="Messages">
                             <span class="glyphicon glyphicon-comment"></span>
@@ -112,7 +211,8 @@
                         <a class="toggleMessageWindow"><span class="glyphicon glyphicon-chevron-up"></span></a>
                     </div>
                     {{/if}}
-                    <br>
+                <br>
+                {{/if}}
                     {{/if}}
                     {{#if page.image}}
                     <img class="img-responsive center-block module-img" src="{{page.image}}" alt="Your Alt Text">

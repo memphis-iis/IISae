@@ -52,6 +52,15 @@ body{
     margin-bottom: 0;  
 
 }
+.animatedAvatar img{
+    border: #286588;
+    overflow: hidden;
+    border-radius: 10px;
+    border: #74c3f0 1px solid;
+    display: inline-block;
+    margin-bottom:10px;
+    max-height:150px;
+}
 .module-card{
     margin-bottom: 20px;
 }
