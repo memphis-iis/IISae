@@ -858,13 +858,13 @@ Template.module.events({
                 type = "danger";
                 username = Meteor.user().firstname;
                 if(res != "disabled"){
-                    message = getAgentSpeech(username, curModule, "feedback", thisPage, thisQuestion, answerValue, 0, res.isCorrect);
+                    message = getAgentSpeech(username, curModule, "feedback", thisPage, thisQuestion, res.selectedAnswerIndex, 0, res.isCorrect);
                     for(charResponse of res.characterRefutation){
                         //check if charResponse.isCorrect and res.isCorrect are the same
                         if(charResponse.isCorrect == res.isCorrect){
                             //if they are the same, then the character is agreeing with the user
                             speakingToArray = [username, charResponse.character];
-                            message = getAgentSpeech(speakingToArray, curModule, "feedback", thisPage, thisQuestion, answerValue, 0, res.isCorrect);
+                            message = getAgentSpeech(speakingToArray, curModule, "feedback", thisPage, thisQuestion, res.selectedAnswerIndex, 0, res.isCorrect);
                         } else {
                             message += " "+ getAgentSpeech(charResponse.character, curModule, "feedback", thisPage, thisQuestion, charResponse.choiceIndex, 0, charResponse.isCorrect);
                         }
@@ -1715,8 +1715,7 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
             if(elaboratedTrigger > threshold){
                 if(isCorrect){
                     simpleFeedback = groupFeedbackBag.correct[Math.floor(Math.random() * groupFeedbackBag.correct.length)];
-                    combinedFeedback = simpleFeedback + " " + elaboratedFeedback;
-                    feedback = combinedFeedback;
+                    feedback = simpleFeedback;
                 } else {
                     simpleFeedback = groupFeedbackBag.incorrect[Math.floor(Math.random() * groupFeedbackBag.incorrect.length)];
                     combinedFeedback = simpleFeedback + " " + elaboratedFeedback;
@@ -1733,8 +1732,7 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
             if(elaboratedTrigger > threshold){
                 if(isCorrect){
                     simpleFeedback = simpleFeedbackBag.correct[Math.floor(Math.random() * simpleFeedbackBag.correct.length)] || "{{speakingTo}} is correct.";
-                    combinedFeedback = simpleFeedback + " " + elaboratedFeedback || "Correct";
-                    feedback = combinedFeedback;
+                    feedback = simpleFeedback;
                 } else {
                     simpleFeedback = simpleFeedbackBag.incorrect[Math.floor(Math.random() * simpleFeedbackBag.incorrect.length)] || "{{speakingTo}} is incorrect.";
                     combinedFeedback = simpleFeedback + " " + elaboratedFeedback || "Incorrect";
