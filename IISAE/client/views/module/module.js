@@ -1712,7 +1712,7 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
             } else {
                 speakingTo = speakingTo.join(" and ");
             }
-            if(elaboratedTrigger < threshold){
+            if(elaboratedTrigger > threshold){
                 if(isCorrect){
                     simpleFeedback = groupFeedbackBag.correct[Math.floor(Math.random() * groupFeedbackBag.correct.length)];
                     combinedFeedback = simpleFeedback + " " + elaboratedFeedback;
