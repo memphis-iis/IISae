@@ -1701,12 +1701,17 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
             getThreshold = new Function(module.feedbackThresholdCalculation);
             threshold = getThreshold();
         } 
-        if(module.feedbackThreshold){
-            threshold = module.feedbackThreshold || threshold;
+        if(module.feedbackThreshold !== undefined){
+            threshold = module.feedbackThreshold;
         }
         //check if speaking to is an array
         if(Array.isArray(speakingTo)){
-            speakingTo = speakingTo.join(" and ");
+            // join the array with commas or and depending on the length of the array
+            if(speakingTo.length > 2){
+                speakingTo = speakingTo.join(", ");
+            } else {
+                speakingTo = speakingTo.join(" and ");
+            }
             if(elaboratedTrigger < threshold){
                 if(isCorrect){
                     simpleFeedback = groupFeedbackBag.correct[Math.floor(Math.random() * groupFeedbackBag.correct.length)];
@@ -1725,7 +1730,7 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
                 }
             }
         } else {
-            if(elaboratedTrigger < threshold){
+            if(elaboratedTrigger > threshold){
                 if(isCorrect){
                     simpleFeedback = simpleFeedbackBag.correct[Math.floor(Math.random() * simpleFeedbackBag.correct.length)] || "{{speakingTo}} is correct.";
                     combinedFeedback = simpleFeedback + " " + elaboratedFeedback || "Correct";
@@ -1746,6 +1751,7 @@ function getAgentSpeech(speakingTo, module, type, page, question, answerId, resp
         feedback = feedback.replace("{{speakingTo}}", speakingTo);
         feedback = feedback.replace("{{response}}", response);
         feedback = feedback.replace("{{user}}", Meteor.user().firstname);
+        console.log("feedback: " + feedback);
         return feedback;
     }
     if(type == "response"){
